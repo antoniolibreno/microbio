@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Microbio</title>
+  <!--
+      th:href="@{/css/login.css}" faz o Thymeleaf resolver o caminho correto.
+      O arquivo CSS fica em: src/main/resources/static/css/login.css
+  -->
+  <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+<div class="login-container">
+  <div class="header">
+    <h1 class="brand-name">Microbio</h1>
+    <p class="brand-subtitle">Laboratório de microbiologia</p>
+  </div>
+
+  <h2 class="title">Acesse sua conta</h2>
+
+  <!-- Aparece quando o login/senha estão errados (?erro=true na URL) -->
+  <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
+
+  <!-- Aparece após o logout (?logout=true na URL) -->
+  <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
+
+  <!--
+      REGRAS OBRIGATÓRIAS DO SPRING SECURITY:
+      - th:action="@{/login}" aponta para a loginProcessingUrl
+      - method="post" é obrigatório
+      - name="username" → o Spring Security espera exatamente esse nome
+      - name="password" → o Spring Security espera exatamente esse nome
+      - th:action com @{} injeta o token CSRF automaticamente
+  -->
+  <form th:action="@{/login}" method="post">
+
+    <div class="form-group">
+      <label for="username">Usuário</label>
+      <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </span>
+        <input type="text"
+               id="username"
+               name="username"
+               placeholder="Seu nome de usuário"
+               autocomplete="username"
+               required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha</label>
+      <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </span>
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="••••••••"
+               autocomplete="current-password"
+               required>
+      </div>
+    </div>
+
+    <a href="#" class="forgot-password">Esqueci minha senha</a>
+
+    <button type="submit" class="btn-submit">
+      Entrar
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+        <polyline points="10 17 15 12 10 7"></polyline>
+        <line x1="15" y1="12" x2="3" y2="12"></line>
+      </svg>
+    </button>
+
+  </form>
+</div>
+
+</body>
+</html>
