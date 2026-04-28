@@ -7,13 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AuthController {
-
-    /**
-     * Exibe a página de login.
-     *
-     * @param erro    presente na URL quando a senha estiver errada (?erro=true)
-     * @param logout  presente na URL quando o usuário acabou de sair (?logout=true)
-     */
     @GetMapping("/login")
     public String loginPage(
             @RequestParam(value = "erro",   required = false) String erro,
@@ -27,7 +20,7 @@ public class AuthController {
             model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
         }
 
-        return "login"; // → src/main/resources/templates/login.html
+        return "login";
     }
 
     /**
@@ -35,13 +28,14 @@ public class AuthController {
      */
     @GetMapping("/dashboard")
     public String dashboard() {
-        return "dashboard"; // → src/main/resources/templates/dashboard.html
+        return "dashboard";
     }
 
-    /**
-     * Redireciona "/" para o dashboard (que o Security vai redirecionar
-     * para login se não estiver autenticado).
-     */
+    @GetMapping("/indicadores")
+    public String indicadores() {
+        return "indicadores";
+    }
+
     @GetMapping("/")
     public String root() {
         return "redirect:/dashboard";
