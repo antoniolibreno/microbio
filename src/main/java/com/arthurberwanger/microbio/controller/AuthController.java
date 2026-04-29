@@ -20,23 +20,25 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(
-            @RequestParam(value = "erro",   required = false) String erro,
+            @RequestParam(value = "erro", required = false) String erro,
             @RequestParam(value = "logout", required = false) String logout,
             Model model) {
 
-        if (erro != null)   model.addAttribute("mensagemErro",    "Login ou senha inválidos. Tente novamente.");
-        if (logout != null) model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
+        if (erro != null) {
+            model.addAttribute("mensagemErro", "Login ou senha inválidos. Tente novamente.");
+        }
+
+        if (logout != null) {
+            model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
+        }
 
         return "login";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // Passa os totais para os cards do dashboard
         model.addAttribute("totalUsuarios", usuarioService.contarUsuarios());
         model.addAttribute("totalClientes", clienteRepository.count());
-        return "dashboard";
-    public String dashboard() {
         return "dashboard";
     }
 
