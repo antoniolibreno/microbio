@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuário - Microbio</title>
+    <style>
+        :root {
+            --primary:       #1a702b;
+            --primary-hover: #135c22;
+            --primary-light: #e8f5e9;
+            --sidebar-w:     240px;
+            --text-dark:     #1f2937;
+            --text-muted:    #6b7280;
+            --bg-input:      #f3f4f6;
+            --bg:            #f3f4f6;
+            --font:          'Inter', system-ui, -apple-system, sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
+
+        /* ── SIDEBAR ── */
+        .sidebar { width:var(--sidebar-w); background:#fff; border-right:1px solid #e5e7eb; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; }
+        .sidebar-brand { padding:24px 20px 20px; border-bottom:1px solid #e5e7eb; }
+        .sidebar-brand h1 { color:var(--primary); font-size:20px; font-weight:700; }
+        .sidebar-brand p  { color:var(--text-muted); font-size:11px; margin-top:2px; }
+        .sidebar-nav  { flex:1; padding:16px 12px; overflow-y:auto; }
+        .nav-section  { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; padding:12px 8px 6px; display:block; }
+        .nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:var(--text-muted); text-decoration:none; font-size:14px; font-weight:500; transition:background .15s,color .15s; margin-bottom:2px; }
+        .nav-link:hover, .nav-link.active { background:var(--primary-light); color:var(--primary); }
+        .nav-link.active { font-weight:600; }
+        .sidebar-footer { padding:16px 12px; border-top:1px solid #e5e7eb; }
+        .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
+        .user-avatar { width:32px; height:32px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
+        .user-name { font-size:13px; font-weight:600; }
+        .user-role { font-size:11px; color:var(--text-muted); }
+        .btn-logout { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:9px; background:none; border:1px solid #e5e7eb; border-radius:8px; color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s,color .15s; }
+        .btn-logout:hover { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
+
+        /* ── MAIN ── */
+        .main { margin-left:var(--sidebar-w); flex:1; padding:32px; }
+        .page-header { margin-bottom:28px; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .page-header h2 { font-size:22px; font-weight:700; }
+        .page-header p  { color:var(--text-muted); font-size:14px; margin-top:4px; }
+        .header-actions { display:flex; gap:8px; }
+        .btn-back { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:1.5px solid #e5e7eb; border-radius:8px; color:var(--text-muted); text-decoration:none; font-size:13px; font-weight:500; background:#fff; transition:border-color .15s,color .15s; }
+        .btn-back:hover { border-color:var(--primary); color:var(--primary); }
+        .btn-view-link { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border:1.5px solid #bfdbfe; border-radius:8px; color:#1d4ed8; text-decoration:none; font-size:13px; font-weight:500; background:#eff6ff; transition:background .15s; }
+        .btn-view-link:hover { background:#dbeafe; }
+
+        /* ── CARD ── */
+        .form-card { background:#fff; border-radius:16px; box-shadow:0 1px 6px rgba(0,0,0,.06); padding:32px; max-width:600px; }
+
+        /* alertas */
+        .alert { padding:12px 16px; border-radius:8px; margin-bottom:20px; font-size:14px; font-weight:500; }
+        .alert-danger  { background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; }
+        .alert-success { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+
+        /* ── ABAS ── */
+        .tabs { display:flex; border-bottom:2px solid #e5e7eb; margin-bottom:28px; }
+        .tab-btn { flex:1; padding:10px; background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-2px; font-size:14px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:color .2s,border-color .2s; }
+        .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+        .tab-panel { display:none; }
+        .tab-panel.active { display:block; }
+
+        /* ── CAMPOS ── */
+        .section-title { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.6px; margin:24px 0 14px; display:block; }
+        .section-title:first-child { margin-top:0; }
+        .form-group { margin-bottom:16px; }
+        .form-group label { display:block; font-size:13px; font-weight:500; margin-bottom:6px; }
+        .form-group input,
+        .form-group select {
+            width:100%; padding:11px 14px;
+            background:var(--bg-input); border:2px solid transparent;
+            border-radius:8px; font-size:14px; color:var(--text-dark);
+            outline:none; transition:border-color .2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color:var(--primary); }
+        .hint { font-size:12px; color:var(--text-muted); margin-top:5px; }
+        .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+        /* ── BOTÃO ── */
+        .btn-submit { width:100%; margin-top:24px; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px; transition:background .2s; }
+        .btn-submit:hover { background:var(--primary-hover); }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <h1>🧫 Microbio</h1>
+        <p>Laboratório de microbiologia</p>
+    </div>
+    <nav class="sidebar-nav">
+        <span class="nav-section">Geral</span>
+        <a th:href="@{/dashboard}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <span class="nav-section">Cadastros</span>
+        <a th:href="@{/usuarios}" class="nav-link active">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Usuários / Clientes
+        </a>
+        <span class="nav-section">Operações</span>
+        <a th:href="@{/orcamentos}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Orçamentos
+        </a>
+        <a th:href="@{/pedidos}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Pedidos
+        </a>
+        <a th:href="@{/analises}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Análises
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <div>
+                <div class="user-name" sec:authentication="name">admin</div>
+                <div class="user-role">Administrador</div>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-logout">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sair
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- ═══════════ CONTEÚDO ═══════════ -->
+<main class="main">
+
+    <div class="page-header">
+        <div>
+            <h2>Editar usuário</h2>
+            <p th:text="'Editando: ' + ${usuario.login}">Editando: admin</p>
+        </div>
+        <div class="header-actions">
+            <!-- Botão visualizar -->
+            <a th:href="@{/usuarios/{id}/visualizar(id=${usuario.id})}" class="btn-view-link">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Visualizar
+            </a>
+            <a th:href="@{/usuarios}" class="btn-back">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="form-card">
+
+        <div th:if="${erro}"    class="alert alert-danger"  th:text="${erro}"></div>
+        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+
+        <!-- ═══ ABAS ═══ -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="trocarAba('acesso', this)">
+                Dados de acesso
+            </button>
+            <button class="tab-btn" onclick="trocarAba('completo', this)">
+                Cadastro completo
+            </button>
+        </div>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- ABA 1 — Dados de acesso (login/senha)  -->
+        <!-- ═══════════════════════════════════════ -->
+        <div id="painel-acesso" class="tab-panel active">
+            <!--
+                POST para /usuarios/{id}/atualizar-acesso
+                Altera só login e senha — não mexe nos dados de cliente/endereço
+            -->
+            <form th:action="@{/usuarios/{id}/atualizar-acesso(id=${usuario.id})}" method="post">
+
+                <span class="section-title">Dados de acesso</span>
+
+                <div class="form-group">
+                    <label for="login-a">Login</label>
+                    <!-- th:value preenche com o login atual -->
+                    <input type="text" id="login-a" name="login"
+                           th:value="${usuario.login}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha-a">Nova senha</label>
+                    <input type="password" id="senha-a" name="senha"
+                           placeholder="Deixe em branco para manter a atual">
+                    <p class="hint">Preencha apenas se quiser alterar a senha.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar-a">Confirmar nova senha</label>
+                    <input type="password" id="confirmar-a" name="confirmarSenha"
+                           placeholder="Repita a nova senha">
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Salvar dados de acesso
+                </button>
+            </form>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- ABA 2 — Cadastro completo (cliente + endereço)     -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <div id="painel-completo" class="tab-panel">
+            <!--
+                POST para /usuarios/{id}/atualizar-completo
+                Altera login, senha E os dados de cliente/endereço.
+                Se o usuário ainda não tinha cliente, cria agora.
+                Se já tinha, atualiza.
+            -->
+            <form th:action="@{/usuarios/{id}/atualizar-completo(id=${usuario.id})}" method="post">
+
+                <!-- ── Dados de acesso ── -->
+                <span class="section-title">Dados de acesso</span>
+
+                <div class="form-group">
+                    <label for="login-c">Login</label>
+                    <input type="text" id="login-c" name="login"
+                           th:value="${usuario.login}" required>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label for="senha-c">Nova senha</label>
+                        <input type="password" id="senha-c" name="senha"
+                               placeholder="Em branco = mantém">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmar-c">Confirmar senha</label>
+                        <input type="password" id="confirmar-c" name="confirmarSenha"
+                               placeholder="Repita">
+                    </div>
+                </div>
+
+                <!-- ── Dados do cliente ── -->
+                <span class="section-title">Dados do cliente</span>
+
+                <div class="row-2">
+                    <div class="form-group">
+                        <label for="tipoCliente">Tipo de cliente</label>
+                        <select id="tipoCliente" name="tipoCliente">
+                            <option value="">Selecione...</option>
+                            <!--
+                                th:selected verifica se o valor do option bate com o tipoCliente
+                                salvo no banco. Se não tiver cliente, nada fica selecionado.
+                            -->
+                            <option value="Pessoa Física"
+                                    th:selected="${usuario.cliente != null
+                                                   and usuario.cliente.tipoCliente == 'Pessoa Física'}">
+                                Pessoa Física
+                            </option>
+                            <option value="Pessoa Jurídica"
+                                    th:selected="${usuario.cliente != null
+                                                   and usuario.cliente.tipoCliente == 'Pessoa Jurídica'}">
+                                Pessoa Jurídica
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cpfCnpj">CPF / CNPJ</label>
+                        <!--
+                            th:value usa safe navigation (?.) para não quebrar
+                            quando usuario.cliente for null
+                        -->
+                        <input type="text" id="cpfCnpj" name="cpfCnpj"
+                               th:value="${usuario.cliente?.cpfCnpj}"
+                               placeholder="000.000.000-00">
+                    </div>
+                </div>
+
+                <!-- ── Endereço ── -->
+                <span class="section-title">Endereço</span>
+
+                <div class="row-2">
+                    <div class="form-group">
+                        <label for="cep">CEP</label>
+                        <input type="text" id="cep" name="cep"
+                               th:value="${usuario.cliente?.endereco?.cep}"
+                               placeholder="00000-000" maxlength="9">
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado (UF)</label>
+                        <input type="text" id="estado" name="estado"
+                               th:value="${usuario.cliente?.endereco?.estado}"
+                               placeholder="SP" maxlength="2">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade"
+                           th:value="${usuario.cliente?.endereco?.cidade}"
+                           placeholder="Nome da cidade">
+                </div>
+
+                <div class="form-group">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" id="bairro" name="bairro"
+                           th:value="${usuario.cliente?.endereco?.bairro}"
+                           placeholder="Nome do bairro">
+                </div>
+
+                <div class="row-2">
+                    <div class="form-group">
+                        <label for="rua">Rua</label>
+                        <input type="text" id="rua" name="rua"
+                               th:value="${usuario.cliente?.endereco?.rua}"
+                               placeholder="Nome da rua">
+                    </div>
+                    <div class="form-group">
+                        <label for="numero">Número</label>
+                        <input type="text" id="numero" name="numero"
+                               th:value="${usuario.cliente?.endereco?.numero}"
+                               placeholder="123">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Salvar cadastro completo
+                </button>
+
+            </form>
+        </div>
+
+    </div><!-- /form-card -->
+</main>
+
+<script>
+    function trocarAba(nome, botao) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('painel-' + nome).classList.add('active');
+        botao.classList.add('active');
+    }
+
+    /*
+     * Se o usuário já tem cliente cadastrado, abre direto na aba "Cadastro completo".
+     * O Thymeleaf injeta true/false na variável JS antes de enviar ao browser.
+     */
+    window.addEventListener('DOMContentLoaded', () => {
+        const temCliente = /*[[${usuario.cliente != null}]]*/ false;
+        if (temCliente) {
+            const btnCompleto = document.querySelectorAll('.tab-btn')[1];
+            trocarAba('completo', btnCompleto);
+        }
+    });
+</script>
+
+</body>
+</html>

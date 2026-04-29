@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microbio - Processos Laboratoriais</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/result.css">
+</head>
+<body>
+
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-microscope"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Microbio</h1>
+                    <p>LABORATÓRIO MICROBIOLÓGICO</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-flask"></i>
+                    Processos laboratoriais
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-primary" id="btnNovaAnalise">
+                    <i class="fa-solid fa-plus"></i> Nova análise
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-titles">
+                    <h2>Processos Laboratoriais</h2>
+                    <p>Acompanhe os status do processo solicitado</p>
+                </div>
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Rafael&background=0D8ABC&color=fff&rounded=true" alt="User Avatar">
+                </div>
+            </header>
+
+            <section class="kanban-board">
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h3><span class="dot dot-gray"></span> Em andamento</h3>
+                        <span class="badge-count" th:text="${#lists.size(processosAndamento)} + ' solicitações'">2 solicitações</span>
+                    </div>
+                    
+                    <div class="cards-container">
+                        <article class="card" th:each="proc : ${processosAndamento}">
+                            <div class="card-top">
+                                <span class="process-id" th:text="${proc.idProcesso}">#LAB-9402</span>
+                                <span class="status-badge badge-analise" th:text="${proc.status}">Em Análise</span>
+                            </div>
+                            <h4 class="process-title" th:text="${proc.nomeExame}">Hematologia Completa</h4>
+                            <div class="process-icon">
+                                <i class="fa-solid fa-microscope"></i>
+                            </div>
+                            <div class="card-bottom">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span class="date" th:text="${#temporals.format(proc.dataSolicitacao, 'dd/MM/yyyy')}">12/05/2026</span>
+                            </div>
+                        </article>
+                        
+                        <article class="card" th:if="${processosAndamento == null}">
+                            <div class="card-top">
+                                <span class="process-id">#LAB-9402</span>
+                                <span class="status-badge badge-analise">Em Análise</span>
+                            </div>
+                            <h4 class="process-title">Hematologia Completa</h4>
+                            <div class="process-icon"><i class="fa-solid fa-vial"></i></div>
+                            <div class="card-bottom">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span class="date">12/05/2026</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <h3><span class="dot dot-gray"></span> Concluídos</h3>
+                        <span class="badge-count" th:text="${#lists.size(processosConcluidos)} + ' solicitações'">2 solicitações</span>
+                    </div>
+                    
+                    <div class="cards-container">
+                        <article class="card" th:each="proc : ${processosConcluidos}">
+                            <div class="card-top">
+                                <span class="process-id" th:text="${proc.idProcesso}">#LAB-9402</span>
+                                <span class="status-badge badge-concluido" th:text="${proc.status}">CONCLUÍDO</span>
+                            </div>
+                            <h4 class="process-title" th:text="${proc.nomeExame}">Hematologia Completa</h4>
+                            <div class="process-icon">
+                                <i class="fa-solid fa-vial"></i>
+                            </div>
+                            <div class="card-bottom">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span class="date" th:text="${#temporals.format(proc.dataSolicitacao, 'dd/MM/yyyy')}">12/05/2026</span>
+                            </div>
+                        </article>
+                        
+                        <article class="card" th:if="${processosConcluidos == null}">
+                            <div class="card-top">
+                                <span class="process-id">#LAB-9402</span>
+                                <span class="status-badge badge-concluido">CONCLUÍDO</span>
+                            </div>
+                            <h4 class="process-title">Hematologia Completa</h4>
+                            <div class="process-icon"><i class="fa-solid fa-vial"></i></div>
+                            <div class="card-bottom">
+                                <i class="fa-regular fa-calendar"></i>
+                                <span class="date">12/05/2026</span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../static/js/result.js"></script>
+</body>
+</html>
