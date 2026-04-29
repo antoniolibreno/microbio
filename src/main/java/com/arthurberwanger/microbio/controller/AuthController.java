@@ -36,6 +36,13 @@ public class AuthController {
         model.addAttribute("totalUsuarios", usuarioService.contarUsuarios());
         model.addAttribute("totalClientes", clienteRepository.count());
         return "dashboard";
+    public String dashboard() {
+        return "dashboard";
+    }
+
+    @GetMapping("/indicadores")
+    public String indicadores() {
+        return "indicadores";
     }
 
     @GetMapping("/")
