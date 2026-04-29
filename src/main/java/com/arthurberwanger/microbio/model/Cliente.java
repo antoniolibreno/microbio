@@ -25,8 +25,13 @@ public class Cliente {
     @Column(name = "data_cadastro")
     private LocalDateTime dataCadastro = LocalDateTime.now();
 
-    // Relacionamento com Endereco (ManyToOne — um cliente tem um endereço)
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    /*
+     * CORREÇÃO: era cascade = CascadeType.PERSIST apenas.
+     * Com só PERSIST, ao editar um endereço já existente o Hibernate
+     * tentava inserir novamente e lançava erro.
+     * Com {PERSIST, MERGE} ele salva tanto na criação quanto na atualização.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "endereco_id")
     private Endereco endereco;
 }

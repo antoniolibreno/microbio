@@ -18,7 +18,11 @@ public class Usuario {
     private String login;
 
     @Column(nullable = false, length = 255)
-    private String senha; // armazenada como BCrypt hash
+    private String senha;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = true)
+    private Cliente cliente;
 
     public Usuario(String login, String senha) {
         this.login = login;
