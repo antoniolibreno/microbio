@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Indicadores | Microbio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"/>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"/>
+
+  <link rel="stylesheet" th:href="@{/css/indicadores.css}" href="/css/indicadores.css"/>
+</head>
+<body class="app-shell">
+
+<aside class="sidebar" aria-label="Navegação principal">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo" aria-hidden="true">
+      <span class="material-symbols-outlined">biotech</span>
+    </div>
+    <div>
+      <h2 class="sidebar__brand-name">Microbio</h2>
+      <p class="sidebar__brand-tag">Laboratório</p>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav">
+    <a th:href="@{/dashboard}"
+       th:classappend="${activePage == 'dashboard'} ? 'is-active'"
+       class="nav-item" href="/dashboard">
+      <span class="material-symbols-outlined">dashboard</span> Visão Geral
+    </a>
+    <a th:href="@{/solicitacoes}"
+       th:classappend="${activePage == 'solicitacoes'} ? 'is-active'"
+       class="nav-item" href="/solicitacoes">
+      <span class="material-symbols-outlined">receipt_long</span> Solicitações
+    </a>
+    <a th:href="@{/analises}"
+       th:classappend="${activePage == 'analises' or activePage == 'indicadores'} ? 'is-active'"
+       class="nav-item is-active" href="/analises">
+      <span class="material-symbols-outlined">biotech</span> Análises
+    </a>
+    <a th:href="@{/financeiro}"
+       th:classappend="${activePage == 'financeiro'} ? 'is-active'"
+       class="nav-item" href="/financeiro">
+      <span class="material-symbols-outlined">payments</span> Financeiro
+    </a>
+    <a th:href="@{/arquivos}"
+       th:classappend="${activePage == 'arquivos'} ? 'is-active'"
+       class="nav-item" href="/arquivos">
+      <span class="material-symbols-outlined">folder_open</span> Arquivos
+    </a>
+  </nav>
+
+  <a th:href="@{/analises/nova}" href="/analises/nova"
+     class="btn btn--primary btn--block sidebar__cta"
+     data-action="nova-analise">
+    <span class="material-symbols-outlined">add</span> Nova Análise
+  </a>
+</aside>
+
+<main class="main">
+
+  <header class="topbar">
+    <div class="topbar__title">
+      <h1>Indicadores</h1>
+      <p>Acompanhe as solicitações de orçamento e processos laboratoriais.</p>
+    </div>
+
+    <div class="topbar__actions">
+      <form th:action="@{/indicadores}" method="get" class="search" role="search">
+        <span class="material-symbols-outlined search__icon">search</span>
+        <input type="text"
+               name="busca"
+               th:value="${busca}"
+               placeholder="Buscar por cliente, exame ou nº..."
+               class="search__input"
+               aria-label="Buscar"/>
+      </form>
+
+      <a th:href="@{/solicitacoes/nova}" href="/solicitacoes/nova"
+         class="btn btn--primary"
+         data-action="nova-solicitacao">
+        <span class="material-symbols-outlined">add_circle</span>
+        Nova Solicitação
+      </a>
+
+      <button type="button"
+              class="icon-btn"
+              data-action="notificacoes"
+              aria-label="Notificações">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="icon-btn__dot" aria-hidden="true"></span>
+      </button>
+
+      <button type="button"
+              class="avatar"
+              data-action="perfil"
+              aria-label="Abrir perfil">
+        <img th:src="${usuarioLogado?.avatarUrl} ?: @{/images/avatar-default.png}"
+             th:alt="${usuarioLogado?.nome} ?: 'Usuário'"
+             src="/images/avatar-default.png" alt="Usuário"/>
+      </button>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Indicadores resumidos">
+    <article class="kpi kpi--neutral">
+      <div class="kpi__icon"><span class="material-symbols-outlined">inbox</span></div>
+      <div class="kpi__body">
+        <span class="kpi__label">Novas</span>
+        <strong class="kpi__value" th:text="${solicitacoesNovo?.size() ?: 0}">2</strong>
+      </div>
+      <span class="kpi__trend kpi__trend--up">
+        <span class="material-symbols-outlined">trending_up</span> +12%
+      </span>
+    </article>
+
+    <article class="kpi kpi--info">
+      <div class="kpi__icon"><span class="material-symbols-outlined">science</span></div>
+      <div class="kpi__body">
+        <span class="kpi__label">Em análise</span>
+        <strong class="kpi__value" th:text="${solicitacoesAnalise?.size() ?: 0}">1</strong>
+      </div>
+      <span class="kpi__trend">SLA 24h</span>
+    </article>
+
+    <article class="kpi kpi--warning">
+      <div class="kpi__icon"><span class="material-symbols-outlined">autorenew</span></div>
+      <div class="kpi__body">
+        <span class="kpi__label">Em andamento</span>
+        <strong class="kpi__value" th:text="${solicitacoesEmAndamento?.size() ?: 0}">1</strong>
+      </div>
+      <span class="kpi__trend">85% médio</span>
+    </article>
+
+    <article class="kpi kpi--success">
+      <div class="kpi__icon"><span class="material-symbols-outlined">task_alt</span></div>
+      <div class="kpi__body">
+        <span class="kpi__label">Finalizadas</span>
+        <strong class="kpi__value" th:text="${solicitacoesFinalizadas?.size() ?: 0}">1</strong>
+      </div>
+      <span class="kpi__trend kpi__trend--up">
+        <span class="material-symbols-outlined">trending_up</span> +5%
+      </span>
+    </article>
+  </section>
+
+  <section class="filters">
+    <form th:action="@{/indicadores}" method="get" class="filters__form" id="filtersForm">
+      <div class="select">
+        <select name="status" data-autosubmit aria-label="Filtrar por status">
+          <option value="" th:selected="${filtroStatus == null or filtroStatus == ''}">Status: Todos</option>
+          <option value="PENDENTE"   th:selected="${filtroStatus == 'PENDENTE'}">Pendente</option>
+          <option value="URGENTE"    th:selected="${filtroStatus == 'URGENTE'}">Urgente</option>
+          <option value="EM_ANALISE" th:selected="${filtroStatus == 'EM_ANALISE'}">Em Análise</option>
+          <option value="CONCLUIDO"  th:selected="${filtroStatus == 'CONCLUIDO'}">Concluído</option>
+        </select>
+        <span class="material-symbols-outlined select__caret">keyboard_arrow_down</span>
+      </div>
+
+      <div class="select">
+        <select name="tipoExame" data-autosubmit aria-label="Filtrar por tipo de exame">
+          <option value="" th:selected="${filtroTipo == null or filtroTipo == ''}">Tipo: Todos os Exames</option>
+          <option value="HEMATOLOGIA"   th:selected="${filtroTipo == 'HEMATOLOGIA'}">Hematologia</option>
+          <option value="BIOQUIMICA"    th:selected="${filtroTipo == 'BIOQUIMICA'}">Bioquímica</option>
+          <option value="MICROBIOLOGIA" th:selected="${filtroTipo == 'MICROBIOLOGIA'}">Microbiologia</option>
+        </select>
+        <span class="material-symbols-outlined select__caret">keyboard_arrow_down</span>
+      </div>
+
+      <button type="button" class="btn btn--ghost" data-action="mais-filtros">
+        <span class="material-symbols-outlined">filter_list</span> Mais filtros
+      </button>
+
+      <button type="button" class="btn btn--text" data-action="limpar-filtros">
+        Limpar
+      </button>
+    </form>
+
+    <div class="view-toggle" role="tablist" aria-label="Modo de visualização">
+      <span class="view-toggle__label">Visualização</span>
+      <div class="view-toggle__group">
+        <button type="button"
+                class="view-toggle__btn is-active"
+                data-view="kanban"
+                role="tab"
+                aria-selected="true"
+                aria-label="Kanban">
+          <span class="material-symbols-outlined">view_kanban</span>
+        </button>
+        <button type="button"
+                class="view-toggle__btn"
+                data-view="list"
+                role="tab"
+                aria-selected="false"
+                aria-label="Lista">
+          <span class="material-symbols-outlined">list</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="kanban" id="kanbanBoard" aria-label="Quadro de solicitações">
+
+    <div class="column" data-status="NOVO">
+      <header class="column__header">
+        <div class="column__title">
+          <span class="column__dot column__dot--neutral"></span>
+          <h3>Novo</h3>
+        </div>
+        <span class="column__count"
+              th:text="${solicitacoesNovo?.size() ?: 0} + ' solicitações'">2 solicitações</span>
+      </header>
+
+      <div class="column__list">
+        <article th:each="s : ${solicitacoesNovo}"
+                 class="card"
+                 th:data-id="${s.id}"
+                 data-action="abrir-solicitacao"
+                 tabindex="0">
+          <div class="card__top">
+            <span class="card__num" th:text="'#' + s.numero">#LAB-0402</span>
+            <span th:if="${s.status == 'URGENTE'}"
+                  class="badge badge--danger"
+                  th:text="#{status.urgente}">Urgente</span>
+            <span th:unless="${s.status == 'URGENTE'}"
+                  class="badge badge--neutral"
+                  th:text="#{status.__${s.status}__}">Pendente</span>
+          </div>
+          <h4 class="card__title" th:text="${s.cliente}">Carlos Oliveira</h4>
+          <p class="card__meta">
+            <span class="material-symbols-outlined" th:text="${s.iconeExame}">biotech</span>
+            <span th:text="${s.tipoExame}">Hematologia Completa</span>
+          </p>
+          <footer class="card__footer">
+            <span class="card__date">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">12/05/2026</span>
+            </span>
+            <a th:href="@{/solicitacoes/{id}(id=${s.id})}"
+               class="card__open" aria-label="Abrir solicitação"
+               href="#" onclick="event.stopPropagation()">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </a>
+          </footer>
+        </article>
+
+        <div th:if="${#lists.isEmpty(solicitacoesNovo)}" class="empty">
+          <span class="material-symbols-outlined">inbox</span>
+          <p>Nenhuma solicitação</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column" data-status="ANALISE">
+      <header class="column__header">
+        <div class="column__title">
+          <span class="column__dot column__dot--info"></span>
+          <h3>Análise</h3>
+        </div>
+        <span class="column__count"
+              th:text="${solicitacoesAnalise?.size() ?: 0} + ' solicitações'">1 solicitação</span>
+      </header>
+
+      <div class="column__list">
+        <article th:each="s : ${solicitacoesAnalise}"
+                 class="card"
+                 th:data-id="${s.id}"
+                 data-action="abrir-solicitacao"
+                 tabindex="0">
+          <div class="card__top">
+            <span class="card__num" th:text="'#' + s.numero">#LAB-0380</span>
+            <span class="badge badge--info"
+                  th:text="#{status.__${s.status}__}">Em Triagem</span>
+          </div>
+          <h4 class="card__title" th:text="${s.cliente}">Roberto Silva</h4>
+          <p class="card__meta">
+            <span class="material-symbols-outlined" th:text="${s.iconeExame}">biotech</span>
+            <span th:text="${s.tipoExame}">Perfil Lipídico</span>
+          </p>
+          <footer class="card__footer">
+            <span class="card__date">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">11/05/2026</span>
+            </span>
+            <div th:if="${s.responsavel != null}" class="avatar-mini" th:text="${s.responsavel.iniciais}">DR</div>
+          </footer>
+        </article>
+
+        <div th:if="${#lists.isEmpty(solicitacoesAnalise)}" class="empty">
+          <span class="material-symbols-outlined">inbox</span>
+          <p>Nenhuma solicitação</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column" data-status="EM_ANDAMENTO">
+      <header class="column__header">
+        <div class="column__title">
+          <span class="column__dot column__dot--warning"></span>
+          <h3>Em andamento</h3>
+        </div>
+        <span class="column__count"
+              th:text="${solicitacoesEmAndamento?.size() ?: 0} + ' solicitações'">1 solicitação</span>
+      </header>
+
+      <div class="column__list">
+        <article th:each="s : ${solicitacoesEmAndamento}"
+                 class="card"
+                 th:data-id="${s.id}"
+                 data-action="abrir-solicitacao"
+                 tabindex="0">
+          <div class="card__top">
+            <span class="card__num" th:text="'#' + s.numero">#LAB-0385</span>
+            <span class="badge badge--warning"
+                  th:text="#{status.__${s.status}__}">Processando</span>
+          </div>
+          <h4 class="card__title" th:text="${s.cliente}">Mariana Souza</h4>
+          <p class="card__meta">
+            <span class="material-symbols-outlined" th:text="${s.iconeExame}">biotech</span>
+            <span th:text="${s.tipoExame}">Citopatologia</span>
+          </p>
+
+          <div class="progress" th:attr="aria-valuenow=${s.progresso}" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress__bar" th:style="'width:' + ${s.progresso} + '%'" style="width:85%"></div>
+          </div>
+
+          <footer class="card__footer">
+            <span class="card__date">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">10/05/2026</span>
+            </span>
+            <span class="card__progress" th:text="${s.progresso} + '%'">85%</span>
+          </footer>
+        </article>
+
+        <div th:if="${#lists.isEmpty(solicitacoesEmAndamento)}" class="empty">
+          <span class="material-symbols-outlined">inbox</span>
+          <p>Nenhuma solicitação</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="column" data-status="FINALIZADO">
+      <header class="column__header">
+        <div class="column__title">
+          <span class="column__dot column__dot--success"></span>
+          <h3>Finalizado</h3>
+        </div>
+        <span class="column__count"
+              th:text="${solicitacoesFinalizadas?.size() ?: 0} + ' solicitações'">1 solicitação</span>
+      </header>
+
+      <div class="column__list">
+        <article th:each="s : ${solicitacoesFinalizadas}"
+                 class="card card--done"
+                 th:data-id="${s.id}"
+                 tabindex="0">
+          <div class="card__top">
+            <span class="card__num" th:text="'#' + s.numero">#LAB-0371</span>
+            <span class="badge badge--success">
+              <span class="material-symbols-outlined">check</span> Concluído
+            </span>
+          </div>
+          <h4 class="card__title" th:text="${s.cliente}">Jorge Mendes</h4>
+          <p class="card__meta">
+            <span class="material-symbols-outlined" th:text="${s.iconeExame}">biotech</span>
+            <span th:text="${s.tipoExame}">Hemoglobina Glicada</span>
+          </p>
+          <footer class="card__footer">
+            <span class="card__date">
+              <span class="material-symbols-outlined">history</span>
+              <span th:text="'Finalizado em ' + ${#temporals.format(s.dataFinalizacao, 'dd/MM')}">Finalizado em 12/05</span>
+            </span>
+            <a th:href="@{/solicitacoes/{id}/laudo(id=${s.id})}"
+               class="card__open" aria-label="Ver laudo"
+               href="#" onclick="event.stopPropagation()"
+               data-action="ver-laudo">
+              <span class="material-symbols-outlined">description</span>
+            </a>
+          </footer>
+        </article>
+
+        <div th:if="${#lists.isEmpty(solicitacoesFinalizadas)}" class="empty">
+          <span class="material-symbols-outlined">inbox</span>
+          <p>Nenhuma solicitação</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+<script th:src="@{/js/indicadores.js}" src="/js/indicadores.js" defer></script>
+</body>
+</html>
