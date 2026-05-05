@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Indicadores | Microbio</title>
+  <title>Indicadores - Microbio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -13,55 +15,155 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"/>
 
   <link rel="stylesheet" th:href="@{/css/indicadores.css}" href="/css/indicadores.css"/>
+
+  <style>
+    /* ==========================================================
+       SIDEBAR PADRÃO DO SISTEMA — mesmo CSS do dashboard.html.
+       Mantida embutida para garantir consistência em toda tela.
+       ========================================================== */
+    :root {
+        --primary:       #1a702b;
+        --primary-hover: #135c22;
+        --primary-light: #e8f5e9;
+        --sidebar-w:     240px;
+        --text-dark:     #1f2937;
+        --text-muted:    #6b7280;
+        --bg:            #f3f4f6;
+        --font:          'Inter', system-ui, -apple-system, sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text-dark);
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+        width: var(--sidebar-w);
+        background: #fff;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        z-index: 50;
+    }
+    .sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid #e5e7eb; }
+    .sidebar-brand h1 { color: var(--primary); font-size: 20px; font-weight: 700; }
+    .sidebar-brand p  { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .nav-section {
+        font-size: 10px; font-weight: 700; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: .8px;
+        padding: 12px 8px 6px; display: block;
+    }
+    .nav-link {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 12px; border-radius: 8px;
+        color: var(--text-muted); text-decoration: none;
+        font-size: 14px; font-weight: 500;
+        transition: background .15s, color .15s;
+        margin-bottom: 2px;
+    }
+    .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); }
+    .nav-link.active { font-weight: 600; }
+
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid #e5e7eb; }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 8px; margin-bottom: 8px; }
+    .user-avatar {
+        width: 32px; height: 32px;
+        background: var(--primary); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 13px; font-weight: 700;
+        flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+    .btn-logout {
+        width: 100%;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 9px;
+        background: none; border: 1px solid #e5e7eb; border-radius: 8px;
+        color: var(--text-muted); font-size: 13px; font-weight: 500;
+        cursor: pointer;
+        transition: background .15s, color .15s;
+    }
+    .btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+    /* ── ÁREA PRINCIPAL ──
+       Reserva o espaço da sidebar fixa. Conteúdo de indicadores
+       (topbar, KPIs, filtros, kanban) vem do indicadores.css. */
+    .main {
+        margin-left: var(--sidebar-w);
+        flex: 1; min-width: 0;
+        display: flex; flex-direction: column;
+    }
+
+    @media (max-width: 900px) {
+        .sidebar { display: none; }
+        .main    { margin-left: 0; }
+    }
+  </style>
 </head>
-<body class="app-shell">
+<body>
 
-<aside class="sidebar" aria-label="Navegação principal">
-  <div class="sidebar__brand">
-    <div class="sidebar__logo" aria-hidden="true">
-      <span class="material-symbols-outlined">biotech</span>
-    </div>
-    <div>
-      <h2 class="sidebar__brand-name">Microbio</h2>
-      <p class="sidebar__brand-tag">Laboratório</p>
-    </div>
+<!-- ============================================================
+     SIDEBAR — idêntica à do dashboard.html (padrão do sistema)
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h1>🧫 Microbio</h1>
+    <p>Laboratório de microbiologia</p>
   </div>
-
-  <nav class="sidebar__nav">
-    <a th:href="@{/dashboard}"
-       th:classappend="${activePage == 'dashboard'} ? 'is-active'"
-       class="nav-item" href="/dashboard">
-      <span class="material-symbols-outlined">dashboard</span> Visão Geral
+  <nav class="sidebar-nav">
+    <span class="nav-section">Geral</span>
+    <a th:href="@{/dashboard}" href="/dashboard" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
     </a>
-    <a th:href="@{/solicitacoes}"
-       th:classappend="${activePage == 'solicitacoes'} ? 'is-active'"
-       class="nav-item" href="/solicitacoes">
-      <span class="material-symbols-outlined">receipt_long</span> Solicitações
+    <span class="nav-section">Cadastros</span>
+    <a th:href="@{/usuarios}" href="/usuarios" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Usuários
     </a>
-    <a th:href="@{/analises}"
-       th:classappend="${activePage == 'analises' or activePage == 'indicadores'} ? 'is-active'"
-       class="nav-item is-active" href="/analises">
-      <span class="material-symbols-outlined">biotech</span> Análises
+    <span class="nav-section">Operações</span>
+    <a th:href="@{/indicadores}" href="/indicadores" class="nav-link active">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Indicadores
     </a>
-    <a th:href="@{/financeiro}"
-       th:classappend="${activePage == 'financeiro'} ? 'is-active'"
-       class="nav-item" href="/financeiro">
-      <span class="material-symbols-outlined">payments</span> Financeiro
+    <a th:href="@{/pedidos}" href="/pedidos" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Pedidos
     </a>
-    <a th:href="@{/arquivos}"
-       th:classappend="${activePage == 'arquivos'} ? 'is-active'"
-       class="nav-item" href="/arquivos">
-      <span class="material-symbols-outlined">folder_open</span> Arquivos
+    <a th:href="@{/analises}" href="/analises" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Análises
     </a>
   </nav>
-
-  <a th:href="@{/analises/nova}" href="/analises/nova"
-     class="btn btn--primary btn--block sidebar__cta"
-     data-action="nova-analise">
-    <span class="material-symbols-outlined">add</span> Nova Análise
-  </a>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">A</div>
+      <div>
+        <div class="user-name" sec:authentication="name">admin</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+    <form th:action="@{/logout}" method="post">
+      <button type="submit" class="btn-logout">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </form>
+  </div>
 </aside>
 
+<!-- ============================================================
+     CONTEÚDO DA TELA DE INDICADORES
+     ============================================================ -->
 <main class="main">
 
   <header class="topbar">
@@ -69,37 +171,23 @@
       <h1>Indicadores</h1>
       <p>Acompanhe as solicitações de orçamento e processos laboratoriais.</p>
     </div>
-
     <div class="topbar__actions">
       <form th:action="@{/indicadores}" method="get" class="search" role="search">
         <span class="material-symbols-outlined search__icon">search</span>
-        <input type="text"
-               name="busca"
-               th:value="${busca}"
+        <input type="text" name="busca" th:value="${busca}"
                placeholder="Buscar por cliente, exame ou nº..."
-               class="search__input"
-               aria-label="Buscar"/>
+               class="search__input" aria-label="Buscar"/>
       </form>
-
       <a th:href="@{/solicitacoes/nova}" href="/solicitacoes/nova"
-         class="btn btn--primary"
-         data-action="nova-solicitacao">
+         class="btn btn--primary" data-action="nova-solicitacao">
         <span class="material-symbols-outlined">add_circle</span>
         Nova Solicitação
       </a>
-
-      <button type="button"
-              class="icon-btn"
-              data-action="notificacoes"
-              aria-label="Notificações">
+      <button type="button" class="icon-btn" data-action="notificacoes" aria-label="Notificações">
         <span class="material-symbols-outlined">notifications</span>
         <span class="icon-btn__dot" aria-hidden="true"></span>
       </button>
-
-      <button type="button"
-              class="avatar"
-              data-action="perfil"
-              aria-label="Abrir perfil">
+      <button type="button" class="avatar-btn" data-action="perfil" aria-label="Abrir perfil">
         <img th:src="${usuarioLogado?.avatarUrl} ?: @{/images/avatar-default.png}"
              th:alt="${usuarioLogado?.nome} ?: 'Usuário'"
              src="/images/avatar-default.png" alt="Usuário"/>
@@ -115,10 +203,9 @@
         <strong class="kpi__value" th:text="${solicitacoesNovo?.size() ?: 0}">2</strong>
       </div>
       <span class="kpi__trend kpi__trend--up">
-        <span class="material-symbols-outlined">trending_up</span> +12%
-      </span>
+                <span class="material-symbols-outlined">trending_up</span> +12%
+            </span>
     </article>
-
     <article class="kpi kpi--info">
       <div class="kpi__icon"><span class="material-symbols-outlined">science</span></div>
       <div class="kpi__body">
@@ -127,7 +214,6 @@
       </div>
       <span class="kpi__trend">SLA 24h</span>
     </article>
-
     <article class="kpi kpi--warning">
       <div class="kpi__icon"><span class="material-symbols-outlined">autorenew</span></div>
       <div class="kpi__body">
@@ -136,7 +222,6 @@
       </div>
       <span class="kpi__trend">85% médio</span>
     </article>
-
     <article class="kpi kpi--success">
       <div class="kpi__icon"><span class="material-symbols-outlined">task_alt</span></div>
       <div class="kpi__body">
@@ -144,8 +229,8 @@
         <strong class="kpi__value" th:text="${solicitacoesFinalizadas?.size() ?: 0}">1</strong>
       </div>
       <span class="kpi__trend kpi__trend--up">
-        <span class="material-symbols-outlined">trending_up</span> +5%
-      </span>
+                <span class="material-symbols-outlined">trending_up</span> +5%
+            </span>
     </article>
   </section>
 
@@ -161,7 +246,6 @@
         </select>
         <span class="material-symbols-outlined select__caret">keyboard_arrow_down</span>
       </div>
-
       <div class="select">
         <select name="tipoExame" data-autosubmit aria-label="Filtrar por tipo de exame">
           <option value="" th:selected="${filtroTipo == null or filtroTipo == ''}">Tipo: Todos os Exames</option>
@@ -171,33 +255,21 @@
         </select>
         <span class="material-symbols-outlined select__caret">keyboard_arrow_down</span>
       </div>
-
       <button type="button" class="btn btn--ghost" data-action="mais-filtros">
         <span class="material-symbols-outlined">filter_list</span> Mais filtros
       </button>
-
-      <button type="button" class="btn btn--text" data-action="limpar-filtros">
-        Limpar
-      </button>
+      <button type="button" class="btn btn--text" data-action="limpar-filtros">Limpar</button>
     </form>
 
     <div class="view-toggle" role="tablist" aria-label="Modo de visualização">
       <span class="view-toggle__label">Visualização</span>
       <div class="view-toggle__group">
-        <button type="button"
-                class="view-toggle__btn is-active"
-                data-view="kanban"
-                role="tab"
-                aria-selected="true"
-                aria-label="Kanban">
+        <button type="button" class="view-toggle__btn is-active"
+                data-view="kanban" role="tab" aria-selected="true" aria-label="Kanban">
           <span class="material-symbols-outlined">view_kanban</span>
         </button>
-        <button type="button"
-                class="view-toggle__btn"
-                data-view="list"
-                role="tab"
-                aria-selected="false"
-                aria-label="Lista">
+        <button type="button" class="view-toggle__btn"
+                data-view="list" role="tab" aria-selected="false" aria-label="Lista">
           <span class="material-symbols-outlined">list</span>
         </button>
       </div>
@@ -215,7 +287,6 @@
         <span class="column__count"
               th:text="${solicitacoesNovo?.size() ?: 0} + ' solicitações'">2 solicitações</span>
       </header>
-
       <div class="column__list">
         <article th:each="s : ${solicitacoesNovo}"
                  class="card"
@@ -223,7 +294,7 @@
                  data-action="abrir-solicitacao"
                  tabindex="0">
           <div class="card__top">
-            <span class="card__num" th:text="'#' + s.numero">#LAB-0402</span>
+            <span class="card__num" th:text="'#' + ${s.numero}">#LAB-0402</span>
             <span th:if="${s.status == 'URGENTE'}"
                   class="badge badge--danger"
                   th:text="#{status.urgente}">Urgente</span>
@@ -237,10 +308,10 @@
             <span th:text="${s.tipoExame}">Hematologia Completa</span>
           </p>
           <footer class="card__footer">
-            <span class="card__date">
-              <span class="material-symbols-outlined">calendar_today</span>
-              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">12/05/2026</span>
-            </span>
+                        <span class="card__date">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">12/05/2026</span>
+                        </span>
             <a th:href="@{/solicitacoes/{id}(id=${s.id})}"
                class="card__open" aria-label="Abrir solicitação"
                href="#" onclick="event.stopPropagation()">
@@ -248,7 +319,6 @@
             </a>
           </footer>
         </article>
-
         <div th:if="${#lists.isEmpty(solicitacoesNovo)}" class="empty">
           <span class="material-symbols-outlined">inbox</span>
           <p>Nenhuma solicitação</p>
@@ -265,7 +335,6 @@
         <span class="column__count"
               th:text="${solicitacoesAnalise?.size() ?: 0} + ' solicitações'">1 solicitação</span>
       </header>
-
       <div class="column__list">
         <article th:each="s : ${solicitacoesAnalise}"
                  class="card"
@@ -273,7 +342,7 @@
                  data-action="abrir-solicitacao"
                  tabindex="0">
           <div class="card__top">
-            <span class="card__num" th:text="'#' + s.numero">#LAB-0380</span>
+            <span class="card__num" th:text="'#' + ${s.numero}">#LAB-0380</span>
             <span class="badge badge--info"
                   th:text="#{status.__${s.status}__}">Em Triagem</span>
           </div>
@@ -283,14 +352,13 @@
             <span th:text="${s.tipoExame}">Perfil Lipídico</span>
           </p>
           <footer class="card__footer">
-            <span class="card__date">
-              <span class="material-symbols-outlined">calendar_today</span>
-              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">11/05/2026</span>
-            </span>
+                        <span class="card__date">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">11/05/2026</span>
+                        </span>
             <div th:if="${s.responsavel != null}" class="avatar-mini" th:text="${s.responsavel.iniciais}">DR</div>
           </footer>
         </article>
-
         <div th:if="${#lists.isEmpty(solicitacoesAnalise)}" class="empty">
           <span class="material-symbols-outlined">inbox</span>
           <p>Nenhuma solicitação</p>
@@ -307,7 +375,6 @@
         <span class="column__count"
               th:text="${solicitacoesEmAndamento?.size() ?: 0} + ' solicitações'">1 solicitação</span>
       </header>
-
       <div class="column__list">
         <article th:each="s : ${solicitacoesEmAndamento}"
                  class="card"
@@ -315,7 +382,7 @@
                  data-action="abrir-solicitacao"
                  tabindex="0">
           <div class="card__top">
-            <span class="card__num" th:text="'#' + s.numero">#LAB-0385</span>
+            <span class="card__num" th:text="'#' + ${s.numero}">#LAB-0385</span>
             <span class="badge badge--warning"
                   th:text="#{status.__${s.status}__}">Processando</span>
           </div>
@@ -324,20 +391,17 @@
             <span class="material-symbols-outlined" th:text="${s.iconeExame}">biotech</span>
             <span th:text="${s.tipoExame}">Citopatologia</span>
           </p>
-
           <div class="progress" th:attr="aria-valuenow=${s.progresso}" role="progressbar" aria-valuemin="0" aria-valuemax="100">
             <div class="progress__bar" th:style="'width:' + ${s.progresso} + '%'" style="width:85%"></div>
           </div>
-
           <footer class="card__footer">
-            <span class="card__date">
-              <span class="material-symbols-outlined">calendar_today</span>
-              <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">10/05/2026</span>
-            </span>
+                        <span class="card__date">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            <span th:text="${#temporals.format(s.data, 'dd/MM/yyyy')}">10/05/2026</span>
+                        </span>
             <span class="card__progress" th:text="${s.progresso} + '%'">85%</span>
           </footer>
         </article>
-
         <div th:if="${#lists.isEmpty(solicitacoesEmAndamento)}" class="empty">
           <span class="material-symbols-outlined">inbox</span>
           <p>Nenhuma solicitação</p>
@@ -354,17 +418,16 @@
         <span class="column__count"
               th:text="${solicitacoesFinalizadas?.size() ?: 0} + ' solicitações'">1 solicitação</span>
       </header>
-
       <div class="column__list">
         <article th:each="s : ${solicitacoesFinalizadas}"
                  class="card card--done"
                  th:data-id="${s.id}"
                  tabindex="0">
           <div class="card__top">
-            <span class="card__num" th:text="'#' + s.numero">#LAB-0371</span>
+            <span class="card__num" th:text="'#' + ${s.numero}">#LAB-0371</span>
             <span class="badge badge--success">
-              <span class="material-symbols-outlined">check</span> Concluído
-            </span>
+                            <span class="material-symbols-outlined">check</span> Concluído
+                        </span>
           </div>
           <h4 class="card__title" th:text="${s.cliente}">Jorge Mendes</h4>
           <p class="card__meta">
@@ -372,10 +435,10 @@
             <span th:text="${s.tipoExame}">Hemoglobina Glicada</span>
           </p>
           <footer class="card__footer">
-            <span class="card__date">
-              <span class="material-symbols-outlined">history</span>
-              <span th:text="'Finalizado em ' + ${#temporals.format(s.dataFinalizacao, 'dd/MM')}">Finalizado em 12/05</span>
-            </span>
+                        <span class="card__date">
+                            <span class="material-symbols-outlined">history</span>
+                            <span th:text="'Finalizado em ' + ${#temporals.format(s.dataFinalizacao, 'dd/MM')}">Finalizado em 12/05</span>
+                        </span>
             <a th:href="@{/solicitacoes/{id}/laudo(id=${s.id})}"
                class="card__open" aria-label="Ver laudo"
                href="#" onclick="event.stopPropagation()"
@@ -384,14 +447,12 @@
             </a>
           </footer>
         </article>
-
         <div th:if="${#lists.isEmpty(solicitacoesFinalizadas)}" class="empty">
           <span class="material-symbols-outlined">inbox</span>
           <p>Nenhuma solicitação</p>
         </div>
       </div>
     </div>
-
   </section>
 </main>
 
