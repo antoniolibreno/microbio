@@ -40,10 +40,12 @@ CREATE TABLE cliente (
 -- ============================================================
 -- TABELA: usuario (ATUALIZADA)
 -- ============================================================
+-- is_admin: TRUE = painel administrativo | FALSE = painel do cliente
 CREATE TABLE usuario (
                          id         SERIAL PRIMARY KEY,
                          login      VARCHAR(50)  NOT NULL UNIQUE,
                          senha      VARCHAR(255) NOT NULL,
+                         is_admin   BOOLEAN      NOT NULL DEFAULT FALSE,
                          cliente_id INT REFERENCES cliente(id) ON DELETE SET NULL
 );
 
@@ -55,6 +57,7 @@ CREATE TABLE pessoa (
                         nome       VARCHAR(150) NOT NULL,
                         email      VARCHAR(150),
                         telefone   VARCHAR(20),
+                        tipo_servico VARCHAR(100),
                         data_sol   TIMESTAMP DEFAULT NOW(),
                         cliente_id INT REFERENCES cliente(id) ON DELETE CASCADE
 );
@@ -114,5 +117,6 @@ CREATE INDEX idx_pedido_analise_a   ON pedido_analise(analise_id);
 -- ============================================================
 -- DADOS INICIAIS
 -- ============================================================
-INSERT INTO usuario (login, senha)
-VALUES ('admin', '$2b$10$uYkTQdD9ZnZTB.t8L6W.puv.I.cTkrFIUOqUdIDIh7SJjVhMF5RUe');
+-- Admin padrão (is_admin = true)
+INSERT INTO usuario (login, senha, is_admin)
+VALUES ('admin', '$2b$10$uYkTQdD9ZnZTB.t8L6W.puv.I.cTkrFIUOqUdIDIh7SJjVhMF5RUe', true);

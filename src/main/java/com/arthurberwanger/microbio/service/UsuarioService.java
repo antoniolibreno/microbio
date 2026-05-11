@@ -41,9 +41,16 @@ public class UsuarioService {
     }
 
     @Transactional
+    /** Cria usuário comum (cliente). */
     public void criarUsuarioSimples(String login, String senha) {
+        criarUsuarioSimples(login, senha, false);
+    }
+
+    /** Cria usuário com controle explícito de admin. */
+    public void criarUsuarioSimples(String login, String senha, boolean admin) {
         validarLogin(login, null);
-        usuarioRepository.save(new Usuario(login, passwordEncoder.encode(senha)));
+        Usuario u = new Usuario(login, passwordEncoder.encode(senha), admin);
+        usuarioRepository.save(u);
     }
 
     @Transactional

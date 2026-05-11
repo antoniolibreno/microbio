@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitações de Orçamento - Microbio</title>
+    <style>
+        :root {
+            --primary:       #1a702b;
+            --primary-hover: #135c22;
+            --primary-light: #e8f5e9;
+            --sidebar-w:     240px;
+            --text-dark:     #1f2937;
+            --text-muted:    #6b7280;
+            --bg:            #f3f4f6;
+            --font:          'Inter', system-ui, -apple-system, sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
+
+        /* ── SIDEBAR (igual ao dashboard) ── */
+        .sidebar { width:var(--sidebar-w); background:#fff; border-right:1px solid #e5e7eb; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; }
+        .sidebar-brand { padding:24px 20px 20px; border-bottom:1px solid #e5e7eb; }
+        .sidebar-brand h1 { color:var(--primary); font-size:20px; font-weight:700; }
+        .sidebar-brand p  { color:var(--text-muted); font-size:11px; margin-top:2px; }
+        .sidebar-nav  { flex:1; padding:16px 12px; overflow-y:auto; }
+        .nav-section  { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; padding:12px 8px 6px; display:block; }
+        .nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:var(--text-muted); text-decoration:none; font-size:14px; font-weight:500; transition:background .15s,color .15s; margin-bottom:2px; }
+        .nav-link:hover,.nav-link.active { background:var(--primary-light); color:var(--primary); }
+        .nav-link.active { font-weight:600; }
+        .sidebar-footer { padding:16px 12px; border-top:1px solid #e5e7eb; }
+        .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
+        .user-avatar { width:32px; height:32px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
+        .user-name { font-size:13px; font-weight:600; }
+        .user-role { font-size:11px; color:var(--text-muted); }
+        .btn-logout { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:9px; background:none; border:1px solid #e5e7eb; border-radius:8px; color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s,color .15s; }
+        .btn-logout:hover { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
+
+        /* ── MAIN ── */
+        .main { margin-left:var(--sidebar-w); flex:1; padding:32px; }
+        .page-header { margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .page-header-text h2 { font-size:22px; font-weight:700; }
+        .page-header-text p  { color:var(--text-muted); font-size:14px; margin-top:4px; }
+
+        /* badge de contagem */
+        .badge { background:var(--primary); color:#fff; font-size:12px; font-weight:700; border-radius:20px; padding:2px 10px; vertical-align:middle; margin-left:8px; }
+
+        /* ── TABELA ── */
+        .table-card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); overflow:hidden; }
+        .table-toolbar { padding:16px 20px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .search-box { display:flex; align-items:center; gap:8px; border:1.5px solid #d1d5db; border-radius:8px; padding:8px 12px; background:#fff; }
+        .search-box input { border:none; outline:none; font-size:14px; color:var(--text-dark); width:220px; }
+        .search-box svg { color:var(--text-muted); flex-shrink:0; }
+
+        table { width:100%; border-collapse:collapse; }
+        thead th { background:#f9fafb; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); padding:12px 16px; text-align:left; border-bottom:1px solid #e5e7eb; }
+        tbody tr { border-bottom:1px solid #f3f4f6; transition:background .1s; }
+        tbody tr:hover { background:#fafafa; }
+        tbody tr:last-child { border-bottom:none; }
+        td { padding:14px 16px; font-size:14px; vertical-align:middle; }
+        td.nome { font-weight:600; color:var(--text-dark); }
+        td.contato { color:var(--text-muted); font-size:13px; }
+        td.contato span { display:block; }
+
+        /* chips de serviço */
+        .chip { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+        .chip-micro  { background:#e8f5e9; color:#1a702b; }
+        .chip-bio    { background:#fef9c3; color:#854d0e; }
+        .chip-hema   { background:#fee2e2; color:#b91c1c; }
+        .chip-imuno  { background:#ede9fe; color:#6d28d9; }
+        .chip-qual   { background:#e0f2fe; color:#0369a1; }
+        .chip-outro  { background:#f3f4f6; color:#374151; }
+
+        /* status vinculação */
+        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+        .status-pendente  { background:#fef9c3; color:#854d0e; }
+        .status-vinculado { background:#e8f5e9; color:#1a702b; }
+
+        .data { color:var(--text-muted); font-size:13px; white-space:nowrap; }
+
+        /* empty state */
+        .empty-state { padding:60px 20px; text-align:center; color:var(--text-muted); }
+        .empty-state svg { margin-bottom:16px; opacity:.4; }
+        .empty-state h3 { font-size:16px; font-weight:600; margin-bottom:6px; color:var(--text-dark); }
+        .empty-state p  { font-size:14px; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <h1>🧫 Microbio</h1>
+        <p>Laboratório de microbiologia</p>
+    </div>
+    <nav class="sidebar-nav">
+        <span class="nav-section">Geral</span>
+        <a th:href="@{/dashboard}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </a>
+        <span class="nav-section">Cadastros</span>
+        <a th:href="@{/usuarios}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Usuários
+        </a>
+        <span class="nav-section">Operações</span>
+        <a th:href="@{/indicadores}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Indicadores
+        </a>
+        <a th:href="@{/pedidos}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Pedidos
+        </a>
+        <a th:href="@{/solicitacoes}" class="nav-link active">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Solicitações
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <div>
+                <div class="user-name" sec:authentication="name">admin</div>
+                <div class="user-role">Administrador</div>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-logout">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sair
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <div class="page-header-text">
+            <h2>
+                Solicitações de Orçamento
+                <span class="badge" th:text="${#lists.size(solicitacoes)}">0</span>
+            </h2>
+            <p>Leads que chegaram pelo site e aguardam cadastro completo.</p>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <div class="search-box">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" placeholder="Buscar por nome, email ou serviço..." oninput="filtrarTabela()">
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(solicitacoes)}" class="empty-state">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3>Nenhuma solicitação ainda</h3>
+            <p>Quando alguém preencher o formulário do site, aparecerá aqui.</p>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(solicitacoes)}" id="tabelaSolicitacoes">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Serviço Solicitado</th>
+                <th>Status</th>
+                <th>Data</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${solicitacoes}">
+                <td th:text="${p.id}" style="color:var(--text-muted);font-size:13px;"></td>
+                <td class="nome" th:text="${p.nome}">—</td>
+                <td class="contato">
+                    <span th:if="${p.email}"    th:text="${p.email}"></span>
+                    <span th:if="${p.telefone}" th:text="${p.telefone}"></span>
+                    <span th:if="${p.email == null and p.telefone == null}" style="color:#d1d5db;">Não informado</span>
+                </td>
+                <td>
+                    <!-- Chips coloridos por tipo de serviço -->
+                    <span th:switch="${p.tipoServico}">
+                            <span th:case="'Microbiologia'"                     class="chip chip-micro"  th:text="${p.tipoServico}"></span>
+                            <span th:case="'Bioquimica'"                        class="chip chip-bio"    th:text="${p.tipoServico}"></span>
+                            <span th:case="'Hematologia'"                       class="chip chip-hema"   th:text="${p.tipoServico}"></span>
+                            <span th:case="'Imunologia'"                        class="chip chip-imuno"  th:text="${p.tipoServico}"></span>
+                            <span th:case="'Controle de Qualidade em Bioinsumos'" class="chip chip-qual" th:text="${p.tipoServico}"></span>
+                            <span th:case="*"                                   class="chip chip-outro"  th:text="${p.tipoServico}"></span>
+                        </span>
+                </td>
+                <td>
+                    <span th:if="${p.cliente != null}"   class="status-badge status-vinculado">✓ Cadastrado</span>
+                    <span th:if="${p.cliente == null}"   class="status-badge status-pendente">⏳ Pendente</span>
+                </td>
+                <td class="data" th:text="${#temporals.format(p.dataSol, 'dd/MM/yyyy HH:mm')}">—</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+    function filtrarTabela() {
+        const termo = document.getElementById('searchInput').value.toLowerCase();
+        const linhas = document.querySelectorAll('#tabelaSolicitacoes tbody tr');
+        linhas.forEach(tr => {
+            const texto = tr.textContent.toLowerCase();
+            tr.style.display = texto.includes(termo) ? '' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>
