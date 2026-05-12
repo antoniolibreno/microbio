@@ -1,6 +1,9 @@
 package com.arthurberwanger.microbio.controller;
 
+import com.arthurberwanger.microbio.model.Orcamento.StatusOrcamento;
 import com.arthurberwanger.microbio.repository.ClienteRepository;
+import com.arthurberwanger.microbio.service.OrcamentoService;
+import com.arthurberwanger.microbio.service.PedidoService;
 import com.arthurberwanger.microbio.service.UsuarioService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,57 +15,48 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AuthController {
 
-    private final UsuarioService usuarioService;
+    private final UsuarioService    usuarioService;
     private final ClienteRepository clienteRepository;
+    private final OrcamentoService  orcamentoService;
+    private final PedidoService     pedidoService;
 
-    public AuthController(UsuarioService usuarioService, ClienteRepository clienteRepository) {
-        this.usuarioService = usuarioService;
+    public AuthController(UsuarioService usuarioService,
+                          ClienteRepository clienteRepository,
+                          OrcamentoService orcamentoService,
+                          PedidoService pedidoService) {
+        this.usuarioService    = usuarioService;
         this.clienteRepository = clienteRepository;
+        this.orcamentoService  = orcamentoService;
+        this.pedidoService     = pedidoService;
     }
 
-    /** Site institucional — público, sem autenticação */
     @GetMapping("/")
-    public String home() {
-        return "index";
-    }
+    public String home() { return "index"; }
 
-    /**
-     * Exibe o formulário de login.
-     * NÃO faz nenhum redirect aqui — isso causava o loop.
-     * O LoginSuccessHandler cuida de onde ir APÓS o login.
-     */
     @GetMapping("/login")
-    public String loginPage(
-            @RequestParam(value = "erro",   required = false) String erro,
-            @RequestParam(value = "logout", required = false) String logout,
-            Model model) {
-
-        if (erro != null)
-            model.addAttribute("mensagemErro", "Login ou senha inválidos. Tente novamente.");
-        if (logout != null)
-            model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
-
+    public String loginPage(@RequestParam(required = false) String erro,
+                            @RequestParam(required = false) String logout,
+                            Model model) {
+        if (erro   != null) model.addAttribute("mensagemErro",    "Login ou senha inválidos. Tente novamente.");
+        if (logout != null) model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
         return "login";
     }
 
-    /** Dashboard admin — protegido por ROLE_ADMIN no SecurityConfig */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("totalUsuarios", usuarioService.contarUsuarios());
-        model.addAttribute("totalClientes", clienteRepository.count());
+        model.addAttribute("totalUsuarios",   usuarioService.contarUsuarios());
+        model.addAttribute("totalClientes",   clienteRepository.count());
+        model.addAttribute("totalOrcamentos", orcamentoService.contarTodos());
+        model.addAttribute("totalPendentes",  orcamentoService.contarPorStatus(StatusOrcamento.PENDENTE));
+        model.addAttribute("totalAndamento",  orcamentoService.contarPorStatus(StatusOrcamento.EM_ANDAMENTO));
+        model.addAttribute("totalConcluidos", orcamentoService.contarPorStatus(StatusOrcamento.CONCLUIDO));
+        model.addAttribute("totalPedidos",    pedidoService.contarTodos());
         return "dashboard";
     }
 
-    /** Painel do cliente — protegido por ROLE_USER no SecurityConfig */
     @GetMapping("/painel")
-    public String painelCliente() {
-        return "painel/index";
-    }
+    public String painelCliente() { return "painel/index"; }
 
-    /**
-     * Rota genérica de painel — redireciona conforme a role.
-     * Usada pelo botão "Meu Painel" no site institucional.
-     */
     @GetMapping("/meu-painel")
     public String meuPainel() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -72,10 +66,5 @@ public class AuthController {
             return "redirect:" + (isAdmin ? "/dashboard" : "/painel");
         }
         return "redirect:/login";
-    }
-
-    @GetMapping("/indicadores")
-    public String indicadores() {
-        return "indicadores";
     }
 }

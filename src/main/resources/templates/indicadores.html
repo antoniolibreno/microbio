@@ -6,644 +6,237 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Indicadores - Microbio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary:       #1a702b;
-      --primary-hover: #135c22;
-      --primary-light: #e8f5e9;
-      --primary-muted: #d1ead5;
-      --sidebar-w:     240px;
-      --text-dark:     #1f2937;
-      --text-muted:    #6b7280;
-      --bg:            #f3f4f6;
-      --border:        #e5e7eb;
-      --font:          'Inter', system-ui, sans-serif;
-      --mono:          'DM Mono', monospace;
+      --primary:#1a702b; --primary-hover:#135c22; --primary-light:#e8f5e9; --primary-muted:#d1ead5;
+      --sidebar-w:240px; --text-dark:#1f2937; --text-muted:#6b7280; --bg:#f3f4f6; --border:#e5e7eb;
+      --font:'Inter',system-ui,sans-serif;
+      --pendente-bg:#fef9c3;  --pendente-txt:#854d0e;
+      --andamento-bg:#dbeafe; --andamento-txt:#1d4ed8;
+      --concluido-bg:#dcfce7; --concluido-txt:#15803d;
+      --cancelado-bg:#fee2e2; --cancelado-txt:#b91c1c;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display:flex;min-height:100vh}
 
-      --status-pendente-bg:    #fef9c3;
-      --status-pendente-text:  #854d0e;
-      --status-andamento-bg:   #dbeafe;
-      --status-andamento-text: #1d4ed8;
-      --status-concluido-bg:   #dcfce7;
-      --status-concluido-text: #15803d;
-      --status-cancelado-bg:   #fee2e2;
-      --status-cancelado-text: #b91c1c;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+    .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+    .sidebar-brand h1{color:var(--primary);font-size:20px;font-weight:700}
+    .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+    .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+    .nav-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px;display:block}
+    .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+    .nav-link:hover,.nav-link.active{background:var(--primary-light);color:var(--primary)}
+    .nav-link.active{font-weight:600}
+    .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+    .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}
+    .user-avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600}
+    .user-role{font-size:11px;color:var(--text-muted)}
+    .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+    .btn-logout:hover{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width:var(--sidebar-w); background:#fff;
-      border-right:1px solid var(--border);
-      display:flex; flex-direction:column;
-      position:fixed; top:0; left:0; bottom:0; z-index:100;
-    }
-    .sidebar-brand { padding:24px 20px 20px; border-bottom:1px solid var(--border); }
-    .sidebar-brand h1 { color:var(--primary); font-size:20px; font-weight:700; }
-    .sidebar-brand p  { color:var(--text-muted); font-size:11px; margin-top:2px; }
-    .sidebar-nav  { flex:1; padding:16px 12px; overflow-y:auto; }
-    .nav-section  { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; padding:12px 8px 6px; display:block; }
-    .nav-link {
-      display:flex; align-items:center; gap:10px;
-      padding:9px 12px; border-radius:8px;
-      color:var(--text-muted); text-decoration:none;
-      font-size:14px; font-weight:500;
-      transition:background .15s,color .15s; margin-bottom:2px;
-    }
-    .nav-link:hover, .nav-link.active { background:var(--primary-light); color:var(--primary); }
-    .nav-link.active { font-weight:600; }
-    .sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-    .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
-    .user-avatar {
-      width:32px; height:32px; background:var(--primary); border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-size:13px; font-weight:700; flex-shrink:0;
-    }
-    .user-name { font-size:13px; font-weight:600; }
-    .user-role { font-size:11px; color:var(--text-muted); }
-    .btn-logout {
-      width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
-      padding:9px; background:none; border:1px solid var(--border); border-radius:8px;
-      color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer;
-      transition:background .15s,color .15s;
-    }
-    .btn-logout:hover { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column}
 
-    /* ── MAIN ── */
-    .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+    /* TOPBAR */
+    .topbar{background:#fff;border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:50}
+    .topbar-left h2{font-size:18px;font-weight:700}
+    .topbar-left p{color:var(--text-muted);font-size:13px;margin-top:2px}
+    .topbar-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .search-wrap{position:relative}
+    .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+    .search-input{padding:9px 14px 9px 36px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:#fff;color:var(--text-dark);width:240px;transition:border-color .15s,box-shadow .15s;outline:none}
+    .search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,112,43,.1)}
 
-    /* ── TOPBAR ── */
-    .topbar {
-      background:#fff; border-bottom:1px solid var(--border);
-      padding:16px 32px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:16px; flex-wrap:wrap;
-      position:sticky; top:0; z-index:50;
-    }
-    .topbar-left h2 { font-size:18px; font-weight:700; line-height:1.2; }
-    .topbar-left p  { color:var(--text-muted); font-size:13px; margin-top:2px; }
+    /* FILTER CHIPS */
+    .filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all .15s;user-select:none;text-decoration:none;display:inline-block}
+    .chip-all{background:#f3f4f6;color:var(--text-muted);border-color:var(--border)}
+    .chip-pendente{background:var(--pendente-bg);color:var(--pendente-txt);border-color:#fde68a}
+    .chip-andamento{background:var(--andamento-bg);color:var(--andamento-txt);border-color:#93c5fd}
+    .chip-concluido{background:var(--concluido-bg);color:var(--concluido-txt);border-color:#86efac}
+    .chip-cancelado{background:var(--cancelado-bg);color:var(--cancelado-txt);border-color:#fca5a5}
+    .chip.active,.chip:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.1)}
+    .chip-all.active{background:#1f2937;color:#fff;border-color:#1f2937}
 
-    .topbar-controls {
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    }
+    /* SUMMARY STRIP */
+    .summary-strip{display:flex;gap:12px;padding:16px 32px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap}
+    .sum-card{flex:1;min-width:100px;background:var(--bg);border-radius:10px;padding:14px 18px}
+    .sum-card .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+    .sum-card .val{font-size:24px;font-weight:700;color:var(--primary);margin-top:2px}
 
-    /* Search */
-    .search-wrap {
-      position:relative;
-    }
-    .search-wrap svg {
-      position:absolute; left:11px; top:50%; transform:translateY(-50%);
-      color:var(--text-muted); pointer-events:none;
-    }
-    .search-input {
-      padding:9px 14px 9px 36px;
-      border:1px solid var(--border); border-radius:8px;
-      font-size:13px; font-family:var(--font);
-      background:#fff; color:var(--text-dark);
-      width:240px; transition:border-color .15s, box-shadow .15s;
-      outline:none;
-    }
-    .search-input::placeholder { color:var(--text-muted); }
-    .search-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,112,43,.1); }
+    /* CONTENT */
+    .content{padding:24px 32px;flex:1}
+    .results-info{font-size:13px;color:var(--text-muted);margin-bottom:16px}
+    .results-info strong{color:var(--text-dark)}
 
-    /* Status filter chips */
-    .filter-chips { display:flex; gap:6px; flex-wrap:wrap; }
-    .chip {
-      padding:6px 14px; border-radius:20px;
-      font-size:12px; font-weight:600; cursor:pointer;
-      border:1.5px solid transparent;
-      transition:all .15s; user-select:none;
-    }
-    .chip-all        { background:#f3f4f6; color:var(--text-muted); border-color:#e5e7eb; }
-    .chip-pendente   { background:var(--status-pendente-bg);   color:var(--status-pendente-text);   border-color:#fde68a; }
-    .chip-andamento  { background:var(--status-andamento-bg);  color:var(--status-andamento-text);  border-color:#93c5fd; }
-    .chip-concluido  { background:var(--status-concluido-bg);  color:var(--status-concluido-text);  border-color:#86efac; }
-    .chip-cancelado  { background:var(--status-cancelado-bg);  color:var(--status-cancelado-text);  border-color:#fca5a5; }
-    .chip.active, .chip:hover { opacity:1; transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,.1); }
-    .chip-all.active { background:#1f2937; color:#fff; border-color:#1f2937; }
+    /* CARDS */
+    .cards-list{display:flex;flex-direction:column;gap:10px}
+    .budget-card{background:#fff;border-radius:12px;border:1px solid var(--border);display:grid;grid-template-columns:220px 1fr auto;align-items:center;overflow:hidden;cursor:pointer;transition:box-shadow .18s,border-color .18s,transform .18s;text-decoration:none;color:inherit}
+    .budget-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.09);border-color:var(--primary-muted);transform:translateY(-1px)}
+    .card-client{padding:18px 22px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+    .card-client-name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-client-id{font-size:11px;color:var(--text-muted);font-family:monospace}
+    .card-info{padding:18px 22px;display:flex;flex-direction:column;gap:8px}
+    .card-info-row{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+    .card-meta{display:flex;flex-direction:column;gap:2px}
+    .card-meta-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+    .card-meta-value{font-size:13px;font-weight:500;color:var(--text-dark)}
+    .card-right{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+    .card-arrow{width:28px;height:28px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .15s,color .15s}
+    .budget-card:hover .card-arrow{background:var(--primary);color:#fff;border-color:var(--primary)}
 
-    /* ── CONTENT ── */
-    .content { padding:28px 32px; flex:1; }
+    /* STATUS BADGES */
+    .status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+    .status-pendente{background:var(--pendente-bg);color:var(--pendente-txt)}
+    .status-em_andamento,.status-andamento{background:var(--andamento-bg);color:var(--andamento-txt)}
+    .status-concluido{background:var(--concluido-bg);color:var(--concluido-txt)}
+    .status-cancelado{background:var(--cancelado-bg);color:var(--cancelado-txt)}
 
-    .results-info {
-      font-size:13px; color:var(--text-muted);
-      margin-bottom:18px; display:flex; align-items:center; gap:8px;
-    }
-    .results-info strong { color:var(--text-dark); }
-
-    /* ── CARDS ── */
-    .cards-list { display:flex; flex-direction:column; gap:12px; }
-
-    .budget-card {
-      background:#fff; border-radius:12px;
-      border:1px solid var(--border);
-      display:grid;
-      grid-template-columns: 220px 1fr auto;
-      align-items:center;
-      overflow:hidden;
-      cursor:pointer;
-      transition:box-shadow .18s, border-color .18s, transform .18s;
-      text-decoration:none; color:inherit;
-    }
-    .budget-card:hover {
-      box-shadow:0 4px 20px rgba(0,0,0,.09);
-      border-color:var(--primary-muted);
-      transform:translateY(-1px);
-    }
-
-    /* Left accent bar */
-    .card-accent {
-      width:5px; height:100%; border-radius:0;
-      display:none;
-    }
-
-    /* Client name column */
-    .card-client {
-      padding:20px 24px;
-      border-right:1px solid var(--border);
-      display:flex; flex-direction:column; gap:4px;
-    }
-    .card-client-name {
-      font-size:15px; font-weight:700; color:var(--text-dark);
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .card-client-id {
-      font-family:var(--mono); font-size:11px; color:var(--text-muted);
-    }
-
-    /* Info column */
-    .card-info {
-      padding:20px 24px;
-      display:flex; flex-direction:column; gap:10px;
-    }
-    .card-info-row {
-      display:flex; gap:24px; flex-wrap:wrap; align-items:center;
-    }
-    .card-meta {
-      display:flex; flex-direction:column; gap:2px;
-    }
-    .card-meta-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); }
-    .card-meta-value { font-size:13px; font-weight:500; color:var(--text-dark); }
-
-    /* Analysis tag */
-    .analysis-tag {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 10px; border-radius:6px;
-      font-size:12px; font-weight:600;
-      background:var(--primary-light); color:var(--primary);
-      border:1px solid var(--primary-muted);
-    }
-
-    /* Right column – status + arrow */
-    .card-right {
-      padding:20px 24px;
-      display:flex; flex-direction:column; align-items:flex-end;
-      gap:12px;
-    }
-    .status-badge {
-      padding:4px 12px; border-radius:20px;
-      font-size:12px; font-weight:600;
-    }
-    .status-pendente  { background:var(--status-pendente-bg);  color:var(--status-pendente-text);  }
-    .status-andamento { background:var(--status-andamento-bg); color:var(--status-andamento-text); }
-    .status-concluido { background:var(--status-concluido-bg); color:var(--status-concluido-text); }
-    .status-cancelado { background:var(--status-cancelado-bg); color:var(--status-cancelado-text); }
-
-    .card-arrow {
-      width:28px; height:28px; border-radius:50%;
-      background:var(--bg); border:1px solid var(--border);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--text-muted); transition:background .15s, color .15s;
-    }
-    .budget-card:hover .card-arrow { background:var(--primary); color:#fff; border-color:var(--primary); }
-
-    /* Empty state */
-    .empty-state {
-      text-align:center; padding:80px 40px;
-      color:var(--text-muted);
-    }
-    .empty-state svg { opacity:.3; margin-bottom:16px; }
-    .empty-state h3 { font-size:16px; font-weight:600; color:var(--text-dark); margin-bottom:6px; }
-    .empty-state p  { font-size:14px; }
-
-    /* Hidden for filtering */
-    .budget-card[data-hidden="true"] { display:none; }
+    /* EMPTY */
+    .empty-state{text-align:center;padding:80px 40px;color:var(--text-muted)}
+    .empty-state svg{opacity:.3;margin-bottom:16px}
+    .empty-state h3{font-size:16px;font-weight:600;color:var(--text-dark);margin-bottom:6px}
   </style>
 </head>
 <body>
 
-<!-- ── SIDEBAR ── -->
-<<aside class="sidebar">
-  <div class="sidebar-brand">
-    <h1>🧫 Microbio</h1>
-    <p>Laboratório de microbiologia</p>
-  </div>
+<aside class="sidebar">
+  <div class="sidebar-brand"><h1>🧫 Microbio</h1><p>Laboratório de microbiologia</p></div>
   <nav class="sidebar-nav">
     <span class="nav-section">Geral</span>
-    <a th:href="@{/dashboard}" class="nav-link active">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Dashboard
-    </a>
+    <a th:href="@{/dashboard}" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
     <span class="nav-section">Cadastros</span>
     <a th:href="@{/usuarios}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Usuários
-    </a>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Usuários</a>
     <span class="nav-section">Operações</span>
-    <a th:href="@{/indicadores}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Indicadores
-    </a>
-    <a th:href="@{/pedidos}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      Pedidos
-    </a>
-    <a th:href="@{/analises}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Análises
-    </a>
+    <a th:href="@{/indicadores}" class="nav-link active">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Indicadores</a>
+    <a th:href="@{/solicitacoes}" class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Solicitações</a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">
       <div class="user-avatar">A</div>
-      <div>
-        <div class="user-name" sec:authentication="name">admin</div>
-        <div class="user-role">Administrador</div>
-      </div>
+      <div><div class="user-name" sec:authentication="name">admin</div><div class="user-role">Administrador</div></div>
     </div>
     <form th:action="@{/logout}" method="post">
       <button type="submit" class="btn-logout">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</button>
     </form>
   </div>
 </aside>
 
-<!-- ── MAIN ── -->
 <main class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
       <h2>Indicadores</h2>
-      <p>Orçamentos e análises solicitadas pelos clientes</p>
+      <p>Orçamentos e seu status de andamento</p>
     </div>
     <div class="topbar-controls">
-      <!-- Status filter chips -->
       <div class="filter-chips">
-        <span class="chip chip-all active"    data-filter="all">Todos</span>
-        <span class="chip chip-pendente"      data-filter="pendente">Pendente</span>
-        <span class="chip chip-andamento"     data-filter="andamento">Em andamento</span>
-        <span class="chip chip-concluido"     data-filter="concluido">Concluído</span>
-        <span class="chip chip-cancelado"     data-filter="cancelado">Cancelado</span>
+        <a th:href="@{/indicadores}" th:classappend="${statusFiltro == null} ? 'active'" class="chip chip-all">
+          Todos <span th:text="'(' + ${totalTodos} + ')'"></span>
+        </a>
+        <a th:href="@{/indicadores(status='PENDENTE')}" th:classappend="${statusFiltro == 'PENDENTE'} ? 'active'" class="chip chip-pendente">
+          Pendente <span th:text="'(' + ${totalPendente} + ')'"></span>
+        </a>
+        <a th:href="@{/indicadores(status='EM_ANDAMENTO')}" th:classappend="${statusFiltro == 'EM_ANDAMENTO'} ? 'active'" class="chip chip-andamento">
+          Em andamento <span th:text="'(' + ${totalAndamento} + ')'"></span>
+        </a>
+        <a th:href="@{/indicadores(status='CONCLUIDO')}" th:classappend="${statusFiltro == 'CONCLUIDO'} ? 'active'" class="chip chip-concluido">
+          Concluído <span th:text="'(' + ${totalConcluido} + ')'"></span>
+        </a>
+        <a th:href="@{/indicadores(status='CANCELADO')}" th:classappend="${statusFiltro == 'CANCELADO'} ? 'active'" class="chip chip-cancelado">
+          Cancelado <span th:text="'(' + ${totalCancelado} + ')'"></span>
+        </a>
       </div>
-      <!-- Search -->
       <div class="search-wrap">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cliente ou análise…">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por cliente…">
       </div>
     </div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content">
-    <div class="results-info">
-      <strong id="resultsCount">6</strong>&nbsp;orçamentos encontrados
-    </div>
-
-    <!--
-        INTEGRAÇÃO THYMELEAF — quando o backend estiver pronto, substitua os cards estáticos por:
-
-        <div class="cards-list" id="cardsList" th:if="${not #lists.isEmpty(orcamentos)}">
-            <a th:each="orc : ${orcamentos}"
-               th:href="@{/indicadores/{id}(id=${orc.id})}"
-               class="budget-card"
-               th:data-status="${orc.status.name().toLowerCase()}"
-               th:data-client="${orc.cliente.nome}"
-               th:data-analysis="${orc.tipoAnalise}">
-                <div class="card-client">
-                    <span class="card-client-name" th:text="${orc.cliente.nome}">Nome do cliente</span>
-                    <span class="card-client-id" th:text="'#ORC-' + ${orc.id}">ID</span>
-                </div>
-                ... (demais colunas com th:text)
-            </a>
-        </div>
-        E no controller: model.addAttribute("orcamentos", orcamentoService.findAll());
-    -->
-
-    <div class="cards-list" id="cardsList">
-
-      <!-- Exemplo 1 -->
-      <a href="/indicadores/41"
-         class="budget-card"
-         data-status="pendente"
-         data-client="Frigorífico Santa Clara"
-         data-analysis="Coliformes Totais">
-        <div class="card-client">
-          <span class="card-client-name">Frigorífico Santa Clara</span>
-          <span class="card-client-id">#ORC-2024-0041</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Coliformes Totais
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">06/05/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">3 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">12/05/2025</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-pendente">Pendente</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Exemplo 2 -->
-      <a href="/indicadores/39"
-         class="budget-card"
-         data-status="andamento"
-         data-client="Laticínios Bela Vista"
-         data-analysis="Salmonella spp.">
-        <div class="card-client">
-          <span class="card-client-name">Laticínios Bela Vista</span>
-          <span class="card-client-id">#ORC-2024-0039</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Salmonella spp.
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">04/05/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">5 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">10/05/2025</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-andamento">Em andamento</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Exemplo 3 -->
-      <a href="/indicadores/38"
-         class="budget-card"
-         data-status="andamento"
-         data-client="Indústria Alimentar Primos & Cia"
-         data-analysis="Contagem Total de Aeróbios">
-        <div class="card-client">
-          <span class="card-client-name">Indústria Alimentar Primos</span>
-          <span class="card-client-id">#ORC-2024-0038</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Contagem Total Aeróbios
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">03/05/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">2 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">09/05/2025</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-andamento">Em andamento</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Exemplo 4 -->
-      <a href="/indicadores/35"
-         class="budget-card"
-         data-status="concluido"
-         data-client="Restaurante Sabor da Terra"
-         data-analysis="Listeria monocytogenes">
-        <div class="card-client">
-          <span class="card-client-name">Restaurante Sabor da Terra</span>
-          <span class="card-client-id">#ORC-2024-0035</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Listeria monocytogenes
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">28/04/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">4 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">05/05/2025</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-concluido">Concluído</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Exemplo 5 -->
-      <a href="/indicadores/33"
-         class="budget-card"
-         data-status="concluido"
-         data-client="Cooperativa Agro Sul"
-         data-analysis="Staphylococcus aureus">
-        <div class="card-client">
-          <span class="card-client-name">Cooperativa Agro Sul</span>
-          <span class="card-client-id">#ORC-2024-0033</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Staphylococcus aureus
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">25/04/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">6 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">02/05/2025</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-concluido">Concluído</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Exemplo 6 -->
-      <a href="/indicadores/30"
-         class="budget-card"
-         data-status="cancelado"
-         data-client="Padaria Trigo Dourado"
-         data-analysis="Bolores e Leveduras">
-        <div class="card-client">
-          <span class="card-client-name">Padaria Trigo Dourado</span>
-          <span class="card-client-id">#ORC-2024-0030</span>
-        </div>
-        <div class="card-info">
-          <div class="card-info-row">
-            <div class="card-meta">
-              <span class="card-meta-label">Tipo de análise</span>
-              <span class="card-meta-value">
-                                <span class="analysis-tag">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                                    Bolores e Leveduras
-                                </span>
-                            </span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Data de entrada</span>
-              <span class="card-meta-value">20/04/2025</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Amostras</span>
-              <span class="card-meta-value">2 amostras</span>
-            </div>
-            <div class="card-meta">
-              <span class="card-meta-label">Prazo</span>
-              <span class="card-meta-value">—</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-right">
-          <span class="status-badge status-cancelado">Cancelado</span>
-          <div class="card-arrow">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-      </a>
-
-    </div><!-- /cards-list -->
-
-    <!-- Empty state (shown via JS) -->
-    <div class="empty-state" id="emptyState" style="display:none">
-      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <h3>Nenhum orçamento encontrado</h3>
-      <p>Tente ajustar os filtros ou a busca.</p>
-    </div>
+  <!-- Summary strip -->
+  <div class="summary-strip">
+    <div class="sum-card"><div class="lbl">Total</div><div class="val" th:text="${totalTodos}">0</div></div>
+    <div class="sum-card" style="--primary:var(--pendente-txt)"><div class="lbl">Pendentes</div><div class="val" style="color:var(--pendente-txt)" th:text="${totalPendente}">0</div></div>
+    <div class="sum-card"><div class="lbl">Em andamento</div><div class="val" style="color:var(--andamento-txt)" th:text="${totalAndamento}">0</div></div>
+    <div class="sum-card"><div class="lbl">Concluídos</div><div class="val" style="color:var(--concluido-txt)" th:text="${totalConcluido}">0</div></div>
+    <div class="sum-card"><div class="lbl">Cancelados</div><div class="val" style="color:var(--cancelado-txt)" th:text="${totalCancelado}">0</div></div>
   </div>
 
+  <div class="content">
+    <div class="results-info">
+      <strong th:text="${#lists.size(orcamentos)}">0</strong> orçamentos encontrados
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(orcamentos)}" class="empty-state">
+      <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <h3>Nenhum orçamento encontrado</h3>
+      <p>Ajuste o filtro ou crie orçamentos a partir das solicitações.</p>
+    </div>
+
+    <div class="cards-list" id="cardsList" th:unless="${#lists.isEmpty(orcamentos)}">
+      <a th:each="orc : ${orcamentos}"
+         th:href="@{/indicadores/{id}(id=${orc.id})}"
+         class="budget-card"
+         th:data-client="${orc.pessoa != null ? orc.pessoa.nome : (orc.usuario != null ? orc.usuario.login : '')}">
+        <div class="card-client">
+          <span class="card-client-name"
+                th:text="${orc.pessoa != null ? orc.pessoa.nome : (orc.usuario != null ? orc.usuario.login : 'Sem cliente')}">—</span>
+          <span class="card-client-id" th:text="'#ORC-' + ${orc.id}">—</span>
+        </div>
+        <div class="card-info">
+          <div class="card-info-row">
+            <div class="card-meta">
+              <span class="card-meta-label">Serviço</span>
+              <span class="card-meta-value"
+                    th:text="${orc.pessoa != null ? orc.pessoa.tipoServico : '—'}">—</span>
+            </div>
+            <div class="card-meta">
+              <span class="card-meta-label">Data</span>
+              <span class="card-meta-value"
+                    th:text="${#temporals.format(orc.dataOrcamento,'dd/MM/yyyy')}">—</span>
+            </div>
+            <div class="card-meta" th:if="${orc.valorTotal != null}">
+              <span class="card-meta-label">Valor</span>
+              <span class="card-meta-value"
+                    th:text="${'R$ ' + #numbers.formatDecimal(orc.valorTotal,1,'POINT',2,'COMMA')}">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="status-badge"
+                th:classappend="'status-' + ${orc.status.name().toLowerCase()}"
+                th:text="${orc.status.label}">—</span>
+          <div class="card-arrow">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
 </main>
 
 <script>
   const cards = document.querySelectorAll('.budget-card');
   const searchInput = document.getElementById('searchInput');
-  const chips = document.querySelectorAll('.chip');
-  const resultsCount = document.getElementById('resultsCount');
-  const emptyState = document.getElementById('emptyState');
-
-  let activeFilter = 'all';
-  let searchTerm = '';
-
-  function applyFilters() {
-    let visible = 0;
-    cards.forEach(card => {
-      const status = card.dataset.status;
-      const client = card.dataset.client.toLowerCase();
-      const analysis = card.dataset.analysis.toLowerCase();
-      const matchFilter = activeFilter === 'all' || status === activeFilter;
-      const matchSearch = client.includes(searchTerm) || analysis.includes(searchTerm);
-      const show = matchFilter && matchSearch;
-      card.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    resultsCount.textContent = visible;
-    emptyState.style.display = visible === 0 ? 'block' : 'none';
-  }
-
-  chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      activeFilter = chip.dataset.filter;
-      applyFilters();
-    });
-  });
-
   searchInput.addEventListener('input', () => {
-    searchTerm = searchInput.value.toLowerCase().trim();
-    applyFilters();
+    const q = searchInput.value.toLowerCase();
+    let vis = 0;
+    cards.forEach(c => {
+      const show = c.dataset.client.toLowerCase().includes(q);
+      c.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    document.querySelector('.results-info strong').textContent = vis;
   });
 </script>
 </body>

@@ -160,12 +160,20 @@
             <div class="value" th:text="${totalClientes}">0</div>
         </div>
         <div class="summary-card">
-            <div class="label">Pedidos</div>
-            <div class="value">0</div>
+            <div class="label">Orçamentos</div>
+            <div class="value" th:text="${totalOrcamentos}">0</div>
         </div>
         <div class="summary-card">
-            <div class="label">Análises</div>
-            <div class="value">0</div>
+            <div class="label">Pendentes</div>
+            <div class="value" style="color:#854d0e" th:text="${totalPendentes}">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Em andamento</div>
+            <div class="value" style="color:#1d4ed8" th:text="${totalAndamento}">0</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Concluídos</div>
+            <div class="value" style="color:#15803d" th:text="${totalConcluidos}">0</div>
         </div>
     </div>
 
@@ -175,6 +183,8 @@
     <div class="quick-actions">
         <a th:href="@{/usuarios/novo}" class="quick-btn">+ Novo usuário</a>
         <a th:href="@{/usuarios}" class="quick-btn outline">Ver todos os usuários</a>
+        <a th:href="@{/indicadores}" class="quick-btn outline">Ver indicadores</a>
+        <a th:href="@{/solicitacoes}" class="quick-btn outline">Ver solicitações</a>
     </div>
 </main>
 
