@@ -94,6 +94,14 @@ public class OrcamentoService {
         return orcamentoRepository.save(orc);
     }
 
+    /** Atualiza o status do orçamento diretamente (qualquer transição). */
+    @Transactional
+    public Orcamento atualizarStatus(Long id, StatusOrcamento novoStatus) {
+        Orcamento orc = buscarPorId(id);
+        orc.setStatus(novoStatus);
+        return orcamentoRepository.save(orc);
+    }
+
     // ── Contadores para o dashboard ───────────────────────────────────────
 
     public long contarTodos()         { return orcamentoRepository.count(); }

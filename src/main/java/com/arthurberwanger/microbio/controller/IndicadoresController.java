@@ -40,7 +40,7 @@ public class IndicadoresController {
         model.addAttribute("totalConcluido",   contarStatus(todos, StatusOrcamento.CONCLUIDO));
         model.addAttribute("totalCancelado",   contarStatus(todos, StatusOrcamento.CANCELADO));
         model.addAttribute("statusValues",     StatusOrcamento.values());
-        return "indicadores";
+        return "orcamentopainel";
     }
 
     /** Detalhe de um orçamento específico. */
@@ -51,7 +51,7 @@ public class IndicadoresController {
             Orcamento orc = orcamentoService.buscarPorId(id);
             model.addAttribute("orcamento", orc);
             model.addAttribute("statusValues", StatusOrcamento.values());
-            return "editarindicadores";
+            return "editarorcamentopainel";
         } catch (EntityNotFoundException e) {
             ra.addFlashAttribute("erro", e.getMessage());
             return "redirect:/indicadores";
@@ -67,6 +67,21 @@ public class IndicadoresController {
                     "Orçamento #" + id + " promovido para " + atualizado.getStatus().getLabel() + ".");
         } catch (Exception e) {
             ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/indicadores/" + id;
+    }
+
+    /** Atualiza o status livremente via select do formulário de edição. */
+    @PostMapping("/{id}/status")
+    public String atualizarStatus(@PathVariable Long id,
+                                  @RequestParam String status,
+                                  RedirectAttributes ra) {
+        try {
+            StatusOrcamento novoStatus = StatusOrcamento.valueOf(status);
+            orcamentoService.atualizarStatus(id, novoStatus);
+            ra.addFlashAttribute("sucesso", "Status atualizado para \"" + novoStatus.getLabel() + "\".");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Não foi possível atualizar o status: " + e.getMessage());
         }
         return "redirect:/indicadores/" + id;
     }
