@@ -51,7 +51,7 @@ public class IndicadoresController {
             Orcamento orc = orcamentoService.buscarPorId(id);
             model.addAttribute("orcamento", orc);
             model.addAttribute("statusValues", StatusOrcamento.values());
-            return "orcamentos/detalhe";
+            return "editarindicadores";
         } catch (EntityNotFoundException e) {
             ra.addFlashAttribute("erro", e.getMessage());
             return "redirect:/indicadores";

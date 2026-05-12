@@ -1,7 +1,7 @@
 package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.dto.OrcamentoDTO;
-import com.arthurberwanger.microbio.model.Pessoa;
+import com.arthurberwanger.microbio.model.Orcamento;
 import com.arthurberwanger.microbio.service.OrcamentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +30,11 @@ public class OrcamentoController {
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody OrcamentoDTO dto) {
         try {
-            Pessoa salva = service.registrarSolicitacao(dto);
+            Orcamento orc = service.registrarSolicitacao(dto);
             return ResponseEntity.ok(Map.of(
                     "sucesso", true,
                     "mensagem", "Solicitação recebida com sucesso! Entraremos em contato em breve.",
-                    "id", salva.getId()
+                    "id", orc.getId()
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(

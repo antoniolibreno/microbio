@@ -26,15 +26,19 @@ public class OrcamentoService {
 
     // ── Solicitações públicas (site institucional) ─────────────────────────
 
-    /** Recebe uma solicitação do site e salva como Pessoa sem cliente vinculado. */
+    /** Recebe uma solicitação do site, cria a Pessoa e já gera o Orçamento PENDENTE vinculado. */
     @Transactional
-    public Pessoa registrarSolicitacao(OrcamentoDTO dto) {
+    public Orcamento registrarSolicitacao(OrcamentoDTO dto) {
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(dto.getNome().trim());
         pessoa.setEmail(dto.getEmail() != null ? dto.getEmail().trim() : null);
         pessoa.setTelefone(dto.getTelefone() != null ? dto.getTelefone().trim() : null);
         pessoa.setTipoServico(dto.getTipoServico());
-        return pessoaRepository.save(pessoa);
+        pessoaRepository.save(pessoa);
+
+        Orcamento orc = new Orcamento();
+        orc.setPessoa(pessoa);
+        return orcamentoRepository.save(orc);
     }
 
     /** Lista todas as solicitações de orçamento (tabela pessoa). */
