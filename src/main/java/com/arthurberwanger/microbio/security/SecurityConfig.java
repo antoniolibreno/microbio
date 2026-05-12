@@ -1,5 +1,6 @@
 package com.arthurberwanger.microbio.security;
 
+import com.arthurberwanger.microbio.security.handler.LoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,51 +15,73 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Define as regras de acesso de toda a aplicação.
-     */
+    private final LoginSuccessHandler loginSuccessHandler;
+
+    public SecurityConfig(LoginSuccessHandler loginSuccessHandler) {
+        this.loginSuccessHandler = loginSuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+
                 .authorizeHttpRequests(auth -> auth
-                        // Rotas públicas (não precisam de login)
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        // Todo o resto exige autenticação
+                        // Públicos
+                        .requestMatchers(
+                                "/", "/login",
+                                "/css/**", "/js/**", "/img/**", "/images/**", "/fonts/**",
+                                "/api/solicitacoes"
+                        ).permitAll()
+
+                        // Admin
+                        .requestMatchers(
+                                "/dashboard", "/dashboard/**",
+                                "/usuarios", "/usuarios/**",
+                                "/indicadores", "/indicadores/**",
+                                "/solicitacoes", "/solicitacoes/**",
+                                "/pedidos", "/pedidos/**",
+                                "/analises", "/analises/**",
+                                "/clientes", "/clientes/**"
+                        ).hasRole("ADMIN")
+
+                        // Cliente
+                        .requestMatchers("/painel", "/painel/**").hasRole("USER")
+
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
-                        .loginPage("/login")               // URL da nossa página de login customizada
-                        .loginProcessingUrl("/login")      // URL que recebe o POST (Spring Security intercepta)
-                        .usernameParameter("username")     // nome do campo no HTML
-                        .passwordParameter("password")     // nome do campo no HTML
-                        .defaultSuccessUrl("/dashboard", true) // para onde vai após login ok
-                        .failureUrl("/login?erro=true")    // para onde vai se errar a senha
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .successHandler(loginSuccessHandler)
+                        .failureUrl("/login?erro=true")
                         .permitAll()
                 )
+
+                // logoutUrl() aceita apenas POST por padrão no Spring Security 6 — sem precisar de AntPathRequestMatcher
                 .logout(logout -> logout
-                        .logoutUrl("/logout")              // URL do POST de logout
-                        .logoutSuccessUrl("/login?logout=true") // após logout, vai para o login com msg
-                        .invalidateHttpSession(true)       // invalida a sessão
-                        .deleteCookies("JSESSIONID")       // limpa o cookie
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
+                )
+
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/painel")
                 );
 
         return http.build();
     }
 
-    /**
-     * BCrypt é o algoritmo de hash recomendado para senhas.
-     * Nunca armazene senha em texto puro!
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * AuthenticationManager exposto como Bean — necessário caso queiramos
-     * autenticar programaticamente (ex: endpoint REST de login futuramente).
-     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {

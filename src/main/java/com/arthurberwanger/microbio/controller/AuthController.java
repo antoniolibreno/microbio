@@ -1,7 +1,12 @@
 package com.arthurberwanger.microbio.controller;
 
+import com.arthurberwanger.microbio.model.Orcamento.StatusOrcamento;
 import com.arthurberwanger.microbio.repository.ClienteRepository;
+import com.arthurberwanger.microbio.service.OrcamentoService;
+import com.arthurberwanger.microbio.service.PedidoService;
 import com.arthurberwanger.microbio.service.UsuarioService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,45 +15,73 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AuthController {
 
-    private final UsuarioService usuarioService;
+    private final UsuarioService    usuarioService;
     private final ClienteRepository clienteRepository;
+    private final OrcamentoService  orcamentoService;
+    private final PedidoService     pedidoService;
 
-    public AuthController(UsuarioService usuarioService, ClienteRepository clienteRepository) {
-        this.usuarioService = usuarioService;
+    public AuthController(UsuarioService usuarioService,
+                          ClienteRepository clienteRepository,
+                          OrcamentoService orcamentoService,
+                          PedidoService pedidoService) {
+        this.usuarioService    = usuarioService;
         this.clienteRepository = clienteRepository;
+        this.orcamentoService  = orcamentoService;
+        this.pedidoService     = pedidoService;
     }
 
+    @GetMapping("/")
+    public String home() { return "index"; }
+
     @GetMapping("/login")
-    public String loginPage(
-            @RequestParam(value = "erro", required = false) String erro,
-            @RequestParam(value = "logout", required = false) String logout,
-            Model model) {
-
-        if (erro != null) {
-            model.addAttribute("mensagemErro", "Login ou senha inválidos. Tente novamente.");
-        }
-
-        if (logout != null) {
-            model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
-        }
-
+    public String loginPage(@RequestParam(required = false) String erro,
+                            @RequestParam(required = false) String logout,
+                            Model model) {
+        if (erro   != null) model.addAttribute("mensagemErro",    "Login ou senha inválidos. Tente novamente.");
+        if (logout != null) model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
         return "login";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("totalUsuarios", usuarioService.contarUsuarios());
-        model.addAttribute("totalClientes", clienteRepository.count());
+        long total      = orcamentoService.contarTodos();
+        long pendentes  = orcamentoService.contarPorStatus(StatusOrcamento.PENDENTE);
+        long andamento  = orcamentoService.contarPorStatus(StatusOrcamento.EM_ANDAMENTO);
+        long concluidos = orcamentoService.contarPorStatus(StatusOrcamento.CONCLUIDO);
+        long cancelados = orcamentoService.contarPorStatus(StatusOrcamento.CANCELADO);
+
+        model.addAttribute("totalUsuarios",   usuarioService.contarUsuarios());
+        model.addAttribute("totalClientes",   clienteRepository.count());
+        model.addAttribute("totalOrcamentos", total);
+        model.addAttribute("totalPendentes",  pendentes);
+        model.addAttribute("totalAndamento",  andamento);
+        model.addAttribute("totalConcluidos", concluidos);
+        model.addAttribute("totalCancelados", cancelados);
+        model.addAttribute("totalPedidos",    pedidoService.contarTodos());
+
+        long ativos = pendentes + andamento;
+        long taxaConclusao = (total - cancelados) > 0
+                ? (concluidos * 100L / (total - cancelados)) : 0L;
+        model.addAttribute("taxaConclusao", taxaConclusao);
+        model.addAttribute("totalAtivos",   ativos);
+
+        model.addAttribute("orcamentosRecentes", orcamentoService.listarRecentes(6));
+        model.addAttribute("contagemPorMes",     orcamentoService.contagemPorMes(6));
+        model.addAttribute("labelsMeses",        orcamentoService.labelsMeses(6));
         return "dashboard";
     }
 
-    @GetMapping("/indicadores")
-    public String indicadores() {
-        return "indicadores";
-    }
+    @GetMapping("/painel")
+    public String painelCliente() { return "painel/index"; }
 
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/dashboard";
+    @GetMapping("/meu-painel")
+    public String meuPainel() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            return "redirect:" + (isAdmin ? "/dashboard" : "/painel");
+        }
+        return "redirect:/login";
     }
 }

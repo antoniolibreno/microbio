@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Ponte entre o Spring Security e o banco de dados.
- * O Security chama loadUserByUsername passando o que o usuário digitou no campo "username".
+ * Atribui ROLE_ADMIN para usuários com is_admin = true,
+ * e ROLE_USER para os demais (clientes).
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -27,11 +28,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Usuário não encontrado: " + login));
 
-        // Retorna um UserDetails com login, senha (hash) e role padrão
+        String role = usuario.isAdmin() ? "ADMIN" : "USER";
+
         return User.builder()
                 .username(usuario.getLogin())
-                .password(usuario.getSenha())   // já está em BCrypt no banco
-                .roles("USER")                  // pode evoluir para roles no banco depois
+                .password(usuario.getSenha())
+                .roles(role)   // Spring adiciona o prefixo ROLE_ automaticamente
                 .build();
     }
 }

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Pedido #' + ${pedido.id} + ' - Microbio'">Pedido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#1a702b;--primary-hover:#135c22;--primary-light:#e8f5e9;--sidebar-w:240px;--text-dark:#1f2937;--text-muted:#6b7280;--bg:#f3f4f6;--border:#e5e7eb;--font:'Inter',system-ui,sans-serif;--pendente-bg:#fef9c3;--pendente-txt:#854d0e;--andamento-bg:#dbeafe;--andamento-txt:#1d4ed8;--concluido-bg:#dcfce7;--concluido-txt:#15803d;--cancelado-bg:#fee2e2;--cancelado-txt:#b91c1c}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display:flex;min-height:100vh}
+        .sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+        .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+        .sidebar-brand h1{color:var(--primary);font-size:20px;font-weight:700}
+        .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+        .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+        .nav-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px;display:block}
+        .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+        .nav-link:hover,.nav-link.active{background:var(--primary-light);color:var(--primary)}
+        .nav-link.active{font-weight:600}
+        .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+        .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}
+        .user-avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+        .user-name{font-size:13px;font-weight:600}.user-role{font-size:11px;color:var(--text-muted)}
+        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+        .btn-logout:hover{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+        .main{margin-left:var(--sidebar-w);flex:1;padding:32px;max-width:900px}
+        .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:20px}
+        .breadcrumb a{color:var(--text-muted);text-decoration:none}.breadcrumb a:hover{color:var(--primary)}
+        .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+        .page-header h2{font-size:22px;font-weight:700;display:flex;align-items:center;gap:12px}
+        .page-header p{color:var(--text-muted);font-size:14px;margin-top:4px}
+        .status-badge{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;display:inline-block}
+        .status-PENDENTE{background:var(--pendente-bg);color:var(--pendente-txt)}
+        .status-EM_ANDAMENTO{background:var(--andamento-bg);color:var(--andamento-txt)}
+        .status-CONCLUIDO{background:var(--concluido-bg);color:var(--concluido-txt)}
+        .status-CANCELADO{background:var(--cancelado-bg);color:var(--cancelado-txt)}
+        .alert{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+        .alert-ok{background:var(--concluido-bg);border:1px solid #86efac;color:var(--concluido-txt)}
+        .alert-err{background:var(--cancelado-bg);border:1px solid #fca5a5;color:var(--cancelado-txt)}
+        .card{background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden}
+        .card-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+        .card-header h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+        .card-body{padding:20px}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px}
+        .info-item .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:4px}
+        .info-item .val{font-size:15px;font-weight:600;color:var(--text-dark)}
+        .info-item .val-link{font-size:15px;font-weight:600;color:var(--primary);text-decoration:none}
+        .info-item .val-link:hover{text-decoration:underline}
+        .actions-row{display:flex;gap:10px;flex-wrap:wrap}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:background .2s;text-decoration:none}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+        .btn-danger{background:#fff;color:var(--cancelado-txt);border:1.5px solid var(--cancelado-txt)}.btn-danger:hover{background:var(--cancelado-bg)}
+        .btn-secondary{background:#fff;color:var(--text-dark);border:1.5px solid var(--border)}.btn-secondary:hover{background:var(--bg)}
+        .timeline{display:flex;align-items:flex-start;gap:0;margin-bottom:4px}
+        .tl-step{display:flex;flex-direction:column;align-items:center;flex:1}
+        .tl-dot{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-muted);z-index:1}
+        .tl-dot.done{background:var(--primary);border-color:var(--primary);color:#fff}
+        .tl-dot.current{background:#fff;border-color:var(--primary);color:var(--primary)}
+        .tl-label{font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center}
+        .tl-label.done{color:var(--primary);font-weight:600}.tl-label.current{color:var(--primary);font-weight:700}
+        .tl-line{flex:1;height:2px;background:var(--border);margin-top:13px}
+        .tl-line.done{background:var(--primary)}
+    </style>
+</head>
+<body>
+<aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
+
+<main class="main">
+    <div class="breadcrumb">
+        <a th:href="@{/pedidos}">Pedidos</a> <span>›</span>
+        <span th:text="'Pedido #' + ${pedido.id}"></span>
+    </div>
+
+    <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
+    <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
+
+    <div class="page-header">
+        <div>
+            <h2>Pedido <span th:text="'#' + ${pedido.id}" style="color:var(--text-muted);font-weight:400"></span>
+                <span class="status-badge"
+                      th:classappend="'status-' + ${pedido.status}"
+                      th:text="${pedido.status == 'PENDENTE' ? 'Pendente' :
+                         pedido.status == 'EM_ANDAMENTO' ? 'Em andamento' :
+                         pedido.status == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'}">Status</span>
+            </h2>
+            <p th:text="'Criado em ' + ${#temporals.format(pedido.dataPedido,'dd/MM/yyyy HH:mm')}"></p>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="card">
+        <div class="card-body">
+            <div class="timeline">
+                <div class="tl-step">
+                    <div th:classappend="${pedido.status == 'PENDENTE'} ? 'current' : (${pedido.status != 'CANCELADO'} ? 'done' : '')" class="tl-dot">1</div>
+                    <div th:classappend="${pedido.status == 'PENDENTE'} ? 'current' : (${pedido.status != 'CANCELADO'} ? 'done' : '')" class="tl-label">Pendente</div>
+                </div>
+                <div th:classappend="${pedido.status == 'EM_ANDAMENTO' or pedido.status == 'CONCLUIDO'} ? 'done'" class="tl-line"></div>
+                <div class="tl-step">
+                    <div th:classappend="${pedido.status == 'EM_ANDAMENTO'} ? 'current' : (${pedido.status == 'CONCLUIDO'} ? 'done' : '')" class="tl-dot">2</div>
+                    <div th:classappend="${pedido.status == 'EM_ANDAMENTO'} ? 'current' : (${pedido.status == 'CONCLUIDO'} ? 'done' : '')" class="tl-label">Em andamento</div>
+                </div>
+                <div th:classappend="${pedido.status == 'CONCLUIDO'} ? 'done'" class="tl-line"></div>
+                <div class="tl-step">
+                    <div th:classappend="${pedido.status == 'CONCLUIDO'} ? 'done'" class="tl-dot">✓</div>
+                    <div th:classappend="${pedido.status == 'CONCLUIDO'} ? 'done'" class="tl-label">Concluído</div>
+                </div>
+            </div>
+            <div th:if="${pedido.status == 'CANCELADO'}" style="margin-top:14px;padding:10px 14px;background:var(--cancelado-bg);border-radius:8px;font-size:13px;color:var(--cancelado-txt);font-weight:600;text-align:center">
+                ⚠️ Este pedido foi cancelado.
+            </div>
+        </div>
+    </div>
+
+    <!-- Orçamento vinculado -->
+    <div class="card">
+        <div class="card-header"><h3>Orçamento vinculado</h3></div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="lbl">Orçamento</div>
+                    <a th:href="@{/indicadores/{id}(id=${pedido.orcamento.id})}" class="val-link"
+                       th:text="'#ORC-' + ${pedido.orcamento.id}">—</a>
+                </div>
+                <div class="info-item">
+                    <div class="lbl">Cliente / Solicitante</div>
+                    <div class="val" th:text="${pedido.orcamento.pessoa != null ? pedido.orcamento.pessoa.nome :
+                                     (pedido.orcamento.usuario != null ? pedido.orcamento.usuario.login : '—')}">—</div>
+                </div>
+                <div class="info-item" th:if="${pedido.orcamento.pessoa != null and pedido.orcamento.pessoa.tipoServico != null}">
+                    <div class="lbl">Serviço</div>
+                    <div class="val" th:text="${pedido.orcamento.pessoa.tipoServico}">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl">Status do orçamento</div>
+                    <div class="val" th:text="${pedido.orcamento.status.label}">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="card">
+        <div class="card-header"><h3>Ações</h3></div>
+        <div class="card-body">
+            <div class="actions-row">
+                <form th:if="${pedido.status == 'PENDENTE' or pedido.status == 'EM_ANDAMENTO'}"
+                      th:action="@{/pedidos/{id}/promover(id=${pedido.id})}" method="post">
+                    <button type="submit" class="btn btn-primary"
+                            th:text="${pedido.status == 'PENDENTE'} ? '▶ Iniciar andamento' : '✓ Marcar como concluído'">Promover</button>
+                </form>
+                <form th:if="${pedido.status != 'CONCLUIDO' and pedido.status != 'CANCELADO'}"
+                      th:action="@{/pedidos/{id}/cancelar(id=${pedido.id})}" method="post"
+                      onsubmit="return confirm('Cancelar este pedido?')">
+                    <button type="submit" class="btn btn-danger">✕ Cancelar pedido</button>
+                </form>
+                <a th:href="@{/pedidos}" class="btn btn-secondary">← Voltar à lista</a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
