@@ -20,6 +20,13 @@ public class Usuario {
     @Column(nullable = false, length = 255)
     private String senha;
 
+    /**
+     * true  → redireciona para /dashboard (painel administrativo)
+     * false → redireciona para /painel    (painel do cliente)
+     */
+    @Column(name = "is_admin", nullable = false)
+    private boolean admin = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = true)
     private Cliente cliente;
@@ -27,5 +34,11 @@ public class Usuario {
     public Usuario(String login, String senha) {
         this.login = login;
         this.senha = senha;
+    }
+
+    public Usuario(String login, String senha, boolean admin) {
+        this.login = login;
+        this.senha = senha;
+        this.admin = admin;
     }
 }

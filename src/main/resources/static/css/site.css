@@ -1,0 +1,713 @@
+/* Variáveis de Cores baseadas no protótipo */
+:root {
+    --white: #ffffff;
+    --text-dark: #1a1e23;
+    --text-gray: #4b5563;
+
+    --green-primary: #1e873a;
+    --green-dark: #297c31;
+    --green-light-bg: #b6dc8d;
+    --green-card: #d3efb0;
+
+    --brown: #8d5624;
+    --brown-text: #6b3e15;
+    --tan-btn: #f5e4b6;
+
+    --tag-bg: #f5e6ce;
+    --tag-text: #a87238;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ==================== NAVBAR ==================== */
+.navbar {
+    background-color: var(--green-light-bg);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* 🔥 ESSENCIAL */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    /* 🔥 aumenta respiro lateral */
+}
+
+/* Logo */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-logo img {
+    height: 55px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+}
+
+/* Menu (links + botão) */
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-left: auto;
+    /* 🔥 aumenta bastante aqui */
+}
+
+/* Links */
+.navbar-links {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: 30px;
+    /* 🔥 espaço entre links */
+    margin: 0;
+    padding: 0;
+}
+
+
+.navbar-links a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.4px;
+    transition: color 0.2s ease;
+}
+
+.navbar-links a:hover {
+    color: var(--green-primary);
+}
+
+/* Botão */
+.btn-brown {
+    background-color: var(--brown);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-brown:hover {
+    background-color: #6b3e15;
+    transform: translateY(-2px);
+}
+
+/* Responsivo */
+@media (max-width: 992px) {
+    .navbar-menu {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-logo img {
+        height: 48px;
+    }
+
+    .btn-brown {
+        padding: 9px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+body {
+    color: var(--text-dark);
+    line-height: 1.6;
+    background-color: var(--white);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.center {
+    text-align: center;
+}
+
+/* Tipografia */
+h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 15px 0;
+}
+
+h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.highlight {
+    color: var(--green-primary);
+}
+
+/* Botões */
+.btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.btn-green {
+    background-color: var(--green-primary);
+    color: var(--white);
+}
+
+.btn-brown {
+    background-color: var(--brown);
+    color: var(--white);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+}
+
+.btn-tan {
+    background-color: var(--tan-btn);
+    color: var(--brown-text);
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+
+/* --- Hero Section --- */
+.hero {
+    padding: 80px 0;
+    background-color: var(--white);
+}
+
+.hero-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--tag-text);
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.hero-image {
+    flex: 1;
+}
+
+.scientist-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+    background-color: var(--green-card);
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    /* 🔥 MUITO IMPORTANTE */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.map-placeholder {
+    background-color: var(--white);
+    height: 250px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.map {
+    width: 100%;
+    /* largura total do container */
+    height: 400px;
+    /* altura do mapa — aumente para 500px ou mais */
+    border: 0;
+    /* remove borda */
+    border-radius: 10px;
+    /* opcional: deixa arredondado */
+}
+
+/* --- Seções Gerais --- */
+.section-light-green {
+    background-color: var(--green-light-bg);
+    padding: 80px 0;
+}
+
+.section-white {
+    background-color: var(--white);
+    padding: 80px 0;
+}
+
+.section-dark-green {
+    background-color: var(--green-dark);
+    padding: 80px 0;
+    color: var(--white);
+    height: 500px;
+}
+
+.section-dark-green h2,
+.section-dark-green p {
+    color: var(--white);
+    margin-top: 40px;
+}
+
+.section-header p {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-dark);
+}
+
+/* --- About Grid --- */
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.card {
+    background-color: var(--green-card);
+    padding: 30px;
+    border-radius: 12px;
+    position: relative;
+    /* Transição suave para o card todo (sombra e posição) */
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+}
+
+/* Efeito de subir o card - Ajustado para ser mais fluido */
+.about-grid .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* --- O SEGREDO DA SUAVEZA --- */
+
+/* 1. O conteúdo extra começa com altura ZERO e invisível */
+.card .extra-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    /* Adicionamos um delay minúsculo na opacidade para ela aparecer enquanto abre */
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s ease-out,
+        margin-top 0.5s ease;
+}
+
+/* 2. Quando passar o mouse no CARD, o conteúdo desenrola */
+.card:hover .extra-content {
+    max-height: 200px;
+    /* Valor fixo maior que o texto, mas não exagerado */
+    opacity: 1;
+    margin-top: 15px;
+    /* Dá o espaçamento suave entre o texto fixo e o extra */
+}
+
+/* Ajustes finos nos textos e ícones */
+.card p {
+    color: var(--text-dark);
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.card .icon {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    /* O ícone também reage suavemente */
+    transition: transform 0.4s ease;
+}
+
+.card:hover .icon {
+    transform: scale(1.1) rotate(5deg);
+    /* Dá uma leve "vivida" no ícone */
+}
+
+/* Container Principal da Section */
+.especialidades-section {
+    padding: 40px 20px;
+    background-color: #f7f9f8;
+    /* Cor de fundo clara inspirada na imagem */
+    font-family: Arial, sans-serif;
+}
+
+/* Cabeçalho da Section */
+.especialidades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 30px auto;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-text h2 {
+    font-size: 2rem;
+    color: #121629;
+    margin: 0 0 10px 0;
+}
+
+.header-text p {
+    margin: 0;
+    color: #4a4a4a;
+}
+
+.link-todos {
+    color: #9d5025;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-todos:hover {
+    text-decoration: underline;
+}
+
+/* Container dos Cards */
+.cards2-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* O Card 2 */
+.card2 {
+    background-color: #aed982;
+    /* Verde claro do card */
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.card2:hover {
+    transform: translateY(-5px);
+}
+
+/* Área da imagem superior */
+.card2-img {
+    height: 140px;
+    width: 100%;
+    /* Aqui você pode usar background-image: url('caminho/para/imagem.jpg'); no seu projeto real */
+}
+
+/* Corpo do card */
+.card2-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card2-body h3 {
+    margin: 0 0 10px 0;
+    color: #121629;
+    font-size: 1.1rem;
+}
+
+.card2-desc {
+    margin: 0 0 15px 0;
+    font-size: 0.9rem;
+    color: #2c3e2e;
+    line-height: 1.4;
+}
+
+/* Área Expansível Oculta */
+.card2-expandable {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+/* 2. O estado ATIVO (visível) */
+/* IMPORTANTE: .card2.active deve estar sem espaço entre eles */
+.card2.active .card2-expandable {
+    max-height: 200px;
+    /* Ajuste conforme o tamanho do texto */
+    opacity: 1;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
+.card2-expandable p {
+    font-size: 0.85rem;
+    color: #1b261c;
+    margin: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 10px;
+}
+
+/* Botão Detalhes */
+.btn-detalhes {
+    margin-top: auto;
+    /* Empurra o botão pro final do card */
+    background-color: #f7e6c3;
+    /* Bege/Amarelo claro */
+    color: #a85822;
+    /* Laranja/Marrom do texto */
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-detalhes:hover {
+    background-color: #ebd5a9;
+}
+
+
+
+/* --- CTA --- */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* --- Footer --- */
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-desc {
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.contact-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.contact-list li {
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--white);
+    color: var(--green-primary);
+    border-radius: 50%;
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+.map-placeholder {
+    background-color: var(--white);
+    height: 250px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 1.2rem;
+}
+
+.map-placeholder i {
+    font-size: 2rem;
+    color: var(--green-primary);
+    margin-bottom: 10px;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.footer-bottom p {
+    margin: auto;
+    color: var(--text-dark);
+}
+
+.footer-links a {
+    color: var(--text-dark);
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+/* --- Responsividade (Mobile) --- */
+@media (max-width: 992px) {
+    .hero-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-image {
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 2.8rem;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .specialties-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .specialties-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .specialties-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}

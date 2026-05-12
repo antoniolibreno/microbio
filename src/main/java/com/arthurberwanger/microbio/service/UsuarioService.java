@@ -41,13 +41,21 @@ public class UsuarioService {
     }
 
     @Transactional
+    /** Cria usuário comum (cliente). */
     public void criarUsuarioSimples(String login, String senha) {
+        criarUsuarioSimples(login, senha, false);
+    }
+
+    /** Cria usuário com controle explícito de admin. */
+    public void criarUsuarioSimples(String login, String senha, boolean admin) {
         validarLogin(login, null);
-        usuarioRepository.save(new Usuario(login, passwordEncoder.encode(senha)));
+        Usuario u = new Usuario(login, passwordEncoder.encode(senha), admin);
+        usuarioRepository.save(u);
     }
 
     @Transactional
     public void criarUsuarioCompleto(String login, String senha,
+                                     boolean admin,
                                      String tipoCliente, String cpfCnpj,
                                      String rua, String numero, String bairro,
                                      String cidade, String estado, String cep) {
@@ -65,16 +73,22 @@ public class UsuarioService {
         cliente.setEndereco(endereco);
         clienteRepository.save(cliente);
 
-        Usuario u = new Usuario(login, passwordEncoder.encode(senha));
+        Usuario u = new Usuario(login, passwordEncoder.encode(senha), admin);
         u.setCliente(cliente);
         usuarioRepository.save(u);
     }
 
     @Transactional
     public void atualizarAcesso(Long id, String login, String senha) {
+        atualizarAcesso(id, login, senha, false);
+    }
+
+    @Transactional
+    public void atualizarAcesso(Long id, String login, String senha, boolean admin) {
         Usuario u = buscarPorId(id);
         validarLogin(login, id);
         u.setLogin(login);
+        u.setAdmin(admin);
         if (senha != null && !senha.isBlank())
             u.setSenha(passwordEncoder.encode(senha));
         usuarioRepository.save(u);
@@ -82,12 +96,14 @@ public class UsuarioService {
 
     @Transactional
     public void atualizarCompleto(Long id, String login, String senha,
+                                  boolean admin,
                                   String tipoCliente, String cpfCnpj,
                                   String rua, String numero, String bairro,
                                   String cidade, String estado, String cep) {
         Usuario u = buscarPorId(id);
         validarLogin(login, id);
         u.setLogin(login);
+        u.setAdmin(admin);
         if (senha != null && !senha.isBlank())
             u.setSenha(passwordEncoder.encode(senha));
 

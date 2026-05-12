@@ -234,94 +234,47 @@
     /* Right column sticky */
     .sidebar-right { position:sticky; top:80px; }
 
-    /* Save feedback */
-    .save-feedback {
-      display:none; align-items:center; gap:6px;
-      font-size:12px; color:var(--primary); font-weight:600;
-      padding:6px 12px; background:var(--primary-light); border-radius:8px;
-    }
-    .save-feedback.show { display:flex; }
   </style>
 </head>
 <body>
 
-<!-- ── SIDEBAR ── -->
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <h1>🧫 Microbio</h1>
-    <p>Laboratório de microbiologia</p>
-  </div>
-  <nav class="sidebar-nav">
-    <span class="nav-section">Geral</span>
-    <a th:href="@{/dashboard}" class="nav-link active">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Dashboard
-    </a>
-    <span class="nav-section">Cadastros</span>
-    <a th:href="@{/usuarios}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Usuários
-    </a>
-    <span class="nav-section">Operações</span>
-    <a th:href="@{/indicadores}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Indicadores
-    </a>
-    <a th:href="@{/pedidos}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      Pedidos
-    </a>
-    <a th:href="@{/analises}" class="nav-link">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Análises
-    </a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="user-info">
-      <div class="user-avatar">A</div>
-      <div>
-        <div class="user-name" sec:authentication="name">admin</div>
-        <div class="user-role">Administrador</div>
-      </div>
-    </div>
-    <form th:action="@{/logout}" method="post">
-      <button type="submit" class="btn-logout">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sair
-      </button>
-    </form>
-  </div>
-</aside>
+<aside th:replace="~{fragments/sidebar :: sidebar('indicadores')}"></aside>
 
 <!-- ── MAIN ── -->
 <main class="main">
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <a th:href="@{/indicadores}" href="indicadores.html" class="back-btn">
+    <a th:href="@{/indicadores}" class="back-btn">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-      Indicadores
+      Orçamentos
     </a>
     <div class="topbar-divider"></div>
     <div class="topbar-title">
-      <h2>Frigorífico Santa Clara</h2>
-      <span class="topbar-id">#ORC-2024-0041</span>
-      <span class="status-badge status-pendente" id="statusBadge">Pendente</span>
+      <h2 th:text="${orcamento.pessoa != null ? orcamento.pessoa.nome : (orcamento.usuario != null ? orcamento.usuario.login : 'Orçamento')}">Cliente</h2>
+      <span class="topbar-id" th:text="'#ORC-' + ${orcamento.id}">#ORC-0</span>
+      <span class="status-badge"
+            th:classappend="${orcamento.status.cssClass}"
+            th:text="${orcamento.status.label}">Status</span>
     </div>
     <div class="topbar-actions">
-            <span class="save-feedback" id="saveFeedback">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                Salvo
-            </span>
       <button class="btn btn-outline" onclick="window.print()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Imprimir
       </button>
-      <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">
+      <button class="btn btn-primary" onclick="document.getElementById('statusForm').submit()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Salvar alterações
       </button>
     </div>
+  </div>
+
+  <!-- Flash messages -->
+  <div th:if="${sucesso}" style="margin:0 32px;padding:12px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;color:#15803d;font-size:14px;font-weight:500;margin-top:16px;">
+    ✅ <span th:text="${sucesso}"></span>
+  </div>
+  <div th:if="${erro}" style="margin:0 32px;padding:12px 16px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#b91c1c;font-size:14px;font-weight:500;margin-top:16px;">
+    ❌ <span th:text="${erro}"></span>
   </div>
 
   <!-- CONTENT -->
@@ -445,19 +398,18 @@
           <h3>Status do orçamento</h3>
         </div>
         <div class="section-body">
-          <div class="form-group">
-            <label class="form-label">Status atual</label>
-            <select class="form-select" id="statusSelect" onchange="updateStatusBadge(this.value)">
-              <option value="pendente" selected>Pendente</option>
-              <option value="andamento">Em andamento</option>
-              <option value="concluido">Concluído</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">Motivo da atualização</label>
-            <textarea class="form-control" style="min-height:70px;" placeholder="Descreva o motivo da mudança de status…"></textarea>
-          </div>
+          <form th:action="@{/indicadores/{id}/status(id=${orcamento.id})}" method="post" id="statusForm">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Status atual</label>
+              <select name="status" class="form-select" id="statusSelect">
+                <option th:each="s : ${statusValues}"
+                        th:value="${s.name()}"
+                        th:text="${s.label}"
+                        th:selected="${orcamento.status == s}">
+                </option>
+              </select>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -533,25 +485,5 @@
   </div>
 </main>
 
-<script>
-  const statusLabels = {
-    pendente:  'Pendente',
-    andamento: 'Em andamento',
-    concluido: 'Concluído',
-    cancelado: 'Cancelado'
-  };
-
-  function updateStatusBadge(val) {
-    const badge = document.getElementById('statusBadge');
-    badge.className = 'status-badge status-' + val;
-    badge.textContent = statusLabels[val];
-  }
-
-  function handleSave() {
-    const fb = document.getElementById('saveFeedback');
-    fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 2500);
-  }
-</script>
 </body>
 </html>
