@@ -44,13 +44,30 @@ public class AuthController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
+        long total      = orcamentoService.contarTodos();
+        long pendentes  = orcamentoService.contarPorStatus(StatusOrcamento.PENDENTE);
+        long andamento  = orcamentoService.contarPorStatus(StatusOrcamento.EM_ANDAMENTO);
+        long concluidos = orcamentoService.contarPorStatus(StatusOrcamento.CONCLUIDO);
+        long cancelados = orcamentoService.contarPorStatus(StatusOrcamento.CANCELADO);
+
         model.addAttribute("totalUsuarios",   usuarioService.contarUsuarios());
         model.addAttribute("totalClientes",   clienteRepository.count());
-        model.addAttribute("totalOrcamentos", orcamentoService.contarTodos());
-        model.addAttribute("totalPendentes",  orcamentoService.contarPorStatus(StatusOrcamento.PENDENTE));
-        model.addAttribute("totalAndamento",  orcamentoService.contarPorStatus(StatusOrcamento.EM_ANDAMENTO));
-        model.addAttribute("totalConcluidos", orcamentoService.contarPorStatus(StatusOrcamento.CONCLUIDO));
+        model.addAttribute("totalOrcamentos", total);
+        model.addAttribute("totalPendentes",  pendentes);
+        model.addAttribute("totalAndamento",  andamento);
+        model.addAttribute("totalConcluidos", concluidos);
+        model.addAttribute("totalCancelados", cancelados);
         model.addAttribute("totalPedidos",    pedidoService.contarTodos());
+
+        long ativos = pendentes + andamento;
+        long taxaConclusao = (total - cancelados) > 0
+                ? (concluidos * 100L / (total - cancelados)) : 0L;
+        model.addAttribute("taxaConclusao", taxaConclusao);
+        model.addAttribute("totalAtivos",   ativos);
+
+        model.addAttribute("orcamentosRecentes", orcamentoService.listarRecentes(6));
+        model.addAttribute("contagemPorMes",     orcamentoService.contagemPorMes(6));
+        model.addAttribute("labelsMeses",        orcamentoService.labelsMeses(6));
         return "dashboard";
     }
 

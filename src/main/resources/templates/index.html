@@ -32,7 +32,6 @@
 
                 <!-- Thymeleaf Security: mostra "Painel" se logado, "Login" se não -->
                 <a sec:authorize="isAuthenticated()"
-                   sec:authentication="principal.authorities"
                    th:href="@{/meu-painel}"
                    id="linkPainel">
                     <button class="btn btn-brown">Meu Painel</button>

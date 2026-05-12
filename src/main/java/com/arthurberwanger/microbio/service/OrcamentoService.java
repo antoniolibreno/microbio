@@ -10,7 +10,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class OrcamentoService {
@@ -108,5 +112,40 @@ public class OrcamentoService {
     public long contarPorStatus(StatusOrcamento s) {
         return orcamentoRepository.findAllComDetalhes().stream()
                 .filter(o -> o.getStatus() == s).count();
+    }
+
+    /** Últimos N orçamentos ordenados por data desc. */
+    public List<Orcamento> listarRecentes(int limite) {
+        return orcamentoRepository.findAllComDetalhes().stream()
+                .limit(limite)
+                .toList();
+    }
+
+    /** Contagem de orçamentos por mês nos últimos numMeses meses. */
+    public List<Long> contagemPorMes(int numMeses) {
+        List<Orcamento> todos = orcamentoRepository.findAllComDetalhes();
+        List<Long> resultado = new ArrayList<>();
+        LocalDateTime agora = LocalDateTime.now();
+        for (int i = numMeses - 1; i >= 0; i--) {
+            LocalDateTime inicio = agora.minusMonths(i)
+                    .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime fim = inicio.plusMonths(1);
+            long count = todos.stream()
+                    .filter(o -> !o.getDataOrcamento().isBefore(inicio) && o.getDataOrcamento().isBefore(fim))
+                    .count();
+            resultado.add(count);
+        }
+        return resultado;
+    }
+
+    /** Labels de mês/ano para os últimos numMeses meses (ex: "jan/25"). */
+    public List<String> labelsMeses(int numMeses) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM/yy", new Locale("pt", "BR"));
+        List<String> labels = new ArrayList<>();
+        LocalDateTime agora = LocalDateTime.now();
+        for (int i = numMeses - 1; i >= 0; i--) {
+            labels.add(agora.minusMonths(i).format(fmt));
+        }
+        return labels;
     }
 }
