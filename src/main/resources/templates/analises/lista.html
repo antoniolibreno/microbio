@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análises · Microbio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#16a34a; --primary-light:#dcfce7; --primary-dark:#15803d; --primary-50:#f0fdf4;
+      --bg-page:#f1f5f9; --bg-card:#ffffff; --surface:#ffffff;
+      --text-primary:#0f172a; --text-secondary:#64748b; --text-tertiary:#94a3b8;
+      --text-muted:#64748b; --text-faint:#94a3b8;
+      --border:#e2e8f0; --border-color:#e2e8f0; --border-light:#f1f5f9;
+      --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
+      --shadow-md:0 2px 8px rgba(0,0,0,0.06);
+      --sidebar-w:248px;
+      --font:'Plus Jakarta Sans',system-ui,sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);
+         -webkit-font-smoothing:antialiased;display:flex;min-height:100vh}
+
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
+             display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+    .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+    .sidebar-brand h1{color:var(--primary);font-size:18px;font-weight:700}
+    .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+    .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+    .nav-section{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;
+                 letter-spacing:.5px;padding:10px 12px 6px;display:block}
+    .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);
+              color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;
+              border-left:3px solid transparent;transition:all .15s;margin-bottom:2px}
+    .nav-link:hover{background:#f8fafc}
+    .nav-link.active{background:var(--primary-50);color:var(--primary);border-left-color:var(--primary);font-weight:600}
+    .sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+    .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:4px}
+    .user-avatar{width:32px;height:32px;background:var(--primary-50);color:var(--primary);
+                 border-radius:50%;display:flex;align-items:center;justify-content:center;
+                 font-size:13px;font-weight:700;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+    .user-role{font-size:11px;color:var(--text-muted)}
+    .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;
+                background:none;border:1px solid var(--border);border-radius:var(--radius-md);
+                color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+                transition:all .15s}
+    .btn-logout:hover{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+
+    .main-area{margin-left:var(--sidebar-w);flex:1;overflow-y:auto;background:var(--bg-page);min-height:100vh}
+    .page-container{padding:28px 32px;max-width:1280px;margin:0 auto}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+    .page-title{font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px;letter-spacing:-.3px}
+    .page-subtitle{font-size:14px;color:var(--text-secondary)}
+
+    .search-input{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg-card);
+                  border:1px solid var(--border-color);border-radius:var(--radius-md);min-width:260px}
+    .search-input:focus-within{border-color:var(--primary)}
+    .search-input input{border:none;outline:none;font-family:inherit;font-size:13px;
+                        color:var(--text-primary);background:transparent;width:100%}
+    .search-input input::placeholder{color:var(--text-tertiary)}
+
+    .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+    .btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;font-weight:600;
+         border:none;border-radius:var(--radius-md);transition:all .15s;font-size:14px;padding:8px 16px;text-decoration:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+
+    .alert{padding:10px 14px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500;
+           margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .alert-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+    .alert-err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+
+    .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border-color);margin-bottom:20px}
+    .tab{padding:10px 16px;border:none;background:none;cursor:pointer;font-family:inherit;
+         font-size:13px;font-weight:500;color:var(--text-secondary);border-bottom:2px solid transparent;
+         transition:all .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+    .tab:hover{color:var(--text-primary)}
+    .tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+    .tab-count{background:var(--bg-page);padding:1px 7px;border-radius:10px;font-size:12px;font-weight:600}
+    .tab.active .tab-count{background:var(--primary-light);color:var(--primary-dark)}
+
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    @media (max-width:720px){.stat-grid{grid-template-columns:1fr}}
+    .stat-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);
+               padding:16px 18px;border-top:3px solid transparent;cursor:pointer;font-family:inherit;
+               text-align:left;transition:all .2s;text-decoration:none;display:block}
+    .stat-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+    .stat-card.active{outline:2px solid var(--stat-color,var(--primary));outline-offset:-1px}
+    .stat-label{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--text-secondary);
+                margin-bottom:6px;display:block}
+    .stat-value{font-size:28px;font-weight:700;line-height:1.2;color:var(--stat-color,var(--primary))}
+    .stat-subtitle{font-size:12px;color:var(--text-tertiary);margin-top:2px}
+
+    .count-line{font-size:13px;color:var(--text-secondary);margin-bottom:12px}
+
+    .list-container{display:flex;flex-direction:column;gap:8px}
+    .list-row{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--bg-card);
+              border:1px solid var(--border-color);border-radius:var(--radius-lg);cursor:pointer;
+              transition:all .15s;text-decoration:none;color:inherit}
+    .list-row:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+    .row-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;
+                justify-content:center;flex-shrink:0;background:var(--primary-light);color:var(--primary-dark)}
+    .row-main{flex:1;min-width:0}
+    .row-title{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+    .row-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+    .row-id{font-size:12px;color:var(--text-tertiary);font-family:monospace}
+    .row-meta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-secondary);flex-wrap:wrap}
+    .row-meta .icon{display:inline-flex;align-items:center;gap:4px}
+    .row-valor{font-weight:600;color:var(--primary)}
+    .row-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+           font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+    .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .badge.ativa  {background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+    .badge.inativa{background:#f1f5f9;color:#64748b;border-color:#cbd5e1}
+
+    .empty{text-align:center;padding:48px 24px;color:var(--text-tertiary);background:var(--bg-card);
+           border:1px solid var(--border-color);border-radius:var(--radius-lg)}
+    .empty-title{font-size:15px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px}
+    .empty-sub{font-size:13px}
+  </style>
+</head>
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('analises')}"></aside>
+
+<main class="main-area">
+  <div class="page-container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Análises</h1>
+        <p class="page-subtitle">Cadastre e gerencie os tipos de análise oferecidos pelo laboratório</p>
+      </div>
+      <div class="header-actions">
+        <div class="search-input">
+          <svg width="18" height="18" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Buscar análise..." oninput="filtrar()">
+        </div>
+        <a th:href="@{/analises/nova}" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nova análise
+        </a>
+      </div>
+    </div>
+
+    <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
+    <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
+
+    <div class="tab-bar">
+      <a th:href="@{/analises}" th:classappend="${statusFiltro == null} ? 'active'" class="tab">
+        Todas <span class="tab-count" th:text="${totalTodas}">0</span>
+      </a>
+      <a th:href="@{/analises(status='ATIVA')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'ATIVA')} ? 'active'" class="tab">
+        Ativas <span class="tab-count" th:text="${totalAtivas}">0</span>
+      </a>
+      <a th:href="@{/analises(status='INATIVA')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'INATIVA')} ? 'active'" class="tab">
+        Inativas <span class="tab-count" th:text="${totalInativas}">0</span>
+      </a>
+    </div>
+
+    <div class="stat-grid">
+      <a th:href="@{/analises}" class="stat-card"
+         th:classappend="${statusFiltro == null} ? 'active'" style="--stat-color:#16a34a">
+        <span class="stat-label">TOTAL</span>
+        <div class="stat-value" th:text="${totalTodas}">0</div>
+        <div class="stat-subtitle">análises cadastradas</div>
+      </a>
+      <a th:href="@{/analises(status='ATIVA')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'ATIVA')} ? 'active'"
+         style="--stat-color:#22c55e">
+        <span class="stat-label">ATIVAS</span>
+        <div class="stat-value" th:text="${totalAtivas}">0</div>
+        <div class="stat-subtitle">disponíveis para solicitação</div>
+      </a>
+      <a th:href="@{/analises(status='INATIVA')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'INATIVA')} ? 'active'"
+         style="--stat-color:#94a3b8">
+        <span class="stat-label">INATIVAS</span>
+        <div class="stat-value" th:text="${totalInativas}">0</div>
+        <div class="stat-subtitle">temporariamente indisponíveis</div>
+      </a>
+    </div>
+
+    <div class="count-line">
+      Exibindo <span id="countLabel" th:text="${#lists.size(analises)}">0</span>
+      <span th:text="${#lists.size(analises) == 1 ? 'análise' : 'análises'}">análises</span>
+    </div>
+
+    <div class="list-container" id="listContainer">
+      <div th:if="${#lists.isEmpty(analises)}" class="empty">
+        <svg width="40" height="40" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.5">
+          <path d="M10 2v6L4.9 18.1A1 1 0 0 0 5.8 19.5h12.4a1 1 0 0 0 .9-1.4L14 8V2"/>
+          <line x1="10" y1="2" x2="14" y2="2"/>
+        </svg>
+        <div class="empty-title">Nenhuma análise encontrada</div>
+        <div class="empty-sub">Tente ajustar os filtros ou cadastre uma nova análise.</div>
+      </div>
+
+      <a th:each="a : ${analises}"
+         th:href="@{/analises/{id}(id=${a.id})}"
+         class="list-row"
+         th:with="st=${a.status}">
+        <div class="row-avatar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M10 2v6L4.9 18.1A1 1 0 0 0 5.8 19.5h12.4a1 1 0 0 0 .9-1.4L14 8V2"/>
+            <line x1="10" y1="2" x2="14" y2="2"/>
+          </svg>
+        </div>
+        <div class="row-main">
+          <div class="row-title">
+            <span class="row-name" th:text="${a.nome}">Análise</span>
+            <span class="row-id" th:text="'#ANL-' + ${a.id}">#ANL-0</span>
+          </div>
+          <div class="row-meta">
+            <span class="icon">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span th:text="${a.tempoProducao != null and !#strings.isEmpty(a.tempoProducao) ? a.tempoProducao : '—'}">—</span>
+            </span>
+            <span th:with="n=${#lists.size(a.amostras)}"
+                  th:text="${n} + ' ' + (${n} == 1 ? 'tipo de amostra' : 'tipos de amostras')">0 tipos</span>
+            <span class="row-valor"
+                  th:text="${a.valor != null ? 'R$ ' + #numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="row-right">
+          <span class="badge"
+                th:classappend="${#strings.equalsIgnoreCase(st,'ATIVA')} ? 'ativa' : 'inativa'"
+                th:text="${#strings.equalsIgnoreCase(st,'ATIVA') ? 'Ativa' : 'Inativa'}">Status</span>
+          <svg width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </div>
+</main>
+
+<script>
+  function filtrar() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#listContainer .list-row');
+    let vis = 0;
+    rows.forEach(r => {
+      const show = r.textContent.toLowerCase().includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    const label = document.getElementById('countLabel');
+    if (label && q) label.textContent = vis;
+  }
+</script>
+</body>
+</html>

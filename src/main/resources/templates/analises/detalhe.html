@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${analise.nome} + ' · Análise · Microbio'">Análise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#16a34a; --primary-light:#dcfce7; --primary-dark:#15803d; --primary-50:#f0fdf4;
+      --bg-page:#f1f5f9; --bg-card:#ffffff; --surface:#ffffff;
+      --text-primary:#0f172a; --text-secondary:#64748b; --text-tertiary:#94a3b8;
+      --text-muted:#64748b; --text-faint:#94a3b8;
+      --border:#e2e8f0; --border-color:#e2e8f0; --border-light:#f1f5f9;
+      --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
+      --shadow-md:0 2px 8px rgba(0,0,0,0.06); --shadow-lg:0 8px 24px rgba(0,0,0,0.1);
+      --sidebar-w:248px;
+      --font:'Plus Jakarta Sans',system-ui,sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);
+         -webkit-font-smoothing:antialiased;display:flex;min-height:100vh}
+
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
+             display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+    .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+    .sidebar-brand h1{color:var(--primary);font-size:18px;font-weight:700}
+    .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+    .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+    .nav-section{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;
+                 letter-spacing:.5px;padding:10px 12px 6px;display:block}
+    .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);
+              color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;
+              border-left:3px solid transparent;transition:all .15s;margin-bottom:2px}
+    .nav-link:hover{background:#f8fafc}
+    .nav-link.active{background:var(--primary-50);color:var(--primary);border-left-color:var(--primary);font-weight:600}
+    .sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+    .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:4px}
+    .user-avatar{width:32px;height:32px;background:var(--primary-50);color:var(--primary);
+                 border-radius:50%;display:flex;align-items:center;justify-content:center;
+                 font-size:13px;font-weight:700;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+    .user-role{font-size:11px;color:var(--text-muted)}
+    .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;
+                background:none;border:1px solid var(--border);border-radius:var(--radius-md);
+                color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+                transition:all .15s}
+    .btn-logout:hover{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+
+    .main-area{margin-left:var(--sidebar-w);flex:1;overflow-y:auto;background:var(--bg-page);min-height:100vh}
+    .page-container{padding:28px 32px;max-width:1280px;margin:0 auto}
+
+    .detail-topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;
+                   margin-bottom:24px;flex-wrap:wrap}
+    .topbar-left{display:flex;align-items:center;gap:12px;min-width:0}
+    .back-btn{width:36px;height:36px;border-radius:var(--radius-md);border:1px solid var(--border-color);
+              background:var(--bg-card);cursor:pointer;display:flex;align-items:center;justify-content:center;
+              transition:all .15s;color:var(--text-secondary);text-decoration:none;flex-shrink:0}
+    .back-btn:hover{background:var(--bg-page);color:var(--text-primary)}
+    .topbar-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+    .topbar-title h1{font-size:20px;font-weight:700;color:var(--text-primary)}
+    .topbar-id{font-size:13px;color:var(--text-tertiary);font-family:monospace}
+    .topbar-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+           font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+    .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .badge.ativa  {background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+    .badge.inativa{background:#f1f5f9;color:#64748b;border-color:#cbd5e1}
+
+    .btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;font-weight:600;
+         border:none;border-radius:var(--radius-md);transition:all .15s;font-size:14px;padding:8px 16px;text-decoration:none}
+    .btn-sm{font-size:13px;padding:6px 12px}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-secondary{background:var(--bg-page);color:var(--text-primary);border:1px solid var(--border-color)}
+    .btn-secondary:hover{background:#e2e8f0}
+    .btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+    .btn-danger:hover{background:#fee2e2}
+    .btn-ghost{background:transparent;color:var(--text-secondary)}
+
+    .alert{padding:10px 14px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500;
+           margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .alert-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+    .alert-err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+
+    .detail-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+    @media (max-width:980px){.detail-layout{grid-template-columns:1fr}}
+    .detail-main{display:flex;flex-direction:column;gap:16px}
+    .detail-sidebar{display:flex;flex-direction:column;gap:16px}
+
+    .card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:20px}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+    .card-title{font-size:15px;font-weight:700;color:var(--text-primary)}
+    .sidebar-card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:14px;
+                        text-transform:uppercase;letter-spacing:.3px}
+    .help-text{font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5}
+
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-field{display:flex;flex-direction:column;gap:5px}
+    .form-field.full{grid-column:1 / -1}
+    .form-field label{font-size:11px;font-weight:600;color:var(--text-secondary);
+                      text-transform:uppercase;letter-spacing:.3px}
+    .form-field input,.form-field select,.form-field textarea{
+      font-family:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--border-color);
+      border-radius:var(--radius-sm);color:var(--text-primary);background:var(--bg-card);
+      transition:border-color .15s;outline:none;width:100%}
+    .form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--primary)}
+    .form-field textarea{resize:vertical;min-height:88px}
+
+    .table-wrapper{overflow-x:auto}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table thead th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;
+                         color:var(--text-secondary);text-transform:uppercase;letter-spacing:.3px;
+                         border-bottom:1px solid var(--border-color);background:var(--bg-page)}
+    .data-table tbody td{padding:8px 10px;border-bottom:1px solid var(--border-light);
+                         color:var(--text-secondary);vertical-align:middle}
+    .data-table tbody tr:last-child td{border-bottom:none}
+    .table-input{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--border-color);
+                 border-radius:var(--radius-sm);width:100%;outline:none;background:transparent;
+                 transition:border-color .15s;color:var(--text-primary)}
+    .table-input:focus{border-color:var(--primary)}
+    .icon-btn-danger{width:28px;height:28px;border-radius:var(--radius-sm);border:none;
+                     background:transparent;cursor:pointer;color:var(--text-tertiary);
+                     display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .icon-btn-danger:hover{background:#fef2f2;color:#ef4444}
+
+    .summary{display:flex;flex-direction:column;gap:10px;font-size:14px}
+    .summary-row{display:flex;justify-content:space-between}
+    .summary-row span{color:var(--text-secondary)}
+    .info-label{color:var(--text-tertiary);font-size:11px;font-weight:600;text-transform:uppercase;
+                letter-spacing:.3px;margin-bottom:3px}
+    .info-value{color:var(--text-secondary);font-size:13px}
+
+    .modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.4);
+                   display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+    .modal-overlay[hidden]{display:none}
+    .modal-content{background:var(--bg-card);border-radius:16px;padding:28px;width:100%;
+                   max-width:440px;box-shadow:var(--shadow-lg)}
+    .modal-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;
+                justify-content:center;margin-bottom:16px}
+    .modal-title{font-size:18px;font-weight:600;margin-bottom:8px;color:var(--text-primary)}
+    .modal-body{color:var(--text-secondary);font-size:14px;line-height:1.6}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
+  </style>
+</head>
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('analises')}"></aside>
+
+<main class="main-area">
+  <div class="page-container" th:with="st=${analise.status}">
+
+    <form id="formSalvar" th:action="@{/analises/{id}/atualizar(id=${analise.id})}" method="post">
+
+      <div class="detail-topbar">
+        <div class="topbar-left">
+          <a th:href="@{/analises}" class="back-btn" title="Voltar">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </a>
+          <div class="topbar-title">
+            <h1 th:text="${analise.nome}">Análise</h1>
+            <span class="topbar-id" th:text="'#ANL-' + ${analise.id}">#ANL-0</span>
+            <span class="badge"
+                  th:classappend="${#strings.equalsIgnoreCase(st,'ATIVA')} ? 'ativa' : 'inativa'"
+                  th:text="${#strings.equalsIgnoreCase(st,'ATIVA') ? 'Ativa' : 'Inativa'}">Status</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button type="button" class="btn btn-danger btn-sm"
+                  onclick="document.getElementById('modalExcluir').hidden=false">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Excluir
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Salvar
+          </button>
+        </div>
+      </div>
+
+      <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
+      <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
+
+      <div class="detail-layout">
+        <div class="detail-main">
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Informações da análise</h2>
+            </div>
+            <div class="form-grid">
+              <div class="form-field full">
+                <label>Nome da análise</label>
+                <input type="text" name="nome" th:value="${analise.nome}" placeholder="Ex: Coliformes Totais" required>
+              </div>
+              <div class="form-field full">
+                <label>Descrição</label>
+                <textarea name="descricao" rows="3"
+                          placeholder="Descreva o que essa análise engloba, metodologias utilizadas, etc."
+                          th:text="${analise.descricao}"></textarea>
+              </div>
+              <div class="form-field">
+                <label>Tempo de produção médio</label>
+                <input type="text" name="tempoProducao" th:value="${analise.tempoProducao}" placeholder="Ex: 5 dias úteis">
+              </div>
+              <div class="form-field">
+                <label>Valor da análise (R$)</label>
+                <input type="number" step="0.01" name="valor"
+                       th:value="${analise.valor}" placeholder="0,00">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                Amostras necessárias (<span id="countAmostras" th:text="${#lists.size(analise.amostras)}">0</span>)
+              </h2>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addAmostra()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Adicionar tipo
+              </button>
+            </div>
+            <p class="help-text">Defina os tipos de amostras que o cliente precisará fornecer para esta análise.</p>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tipo de amostra</th>
+                    <th style="width:170px">Quantidade mínima</th>
+                    <th style="width:190px">Conservação</th>
+                    <th style="width:40px"></th>
+                  </tr>
+                </thead>
+                <tbody id="amostrasBody">
+                  <tr th:each="am : ${analise.amostras}">
+                    <td><input class="table-input" name="tipo" th:value="${am.tipo}" placeholder="Ex: Alimento sólido"></td>
+                    <td><input class="table-input" name="quantidade" th:value="${am.quantidade}" placeholder="Ex: 250g mínimo"></td>
+                    <td><input class="table-input" name="conservacao" th:value="${am.conservacao}" placeholder="Ex: Refrigerado (2-8°C)"></td>
+                    <td>
+                      <button type="button" class="icon-btn-danger" onclick="removeAmostra(this)">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr id="emptyRow" th:if="${#lists.isEmpty(analise.amostras)}">
+                    <td colspan="4" style="text-align:center;padding:24px;color:var(--text-tertiary);font-size:13px">
+                      Nenhum tipo de amostra cadastrado. Clique em "Adicionar tipo" acima.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-sidebar">
+          <div class="card">
+            <h3 class="sidebar-card-title">Status</h3>
+            <div class="form-field">
+              <label>Status da análise</label>
+              <select name="status">
+                <option value="ATIVA"   th:selected="${#strings.equalsIgnoreCase(st,'ATIVA')}">Ativa</option>
+                <option value="INATIVA" th:selected="${#strings.equalsIgnoreCase(st,'INATIVA')}">Inativa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="sidebar-card-title">Resumo</h3>
+            <div class="summary">
+              <div class="summary-row">
+                <span>Valor</span>
+                <strong style="color:var(--primary)"
+                        th:text="${analise.valor != null ? 'R$ ' + #numbers.formatDecimal(analise.valor,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</strong>
+              </div>
+              <div class="summary-row">
+                <span>Prazo</span>
+                <strong th:text="${analise.tempoProducao != null and !#strings.isEmpty(analise.tempoProducao) ? analise.tempoProducao : '—'}">—</strong>
+              </div>
+              <div class="summary-row">
+                <span>Tipos de amostra</span>
+                <strong th:text="${#lists.size(analise.amostras)}">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="sidebar-card-title">Informações</h3>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div class="info-label">Criado em</div>
+                <div class="info-value"
+                     th:text="${analise.dataCriacao != null ? #temporals.format(analise.dataCriacao,'dd/MM/yyyy HH:mm') : '—'}">—</div>
+              </div>
+              <div>
+                <div class="info-label">Última atualização</div>
+                <div class="info-value"
+                     th:text="${analise.dataAtualizacao != null ? #temporals.format(analise.dataAtualizacao,'dd/MM/yyyy HH:mm') : '—'}">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Modal Excluir -->
+    <div class="modal-overlay" id="modalExcluir" hidden onclick="if(event.target===this) this.hidden=true">
+      <div class="modal-content">
+        <div class="modal-icon" style="background:#fef2f2;color:#ef4444">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h3 class="modal-title">Excluir análise</h3>
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir a análise <strong th:text="${analise.nome}">—</strong>?</p>
+          <p style="margin-top:8px;font-size:13px;color:var(--text-tertiary)">
+            Essa ação removerá a análise do sistema. Orçamentos e pedidos existentes não serão afetados.
+          </p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" onclick="document.getElementById('modalExcluir').hidden=true">Voltar</button>
+          <form th:action="@{/analises/{id}/excluir(id=${analise.id})}" method="post" style="display:inline">
+            <button type="submit" class="btn btn-danger">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Confirmar exclusão
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  function recountAmostras() {
+    const rows = document.querySelectorAll('#amostrasBody tr:not(#emptyRow)');
+    document.getElementById('countAmostras').textContent = rows.length;
+    const empty = document.getElementById('emptyRow');
+    if (empty) empty.hidden = rows.length > 0;
+  }
+  function addAmostra() {
+    const tbody = document.getElementById('amostrasBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="table-input" name="tipo" placeholder="Ex: Alimento sólido"></td>
+      <td><input class="table-input" name="quantidade" placeholder="Ex: 250g mínimo"></td>
+      <td><input class="table-input" name="conservacao" placeholder="Ex: Refrigerado (2-8°C)"></td>
+      <td>
+        <button type="button" class="icon-btn-danger" onclick="removeAmostra(this)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </td>`;
+    tbody.appendChild(tr);
+    recountAmostras();
+  }
+  function removeAmostra(btn) {
+    btn.closest('tr').remove();
+    recountAmostras();
+  }
+</script>
+</body>
+</html>

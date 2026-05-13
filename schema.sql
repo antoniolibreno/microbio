@@ -5,6 +5,7 @@
 
 -- Limpar tabelas (ordem respeitando FKs)
 DROP TABLE IF EXISTS pedido_analise CASCADE;
+DROP TABLE IF EXISTS amostra_necessaria CASCADE;
 DROP TABLE IF EXISTS analise CASCADE;
 DROP TABLE IF EXISTS pedido CASCADE;
 DROP TABLE IF EXISTS orcamento CASCADE;
@@ -88,10 +89,25 @@ CREATE TABLE pedido (
 -- TABELA: analise
 -- ============================================================
 CREATE TABLE analise (
-                         id        SERIAL PRIMARY KEY,
-                         nome      VARCHAR(150) NOT NULL,
-                         descricao TEXT,
-                         valor     DECIMAL(10, 2)
+                         id               SERIAL PRIMARY KEY,
+                         nome             VARCHAR(150) NOT NULL,
+                         descricao        TEXT,
+                         valor            DECIMAL(10, 2),
+                         status           VARCHAR(20) DEFAULT 'ATIVA',
+                         tempo_producao   VARCHAR(60),
+                         data_criacao     TIMESTAMP DEFAULT NOW(),
+                         data_atualizacao TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================================
+-- TABELA: amostra_necessaria
+-- ============================================================
+CREATE TABLE amostra_necessaria (
+                         id          SERIAL PRIMARY KEY,
+                         analise_id  INT REFERENCES analise(id) ON DELETE CASCADE,
+                         tipo        VARCHAR(120),
+                         quantidade  VARCHAR(60),
+                         conservacao VARCHAR(120)
 );
 
 -- ============================================================
