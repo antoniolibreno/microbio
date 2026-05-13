@@ -59,6 +59,15 @@ public class PedidoService {
         return pedidoRepository.save(p);
     }
 
+    /** Atualiza status + observações em uma única chamada. */
+    @Transactional
+    public Pedido atualizar(Long id, String status, String observacoes) {
+        Pedido p = buscarPorId(id);
+        if (status != null && !status.isBlank()) p.setStatus(status);
+        p.setObservacoes(observacoes);
+        return pedidoRepository.save(p);
+    }
+
     /** Cancela o pedido. */
     @Transactional
     public Pedido cancelar(Long id) {

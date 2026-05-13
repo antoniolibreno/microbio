@@ -6,7 +6,7 @@
 <!--
   Fragmento da sidebar administrativa.
   Uso: <aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
-  Valores válidos para activePage: 'dashboard', 'usuarios', 'indicadores', 'analises'
+  Valores válidos para activePage: 'dashboard', 'usuarios', 'indicadores', 'pedidos', 'analises'
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +53,16 @@
         <line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       Orçamentos
+    </a>
+    <a th:href="@{/pedidos}"
+       th:classappend="${activePage == 'pedidos'} ? 'active'"
+       class="nav-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <rect x="8" y="2" width="8" height="4" rx="1"/>
+        <path d="M9 14l2 2 4-4"/>
+      </svg>
+      Pedidos
     </a>
     <a th:href="@{/analises}"
        th:classappend="${activePage == 'analises'} ? 'active'"

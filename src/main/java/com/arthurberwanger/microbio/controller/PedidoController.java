@@ -19,8 +19,14 @@ public class PedidoController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("pedidos",         pedidoService.listarTodos());
+    public String listar(@RequestParam(required = false) String status, Model model) {
+        var todos = pedidoService.listarTodos();
+        var filtrados = (status != null && !status.isBlank())
+                ? todos.stream().filter(p -> status.equalsIgnoreCase(p.getStatus())).toList()
+                : todos;
+        model.addAttribute("pedidos",         filtrados);
+        model.addAttribute("statusFiltro",    status);
+        model.addAttribute("totalTodos",      todos.size());
         model.addAttribute("totalPendentes",  pedidoService.contarPorStatus("PENDENTE"));
         model.addAttribute("totalAndamento",  pedidoService.contarPorStatus("EM_ANDAMENTO"));
         model.addAttribute("totalConcluidos", pedidoService.contarPorStatus("CONCLUIDO"));
@@ -46,6 +52,20 @@ public class PedidoController {
             ra.addFlashAttribute("sucesso", "Pedido #" + id + " atualizado para " + labelStatus(p.getStatus()) + ".");
         } catch (Exception e) {
             ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/pedidos/" + id;
+    }
+
+    @PostMapping("/{id}/atualizar")
+    public String atualizar(@PathVariable Long id,
+                            @RequestParam(required = false) String status,
+                            @RequestParam(required = false) String observacoes,
+                            RedirectAttributes ra) {
+        try {
+            pedidoService.atualizar(id, status, observacoes);
+            ra.addFlashAttribute("sucesso", "Pedido atualizado.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Erro ao atualizar: " + e.getMessage());
         }
         return "redirect:/pedidos/" + id;
     }

@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -103,6 +104,16 @@ public class OrcamentoService {
     public Orcamento atualizarStatus(Long id, StatusOrcamento novoStatus) {
         Orcamento orc = buscarPorId(id);
         orc.setStatus(novoStatus);
+        return orcamentoRepository.save(orc);
+    }
+
+    /** Atualiza status, valor total e observações em uma única chamada. */
+    @Transactional
+    public Orcamento atualizar(Long id, StatusOrcamento status, BigDecimal valorTotal, String observacoes) {
+        Orcamento orc = buscarPorId(id);
+        if (status != null)      orc.setStatus(status);
+        if (valorTotal != null)  orc.setValorTotal(valorTotal);
+        orc.setObservacoes(observacoes);
         return orcamentoRepository.save(orc);
     }
 

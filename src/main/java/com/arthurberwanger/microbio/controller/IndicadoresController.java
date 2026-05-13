@@ -2,13 +2,16 @@ package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.model.Orcamento;
 import com.arthurberwanger.microbio.model.Orcamento.StatusOrcamento;
+import com.arthurberwanger.microbio.model.Pedido;
 import com.arthurberwanger.microbio.service.OrcamentoService;
+import com.arthurberwanger.microbio.service.PedidoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -16,9 +19,12 @@ import java.util.List;
 public class IndicadoresController {
 
     private final OrcamentoService orcamentoService;
+    private final PedidoService    pedidoService;
 
-    public IndicadoresController(OrcamentoService orcamentoService) {
+    public IndicadoresController(OrcamentoService orcamentoService,
+                                 PedidoService pedidoService) {
         this.orcamentoService = orcamentoService;
+        this.pedidoService    = pedidoService;
     }
 
     /** Lista todos os orçamentos com filtro opcional por status. */
@@ -84,6 +90,43 @@ public class IndicadoresController {
             ra.addFlashAttribute("erro", "Não foi possível atualizar o status: " + e.getMessage());
         }
         return "redirect:/indicadores/" + id;
+    }
+
+    /** Salva status + valor + observações de uma vez (botão "Salvar" do detalhe). */
+    @PostMapping("/{id}/atualizar")
+    public String atualizar(@PathVariable Long id,
+                            @RequestParam(required = false) String status,
+                            @RequestParam(required = false) String valorTotal,
+                            @RequestParam(required = false) String observacoes,
+                            RedirectAttributes ra) {
+        try {
+            StatusOrcamento s = (status != null && !status.isBlank())
+                    ? StatusOrcamento.valueOf(status) : null;
+            BigDecimal valor = null;
+            if (valorTotal != null && !valorTotal.isBlank()) {
+                valor = new BigDecimal(valorTotal.replace(",", "."));
+            }
+            orcamentoService.atualizar(id, s, valor, observacoes);
+            ra.addFlashAttribute("sucesso", "Orçamento atualizado.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Erro ao atualizar: " + e.getMessage());
+        }
+        return "redirect:/indicadores/" + id;
+    }
+
+    /** "Ganhar" o orçamento: marca CONCLUIDO e cria um Pedido vinculado. */
+    @PostMapping("/{id}/ganhar")
+    public String ganhar(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            Pedido novo = pedidoService.criarDe(id);
+            orcamentoService.atualizarStatus(id, StatusOrcamento.CONCLUIDO);
+            ra.addFlashAttribute("sucesso",
+                    "Orçamento ganho! Pedido #" + novo.getId() + " criado.");
+            return "redirect:/pedidos/" + novo.getId();
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Não foi possível ganhar o orçamento: " + e.getMessage());
+            return "redirect:/indicadores/" + id;
+        }
     }
 
     /** Cancela o orçamento. */

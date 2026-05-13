@@ -3,145 +3,279 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedidos - Microbio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-          --primary:#1a702b;--primary-hover:#135c22;--primary-light:#e8f5e9;
-          --sidebar-w:240px;--text-dark:#1f2937;--text-muted:#6b7280;--bg:#f3f4f6;--border:#e5e7eb;
-          --font:'Inter',system-ui,sans-serif;
-          --pendente-bg:#fef9c3;--pendente-txt:#854d0e;
-          --andamento-bg:#dbeafe;--andamento-txt:#1d4ed8;
-          --concluido-bg:#dcfce7;--concluido-txt:#15803d;
-          --cancelado-bg:#fee2e2;--cancelado-txt:#b91c1c;
-        }
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display:flex;min-height:100vh}
-        .sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
-        .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
-        .sidebar-brand h1{color:var(--primary);font-size:20px;font-weight:700}
-        .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
-        .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
-        .nav-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px;display:block}
-        .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
-        .nav-link:hover,.nav-link.active{background:var(--primary-light);color:var(--primary)}
-        .nav-link.active{font-weight:600}
-        .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
-        .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}
-        .user-avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
-        .user-name{font-size:13px;font-weight:600}.user-role{font-size:11px;color:var(--text-muted)}
-        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
-        .btn-logout:hover{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
-        .main{margin-left:var(--sidebar-w);flex:1;padding:32px}
-        .page-header{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-        .page-header-text h2{font-size:22px;font-weight:700}
-        .page-header-text p{color:var(--text-muted);font-size:14px;margin-top:4px}
-        .summary-strip{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-        .sum-card{flex:1;min-width:120px;background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-        .sum-card .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
-        .sum-card .val{font-size:24px;font-weight:700;margin-top:2px}
-        .table-card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
-        .table-toolbar{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-        .search-box{display:flex;align-items:center;gap:8px;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;background:#fff}
-        .search-box input{border:none;outline:none;font-size:14px;color:var(--text-dark);width:220px}
-        table{width:100%;border-collapse:collapse}
-        thead th{background:#f9fafb;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
-        tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s}
-        tbody tr:hover{background:#fafafa}
-        tbody tr:last-child{border-bottom:none}
-        td{padding:14px 16px;font-size:14px;vertical-align:middle}
-        .status-badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;display:inline-block}
-        .status-PENDENTE{background:var(--pendente-bg);color:var(--pendente-txt)}
-        .status-EM_ANDAMENTO{background:var(--andamento-bg);color:var(--andamento-txt)}
-        .status-CONCLUIDO{background:var(--concluido-bg);color:var(--concluido-txt)}
-        .status-CANCELADO{background:var(--cancelado-bg);color:var(--cancelado-txt)}
-        .btn-link{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;background:var(--primary-light);color:var(--primary);transition:background .15s}
-        .btn-link:hover{background:var(--primary);color:#fff}
-        .empty-state{padding:60px 20px;text-align:center;color:var(--text-muted)}
-        .empty-state h3{font-size:16px;font-weight:600;color:var(--text-dark);margin-bottom:6px}
-        .alert{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:8px}
-        .alert-ok{background:var(--concluido-bg);border:1px solid #86efac;color:var(--concluido-txt)}
-        .alert-err{background:var(--cancelado-bg);border:1px solid #fca5a5;color:var(--cancelado-txt)}
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos · Microbio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#16a34a; --primary-light:#dcfce7; --primary-dark:#15803d; --primary-50:#f0fdf4;
+      --bg-page:#f1f5f9; --bg-card:#ffffff; --surface:#ffffff;
+      --text-primary:#0f172a; --text-secondary:#64748b; --text-tertiary:#94a3b8;
+      --text-dark:#0f172a; --text-muted:#64748b; --text-faint:#94a3b8;
+      --border:#e2e8f0; --border-color:#e2e8f0; --border-light:#f1f5f9;
+      --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
+      --shadow-md:0 2px 8px rgba(0,0,0,0.06);
+      --sidebar-w:248px;
+      --font:'Plus Jakarta Sans',system-ui,sans-serif;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary);
+         -webkit-font-smoothing:antialiased;display:flex;min-height:100vh}
+
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
+             display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+    .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+    .sidebar-brand h1{color:var(--primary);font-size:18px;font-weight:700}
+    .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+    .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+    .nav-section{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;
+                 letter-spacing:.5px;padding:10px 12px 6px;display:block}
+    .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);
+              color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;
+              border-left:3px solid transparent;transition:all .15s;margin-bottom:2px}
+    .nav-link:hover{background:#f8fafc}
+    .nav-link.active{background:var(--primary-50);color:var(--primary);border-left-color:var(--primary);font-weight:600}
+    .sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+    .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:4px}
+    .user-avatar{width:32px;height:32px;background:var(--primary-50);color:var(--primary);
+                 border-radius:50%;display:flex;align-items:center;justify-content:center;
+                 font-size:13px;font-weight:700;flex-shrink:0}
+    .user-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+    .user-role{font-size:11px;color:var(--text-muted)}
+    .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;
+                background:none;border:1px solid var(--border);border-radius:var(--radius-md);
+                color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+                transition:all .15s}
+    .btn-logout:hover{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+
+    .main-area{margin-left:var(--sidebar-w);flex:1;overflow-y:auto;background:var(--bg-page);min-height:100vh}
+    .page-container{padding:28px 32px;max-width:1280px;margin:0 auto}
+
+    .page-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+    .page-title{font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px;letter-spacing:-.3px}
+    .page-subtitle{font-size:14px;color:var(--text-secondary)}
+
+    .search-input{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg-card);
+                  border:1px solid var(--border-color);border-radius:var(--radius-md);min-width:280px}
+    .search-input:focus-within{border-color:var(--primary)}
+    .search-input input{border:none;outline:none;font-family:inherit;font-size:13px;
+                        color:var(--text-primary);background:transparent;width:100%}
+    .search-input input::placeholder{color:var(--text-tertiary)}
+
+    .alert{padding:10px 14px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500;
+           margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .alert-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+    .alert-err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+
+    .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border-color);margin-bottom:20px;
+             overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+    .tab-bar::-webkit-scrollbar{display:none}
+    .tab{padding:10px 16px;border:none;background:none;cursor:pointer;font-family:inherit;
+         font-size:13px;font-weight:500;color:var(--text-secondary);border-bottom:2px solid transparent;
+         transition:all .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
+    .tab:hover{color:var(--text-primary)}
+    .tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+    .tab-count{background:var(--bg-page);padding:1px 7px;border-radius:10px;font-size:12px;font-weight:600}
+    .tab.active .tab-count{background:var(--primary-light);color:var(--primary-dark)}
+
+    .stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+    @media (max-width:1100px){.stat-grid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:720px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+    .stat-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-lg);
+               padding:16px 18px;border-top:3px solid transparent;cursor:pointer;font-family:inherit;
+               text-align:left;transition:all .2s;text-decoration:none;display:block}
+    .stat-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+    .stat-card.active{outline:2px solid var(--stat-color,var(--primary));outline-offset:-1px}
+    .stat-label{font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--text-secondary);
+                margin-bottom:6px;display:block}
+    .stat-value{font-size:28px;font-weight:700;line-height:1.2;color:var(--stat-color,var(--primary))}
+    .stat-subtitle{font-size:12px;color:var(--text-tertiary);margin-top:2px}
+
+    .count-line{font-size:13px;color:var(--text-secondary);margin-bottom:12px}
+
+    .list-container{display:flex;flex-direction:column;gap:8px}
+    .list-row{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--bg-card);
+              border:1px solid var(--border-color);border-radius:var(--radius-lg);cursor:pointer;
+              transition:all .15s;text-decoration:none;color:inherit}
+    .list-row:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+    .row-avatar{width:40px;height:40px;border-radius:10px;font-weight:700;font-size:13px;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;text-transform:uppercase}
+    .row-main{flex:1;min-width:0}
+    .row-title{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+    .row-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+    .row-id{font-size:12px;color:var(--text-tertiary);font-family:monospace}
+    .row-meta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-secondary);flex-wrap:wrap}
+    .tag-analysis{display:inline-flex;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500;
+                  background:var(--primary-light);color:var(--primary-dark)}
+    .via-tag{font-size:11px;color:var(--text-tertiary);font-family:monospace;background:var(--bg-page);
+             padding:1px 6px;border-radius:4px}
+    .row-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+           font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+    .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .badge.pendente {background:#fffbeb;color:#b45309;border-color:#fde68a}
+    .badge.andamento{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+    .badge.concluido{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+    .badge.cancelado{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+
+    .empty{text-align:center;padding:48px 24px;color:var(--text-tertiary);background:var(--bg-card);
+           border:1px solid var(--border-color);border-radius:var(--radius-lg)}
+    .empty-title{font-size:15px;font-weight:600;color:var(--text-secondary);margin:8px 0 4px}
+    .empty-sub{font-size:13px}
+  </style>
 </head>
 <body>
-<aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
 
-<main class="main">
+<aside th:replace="~{fragments/sidebar :: sidebar('pedidos')}"></aside>
+
+<main class="main-area">
+  <div class="page-container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Pedidos</h1>
+        <p class="page-subtitle">Gerencie todos os pedidos de análise do laboratório</p>
+      </div>
+      <div class="search-input">
+        <svg width="18" height="18" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Buscar cliente ou ID..." oninput="filtrar()">
+      </div>
+    </div>
+
     <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
     <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
 
-    <div class="page-header">
-        <div class="page-header-text">
-            <h2>Pedidos</h2>
-            <p>Pedidos gerados a partir dos orçamentos aprovados.</p>
-        </div>
+    <div class="tab-bar">
+      <a th:href="@{/pedidos}" th:classappend="${statusFiltro == null} ? 'active'" class="tab">
+        Todos <span class="tab-count" th:text="${totalTodos}">0</span>
+      </a>
+      <a th:href="@{/pedidos(status='PENDENTE')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'PENDENTE')} ? 'active'" class="tab">
+        Pendentes <span class="tab-count" th:text="${totalPendentes}">0</span>
+      </a>
+      <a th:href="@{/pedidos(status='EM_ANDAMENTO')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'EM_ANDAMENTO')} ? 'active'" class="tab">
+        Em andamento <span class="tab-count" th:text="${totalAndamento}">0</span>
+      </a>
+      <a th:href="@{/pedidos(status='CONCLUIDO')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'CONCLUIDO')} ? 'active'" class="tab">
+        Concluídos <span class="tab-count" th:text="${totalConcluidos}">0</span>
+      </a>
+      <a th:href="@{/pedidos(status='CANCELADO')}"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'CANCELADO')} ? 'active'" class="tab">
+        Cancelados <span class="tab-count" th:text="${totalCancelados}">0</span>
+      </a>
     </div>
 
-    <div class="summary-strip">
-        <div class="sum-card"><div class="lbl">Total</div><div class="val" style="color:var(--primary)" th:text="${pedidos.size()}">0</div></div>
-        <div class="sum-card"><div class="lbl">Pendentes</div><div class="val" style="color:var(--pendente-txt)" th:text="${totalPendentes}">0</div></div>
-        <div class="sum-card"><div class="lbl">Em andamento</div><div class="val" style="color:var(--andamento-txt)" th:text="${totalAndamento}">0</div></div>
-        <div class="sum-card"><div class="lbl">Concluídos</div><div class="val" style="color:var(--concluido-txt)" th:text="${totalConcluidos}">0</div></div>
-        <div class="sum-card"><div class="lbl">Cancelados</div><div class="val" style="color:var(--cancelado-txt)" th:text="${totalCancelados}">0</div></div>
+    <div class="stat-grid">
+      <a th:href="@{/pedidos}" class="stat-card"
+         th:classappend="${statusFiltro == null} ? 'active'" style="--stat-color:#16a34a">
+        <span class="stat-label">TOTAL</span>
+        <div class="stat-value" th:text="${totalTodos}">0</div>
+        <div class="stat-subtitle">pedidos registrados</div>
+      </a>
+      <a th:href="@{/pedidos(status='PENDENTE')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'PENDENTE')} ? 'active'"
+         style="--stat-color:#f59e0b">
+        <span class="stat-label">PENDENTES</span>
+        <div class="stat-value" th:text="${totalPendentes}">0</div>
+        <div class="stat-subtitle">aguardando início</div>
+      </a>
+      <a th:href="@{/pedidos(status='EM_ANDAMENTO')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'EM_ANDAMENTO')} ? 'active'"
+         style="--stat-color:#3b82f6">
+        <span class="stat-label">EM ANDAMENTO</span>
+        <div class="stat-value" th:text="${totalAndamento}">0</div>
+        <div class="stat-subtitle">em processamento</div>
+      </a>
+      <a th:href="@{/pedidos(status='CONCLUIDO')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'CONCLUIDO')} ? 'active'"
+         style="--stat-color:#22c55e">
+        <span class="stat-label">CONCLUÍDOS</span>
+        <div class="stat-value" th:text="${totalConcluidos}">0</div>
+        <div class="stat-subtitle">finalizados</div>
+      </a>
+      <a th:href="@{/pedidos(status='CANCELADO')}" class="stat-card"
+         th:classappend="${statusFiltro != null and #strings.equalsIgnoreCase(statusFiltro, 'CANCELADO')} ? 'active'"
+         style="--stat-color:#ef4444">
+        <span class="stat-label">CANCELADOS</span>
+        <div class="stat-value" th:text="${totalCancelados}">0</div>
+        <div class="stat-subtitle">não prosseguidos</div>
+      </a>
     </div>
 
-    <div class="table-card">
-        <div class="table-toolbar">
-            <div class="search-box">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="searchInput" placeholder="Buscar pedido..." oninput="filtrar()">
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(pedidos)}" class="empty-state">
-            <h3>Nenhum pedido ainda</h3>
-            <p>Pedidos são gerados a partir dos <a th:href="@{/indicadores}" style="color:var(--primary)">orçamentos</a> aprovados.</p>
-        </div>
-
-        <table th:unless="${#lists.isEmpty(pedidos)}" id="tabela">
-            <thead><tr>
-                <th>#</th>
-                <th>Orçamento</th>
-                <th>Cliente / Solicitante</th>
-                <th>Status</th>
-                <th>Data</th>
-                <th></th>
-            </tr></thead>
-            <tbody>
-            <tr th:each="p : ${pedidos}">
-                <td th:text="${p.id}" style="color:var(--text-muted);font-family:monospace;font-size:13px"></td>
-                <td>
-                    <a th:href="@{/indicadores/{id}(id=${p.orcamento.id})}"
-                       style="color:var(--primary);font-weight:600;text-decoration:none;font-size:13px"
-                       th:text="'#ORC-' + ${p.orcamento.id}">—</a>
-                </td>
-                <td th:text="${p.orcamento.pessoa != null ? p.orcamento.pessoa.nome : (p.orcamento.usuario != null ? p.orcamento.usuario.login : '—')}">—</td>
-                <td>
-            <span class="status-badge"
-                  th:classappend="'status-' + ${p.status}"
-                  th:text="${p.status == 'PENDENTE' ? 'Pendente' :
-                             p.status == 'EM_ANDAMENTO' ? 'Em andamento' :
-                             p.status == 'CONCLUIDO' ? 'Concluído' :
-                             p.status == 'CANCELADO' ? 'Cancelado' : p.status}">—</span>
-                </td>
-                <td style="color:var(--text-muted);font-size:13px" th:text="${#temporals.format(p.dataPedido,'dd/MM/yyyy HH:mm')}">—</td>
-                <td><a th:href="@{/pedidos/{id}(id=${p.id})}" class="btn-link">Ver →</a></td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="count-line">
+      Exibindo <span id="countLabel" th:text="${#lists.size(pedidos)}">0</span>
+      <span th:text="${#lists.size(pedidos) == 1 ? 'pedido' : 'pedidos'}">pedidos</span>
     </div>
+
+    <div class="list-container" id="listContainer">
+      <div th:if="${#lists.isEmpty(pedidos)}" class="empty">
+        <svg width="40" height="40" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.5">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+          <rect x="8" y="2" width="8" height="4" rx="1"/>
+        </svg>
+        <div class="empty-title">Nenhum pedido encontrado</div>
+        <div class="empty-sub">Pedidos são criados a partir dos orçamentos aprovados.</div>
+      </div>
+
+      <a th:each="p : ${pedidos}"
+         th:href="@{/pedidos/{id}(id=${p.id})}"
+         class="list-row"
+         th:with="
+           orc=${p.orcamento},
+           nome=${orc != null and orc.pessoa != null and orc.pessoa.nome != null ? orc.pessoa.nome : (orc != null and orc.usuario != null ? orc.usuario.login : 'Sem cliente')},
+           tipo=${orc != null and orc.pessoa != null and orc.pessoa.tipoServico != null and !#strings.isEmpty(orc.pessoa.tipoServico) ? orc.pessoa.tipoServico : 'Não especificado'},
+           st=${p.status}">
+        <div class="row-avatar"
+             th:style="${st == 'PENDENTE' ? 'background:#fffbeb;color:#b45309'
+                       : st == 'EM_ANDAMENTO' ? 'background:#eff6ff;color:#1d4ed8'
+                       : st == 'CONCLUIDO' ? 'background:#f0fdf4;color:#15803d'
+                       : 'background:#fef2f2;color:#b91c1c'}"
+             th:text="${#strings.toUpperCase(nome.length() &lt; 2 ? nome : nome.substring(0,2))}">??</div>
+        <div class="row-main">
+          <div class="row-title">
+            <span class="row-name" th:text="${nome}">Cliente</span>
+            <span class="row-id" th:text="'#PED-' + ${p.id}">#PED-0</span>
+            <span th:if="${orc != null}" class="via-tag" th:text="'via #ORC-' + ${orc.id}">via #ORC-0</span>
+          </div>
+          <div class="row-meta">
+            <span class="tag-analysis" th:text="${tipo}">Análise</span>
+            <span>📅 <span th:text="${#temporals.format(p.dataPedido,'dd/MM/yyyy')}">—</span></span>
+            <span style="font-weight:600;color:var(--text-primary)"
+                  th:text="${orc != null and orc.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(orc.valorTotal,1,'POINT',2,'COMMA') : '—'}">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="row-right">
+          <span class="badge"
+                th:classappend="${st == 'PENDENTE'} ? 'pendente' : (${st == 'EM_ANDAMENTO'} ? 'andamento' : (${st == 'CONCLUIDO'} ? 'concluido' : 'cancelado'))"
+                th:text="${st == 'PENDENTE' ? 'Pendente' : (st == 'EM_ANDAMENTO' ? 'Em andamento' : (st == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'))}">Status</span>
+          <svg width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </div>
 </main>
 
 <script>
-    function filtrar() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      document.querySelectorAll('#tabela tbody tr').forEach(tr => {
-        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
-      });
-    }
+  function filtrar() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#listContainer .list-row');
+    let vis = 0;
+    rows.forEach(r => {
+      const show = r.textContent.toLowerCase().includes(q);
+      r.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    const label = document.getElementById('countLabel');
+    if (label && q) label.textContent = vis;
+  }
 </script>
 </body>
 </html>
