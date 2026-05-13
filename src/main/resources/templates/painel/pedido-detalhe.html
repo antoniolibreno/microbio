@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Pedido #' + ${pedido.id} + ' - Microbio'">Pedido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#1a702b;--primary-hover:#135c22;--primary-light:#e8f5e9;--brown:#9c5f32;--sidebar-w:240px;--text-dark:#1f2937;--text-muted:#6b7280;--text-faint:#9ca3af;--bg:#f3f4f6;--border:#e5e7eb;--font:'Inter',system-ui,sans-serif}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display:flex;min-height:100vh}
+        .sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+        .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+        .sidebar-brand h1{color:var(--primary);font-size:20px;font-weight:700}
+        .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+        .sidebar-nav{flex:1;padding:16px 12px}
+        .nav-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px;display:block}
+        .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+        .nav-link:hover,.nav-link.active{background:var(--primary-light);color:var(--primary)}
+        .nav-link.active{font-weight:600}
+        .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+        .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}
+        .user-avatar{width:32px;height:32px;background:var(--brown);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+        .user-name{font-size:13px;font-weight:600}
+        .user-role{font-size:11px;color:var(--text-muted)}
+        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+        .btn-logout:hover{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+        .main{margin-left:var(--sidebar-w);flex:1;padding:32px}
+        .inner{max-width:860px}
+        .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:20px}
+        .breadcrumb a{color:var(--text-muted);text-decoration:none}
+        .breadcrumb a:hover{color:var(--primary);text-decoration:underline}
+        .page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+        .page-header h2{font-size:22px;font-weight:700;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .page-header p{color:var(--text-muted);font-size:14px;margin-top:4px}
+        .status-badge{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;display:inline-block}
+        .s-pendente{background:#fef9c3;color:#854d0e}
+        .s-em_andamento{background:#dbeafe;color:#1d4ed8}
+        .s-concluido{background:#dcfce7;color:#15803d}
+        .s-cancelado{background:#fee2e2;color:#b91c1c}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:background .2s;text-decoration:none}
+        .btn-secondary{background:#fff;color:var(--text-dark);border:1.5px solid var(--border)}
+        .btn-secondary:hover{background:var(--bg)}
+        .card{background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden}
+        .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .card-header h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+        .card-body{padding:20px}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px}
+        .info-item .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:4px}
+        .info-item .val{font-size:15px;font-weight:600;color:var(--text-dark)}
+        /* Timeline pedido */
+        .timeline{display:flex;align-items:center}
+        .tl-step{display:flex;flex-direction:column;align-items:center;flex:1}
+        .tl-dot{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-muted);z-index:1}
+        .tl-dot.done{background:var(--primary);border-color:var(--primary);color:#fff}
+        .tl-dot.current{background:#fff;border-color:var(--primary);color:var(--primary)}
+        .tl-label{font-size:11px;color:var(--text-muted);margin-top:6px;text-align:center}
+        .tl-label.done{color:var(--primary);font-weight:600}
+        .tl-label.current{color:var(--primary);font-weight:700}
+        .tl-line{flex:1;height:2px;background:var(--border);margin-top:-14px}
+        .tl-line.done{background:var(--primary)}
+        /* Análises */
+        .t-head th{padding:10px 16px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;background:#f9fafb;border-bottom:1px solid var(--border);text-align:left}
+        .t-row td{padding:14px 16px;border-bottom:1px solid #f3f4f6;font-size:14px;color:var(--text-dark);vertical-align:middle}
+        .t-row:last-child td{border-bottom:none}
+        .t-row:hover td{background:#fafafa}
+        .analise-tag{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;background:var(--primary-light);color:var(--primary)}
+        .total-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:2px solid var(--border);font-size:14px;font-weight:700;color:var(--text-dark)}
+        .total-bar .total-val{font-size:18px;color:var(--primary)}
+        .empty-small{padding:24px;text-align:center;color:var(--text-muted);font-size:14px}
+        .obs-box{background:#f9fafb;border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.7;color:var(--text-dark)}
+        .link-orc{color:var(--primary);text-decoration:none;font-weight:500;font-size:13px}
+        .link-orc:hover{text-decoration:underline}
+        .alert{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .alert-ok{background:#dcfce7;border:1px solid #86efac;color:#15803d}
+        .alert-err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c}
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-brand"><h1>🧫 Microbio</h1><p>Laboratório de microbiologia</p></div>
+    <nav class="sidebar-nav">
+        <span class="nav-section">Minha conta</span>
+        <a th:href="@{/painel}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Início
+        </a>
+        <a th:href="@{/painel/orcamentos}" class="nav-link">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Meus Orçamentos
+        </a>
+        <a th:href="@{/painel/pedidos}" class="nav-link active">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>Meus Pedidos
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar" sec:authentication="name">C</div>
+            <div><div class="user-name" sec:authentication="name">cliente</div><div class="user-role">Cliente</div></div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-logout">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair
+            </button>
+        </form>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="inner"
+         th:with="orc=${pedido.orcamento},
+                st=${pedido.status},
+                valorOrc=${orc != null ? orc.valorTotal : null}">
+
+        <div class="breadcrumb">
+            <a th:href="@{/painel}">Início</a><span>›</span>
+            <a th:href="@{/painel/pedidos}">Pedidos</a><span>›</span>
+            <span th:text="'Pedido #PED-' + ${pedido.id}">Pedido</span>
+        </div>
+
+        <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
+        <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
+
+        <div class="page-header">
+            <div>
+                <h2>
+                    Pedido <span th:text="'#PED-' + ${pedido.id}" style="color:var(--text-muted);font-weight:400"></span>
+                    <span class="status-badge"
+                          th:classappend="${st == 'PENDENTE'} ? 's-pendente' : (${st == 'EM_ANDAMENTO'} ? 's-em_andamento' : (${st == 'CONCLUIDO'} ? 's-concluido' : 's-cancelado'))"
+                          th:text="${st == 'PENDENTE' ? 'Pendente' : (st == 'EM_ANDAMENTO' ? 'Em andamento' : (st == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'))}">Status</span>
+                </h2>
+                <p th:text="'Criado em ' + ${#temporals.format(pedido.dataPedido,'dd/MM/yyyy \'às\' HH:mm')}">Data</p>
+            </div>
+            <a th:href="@{/painel/pedidos}" class="btn btn-secondary">← Voltar</a>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card">
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="tl-step">
+                        <div class="tl-dot" th:classappend="${st == 'PENDENTE'} ? 'current' : (${st == 'EM_ANDAMENTO' or st == 'CONCLUIDO'} ? 'done' : '')">1</div>
+                        <div class="tl-label" th:classappend="${st == 'PENDENTE'} ? 'current' : (${st == 'EM_ANDAMENTO' or st == 'CONCLUIDO'} ? 'done' : '')">Pendente</div>
+                    </div>
+                    <div class="tl-line" th:classappend="${st == 'EM_ANDAMENTO' or st == 'CONCLUIDO'} ? 'done'"></div>
+                    <div class="tl-step">
+                        <div class="tl-dot" th:classappend="${st == 'EM_ANDAMENTO'} ? 'current' : (${st == 'CONCLUIDO'} ? 'done' : '')">2</div>
+                        <div class="tl-label" th:classappend="${st == 'EM_ANDAMENTO'} ? 'current' : (${st == 'CONCLUIDO'} ? 'done' : '')">Em andamento</div>
+                    </div>
+                    <div class="tl-line" th:classappend="${st == 'CONCLUIDO'} ? 'done'"></div>
+                    <div class="tl-step">
+                        <div class="tl-dot" th:classappend="${st == 'CONCLUIDO'} ? 'done'">✓</div>
+                        <div class="tl-label" th:classappend="${st == 'CONCLUIDO'} ? 'done'">Concluído</div>
+                    </div>
+                </div>
+                <div th:if="${st == 'CANCELADO'}"
+                     style="margin-top:14px;padding:10px 14px;background:#fee2e2;border-radius:8px;font-size:13px;color:#b91c1c;font-weight:600;text-align:center">
+                    ⚠️ Este pedido foi cancelado.
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações gerais -->
+        <div class="card" th:if="${orc != null}">
+            <div class="card-header"><h3>Informações do pedido</h3></div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="lbl">Serviço</div>
+                        <div class="val" th:text="${orc.pessoa != null and orc.pessoa.tipoServico != null ? orc.pessoa.tipoServico : 'Laboratorial'}">—</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="lbl">Orçamento de origem</div>
+                        <div class="val"><a th:href="@{/painel/orcamentos/{id}(id=${orc.id})}" class="link-orc" th:text="'#' + ${orc.id}">—</a></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="lbl">Data do pedido</div>
+                        <div class="val" th:text="${#temporals.format(pedido.dataPedido,'dd/MM/yyyy')}">—</div>
+                    </div>
+                    <div class="info-item" th:if="${valorOrc != null}">
+                        <div class="lbl">Valor total</div>
+                        <div class="val" style="color:var(--primary)" th:text="'R$ ' + ${#numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA')}">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análises do pedido (resultado laboratorial) -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Análises laboratoriais (<span th:text="${#lists.size(pedido.analises)}">0</span>)</h3>
+            </div>
+            <div th:if="${#lists.isEmpty(pedido.analises)}" class="empty-small">
+                🔬 As análises serão exibidas aqui quando o laboratório processar seu pedido.
+            </div>
+            <div th:unless="${#lists.isEmpty(pedido.analises)}">
+                <table style="width:100%;border-collapse:collapse">
+                    <thead><tr class="t-head">
+                        <th>Análise</th>
+                        <th>Descrição</th>
+                        <th style="text-align:right">Valor</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr th:each="pa : ${pedido.analises}" th:with="a=${pa.analise}" class="t-row">
+                        <td>
+                            <span class="analise-tag" th:text="${a.nome}">—</span>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:13px" th:text="${a.descricao != null ? a.descricao : '—'}">—</td>
+                        <td style="text-align:right;font-weight:600"
+                            th:text="${a.valor != null ? 'R$ ' + #numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA') : '—'}">—</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="total-bar">
+                    <span>Total do pedido</span>
+                    <span class="total-val" th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="card" th:if="${pedido.observacoes != null and !pedido.observacoes.isBlank()}">
+            <div class="card-header"><h3>Observações</h3></div>
+            <div class="card-body">
+                <div class="obs-box" th:text="${pedido.observacoes}"></div>
+            </div>
+        </div>
+
+    </div><!-- /inner -->
+</main>
+</body>
+</html>

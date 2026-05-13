@@ -70,6 +70,8 @@ CREATE TABLE orcamento (
                            usuario_id     INT REFERENCES usuario(id) ON DELETE SET NULL,
                            pessoa_id      INT REFERENCES pessoa(id)  ON DELETE SET NULL,
                            valor_total    DECIMAL(10, 2),
+                           status VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+                           observacoes VARCHAR(255),
                            data_orcamento TIMESTAMP DEFAULT NOW()
 );
 

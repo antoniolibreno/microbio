@@ -41,12 +41,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    /** Cria usuário comum (cliente). */
     public void criarUsuarioSimples(String login, String senha) {
         criarUsuarioSimples(login, senha, false);
     }
 
-    /** Cria usuário com controle explícito de admin. */
+    @Transactional
     public void criarUsuarioSimples(String login, String senha, boolean admin) {
         validarLogin(login, null);
         Usuario u = new Usuario(login, passwordEncoder.encode(senha), admin);
@@ -60,16 +59,20 @@ public class UsuarioService {
                                      String rua, String numero, String bairro,
                                      String cidade, String estado, String cep) {
         validarLogin(login, null);
-        if (cpfCnpj != null && !cpfCnpj.isBlank() && clienteRepository.existsByCpfCnpj(cpfCnpj))
+        String cpfNorm = normBlank(cpfCnpj);
+        if (cpfNorm != null && clienteRepository.existsByCpfCnpj(cpfNorm))
             throw new IllegalArgumentException("CPF/CNPJ já cadastrado.");
 
-        Endereco endereco = new Endereco();
-        preencher(endereco, rua, numero, bairro, cidade, estado, cep);
-        enderecoRepository.save(endereco);
+        Endereco endereco = null;
+        if (temEndereco(rua, numero, bairro, cidade, estado, cep)) {
+            endereco = new Endereco();
+            preencher(endereco, rua, numero, bairro, cidade, estado, cep);
+            enderecoRepository.save(endereco);
+        }
 
         Cliente cliente = new Cliente();
-        cliente.setTipoCliente(tipoCliente);
-        cliente.setCpfCnpj(cpfCnpj);
+        cliente.setTipoCliente(normBlank(tipoCliente));
+        cliente.setCpfCnpj(cpfNorm);
         cliente.setEndereco(endereco);
         clienteRepository.save(cliente);
 
@@ -107,38 +110,42 @@ public class UsuarioService {
         if (senha != null && !senha.isBlank())
             u.setSenha(passwordEncoder.encode(senha));
 
+        String cpfNorm = normBlank(cpfCnpj);
         Cliente cliente = u.getCliente();
         if (cliente == null) {
-            // Usuário ainda não tinha cliente — cria agora
-            if (cpfCnpj != null && !cpfCnpj.isBlank() && clienteRepository.existsByCpfCnpj(cpfCnpj))
+            if (cpfNorm != null && clienteRepository.existsByCpfCnpj(cpfNorm))
                 throw new IllegalArgumentException("CPF/CNPJ já cadastrado.");
-            Endereco e = new Endereco();
-            preencher(e, rua, numero, bairro, cidade, estado, cep);
-            enderecoRepository.save(e);
+            Endereco e = null;
+            if (temEndereco(rua, numero, bairro, cidade, estado, cep)) {
+                e = new Endereco();
+                preencher(e, rua, numero, bairro, cidade, estado, cep);
+                enderecoRepository.save(e);
+            }
             cliente = new Cliente();
-            cliente.setTipoCliente(tipoCliente);
-            cliente.setCpfCnpj(cpfCnpj);
+            cliente.setTipoCliente(normBlank(tipoCliente));
+            cliente.setCpfCnpj(cpfNorm);
             cliente.setEndereco(e);
             clienteRepository.save(cliente);
             u.setCliente(cliente);
         } else {
-            // Já tem cliente — atualiza campos
-            if (cpfCnpj != null && !cpfCnpj.isBlank()
-                    && !cpfCnpj.equals(cliente.getCpfCnpj())
-                    && clienteRepository.existsByCpfCnpj(cpfCnpj))
+            if (cpfNorm != null
+                    && !cpfNorm.equals(cliente.getCpfCnpj())
+                    && clienteRepository.existsByCpfCnpj(cpfNorm))
                 throw new IllegalArgumentException("CPF/CNPJ já cadastrado.");
 
-            cliente.setTipoCliente(tipoCliente);
-            cliente.setCpfCnpj(cpfCnpj);
+            cliente.setTipoCliente(normBlank(tipoCliente));
+            cliente.setCpfCnpj(cpfNorm);
 
             Endereco e = cliente.getEndereco();
-            if (e == null) {
-                e = new Endereco();
+            if (temEndereco(rua, numero, bairro, cidade, estado, cep)) {
+                if (e == null) {
+                    e = new Endereco();
+                    enderecoRepository.save(e);
+                    cliente.setEndereco(e);
+                }
+                preencher(e, rua, numero, bairro, cidade, estado, cep);
                 enderecoRepository.save(e);
-                cliente.setEndereco(e);
             }
-            preencher(e, rua, numero, bairro, cidade, estado, cep);
-            enderecoRepository.save(e);
             clienteRepository.save(cliente);
         }
 
@@ -162,11 +169,20 @@ public class UsuarioService {
 
     private void preencher(Endereco e, String rua, String numero,
                            String bairro, String cidade, String estado, String cep) {
-        e.setRua(rua);
-        e.setNumero(numero);
-        e.setBairro(bairro);
-        e.setCidade(cidade);
-        e.setEstado(estado);
-        e.setCep(cep);
+        e.setRua(normBlank(rua));
+        e.setNumero(normBlank(numero));
+        e.setBairro(normBlank(bairro));
+        e.setCidade(normBlank(cidade));
+        e.setEstado(normBlank(estado));
+        e.setCep(normBlank(cep));
+    }
+
+    private static String normBlank(String s) {
+        return (s != null && !s.isBlank()) ? s.strip() : null;
+    }
+
+    private static boolean temEndereco(String... campos) {
+        for (String c : campos) if (c != null && !c.isBlank()) return true;
+        return false;
     }
 }

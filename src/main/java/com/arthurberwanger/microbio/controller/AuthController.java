@@ -71,9 +71,6 @@ public class AuthController {
         return "dashboard";
     }
 
-    @GetMapping("/painel")
-    public String painelCliente() { return "painel/index"; }
-
     @GetMapping("/meu-painel")
     public String meuPainel() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

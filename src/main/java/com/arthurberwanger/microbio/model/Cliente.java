@@ -1,15 +1,10 @@
 package com.arthurberwanger.microbio.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "cliente")
-@Data
-@NoArgsConstructor
 public class Cliente {
 
     @Id
@@ -25,13 +20,24 @@ public class Cliente {
     @Column(name = "data_cadastro")
     private LocalDateTime dataCadastro = LocalDateTime.now();
 
-    /*
-     * CORREÇÃO: era cascade = CascadeType.PERSIST apenas.
-     * Com só PERSIST, ao editar um endereço já existente o Hibernate
-     * tentava inserir novamente e lançava erro.
-     * Com {PERSIST, MERGE} ele salva tanto na criação quanto na atualização.
-     */
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "endereco_id")
     private Endereco endereco;
+
+    public Cliente() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTipoCliente() { return tipoCliente; }
+    public void setTipoCliente(String tipoCliente) { this.tipoCliente = tipoCliente; }
+
+    public String getCpfCnpj() { return cpfCnpj; }
+    public void setCpfCnpj(String cpfCnpj) { this.cpfCnpj = cpfCnpj; }
+
+    public LocalDateTime getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
+    public Endereco getEndereco() { return endereco; }
+    public void setEndereco(Endereco endereco) { this.endereco = endereco; }
 }
