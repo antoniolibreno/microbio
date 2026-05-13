@@ -36,7 +36,6 @@
 
     .main{margin-left:var(--sidebar-w);flex:1;padding:32px 36px;display:flex;flex-direction:column;gap:24px}
 
-    /* header */
     .page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
     .header-left h1{font-size:22px;font-weight:800;color:var(--text-dark);letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
     .header-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a702b,#2d9e42);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(26,112,43,.3);flex-shrink:0}
@@ -44,12 +43,10 @@
     .btn-new{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;background:var(--primary);color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:13.5px;font-weight:600;transition:background .2s;white-space:nowrap}
     .btn-new:hover{background:var(--primary-hover)}
 
-    /* alerts */
     .alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
     .alert-danger {background:#fff1f2;color:#9f1239;border:1px solid #fda4af}
     .alert-success{background:#f0fdf4;color:#15803d;border:1px solid #86efac}
 
-    /* table card */
     .table-card{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border);overflow:hidden}
     .table-toolbar{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
     .search-wrap{position:relative;flex:1;max-width:320px}
@@ -80,6 +77,8 @@
 
     .actions{display:flex;gap:6px;flex-wrap:wrap}
     .btn-act{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .15s}
+    .btn-view  {background:#f1f5f9;color:#334155}
+    .btn-view:hover{background:#e2e8f0}
     .btn-edit  {background:#eff6ff;color:#1d4ed8}
     .btn-edit:hover{background:#dbeafe}
     .btn-del   {background:#fff1f2;color:#be123c}
@@ -124,7 +123,8 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" class="search-input" id="searchInput" placeholder="Buscar usuário…" oninput="filtrar()">
       </div>
-      <span class="table-count" id="countLabel"></span>
+      <span class="table-count" id="countLabel"
+            th:text="${usuarios != null ? usuarios.size() + ' usuário(s)' : '0 usuário(s)'}">0 usuário(s)</span>
     </div>
 
     <table id="userTable">
@@ -133,7 +133,7 @@
           <th>Usuário</th>
           <th>Perfil</th>
           <th>Cadastro</th>
-          <th>Ações</th>
+          <th style="text-align:right">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -145,43 +145,48 @@
             </div>
           </td>
         </tr>
-        <tr th:each="u : ${usuarios}">
+        <tr th:each="u : ${usuarios}" th:with="login=${u.login != null ? u.login : ''},
+                                                hasCliente=${u.cliente != null}">
           <td>
             <div class="td-user">
               <div class="u-avatar" th:classappend="${u.admin} ? 'avatar-admin' : 'avatar-client'"
-                   th:text="${#strings.substring(u.login, 0, (u.login.length() > 1 ? 2 : 1))}">??</div>
+                   th:text="${#strings.toUpperCase(login.length() &lt; 2 ? login : login.substring(0,2))}">??</div>
               <div>
-                <div class="u-name" th:text="${u.login}">login</div>
+                <div class="u-name" th:text="${login}">login</div>
                 <div class="u-sub" th:text="'ID #' + ${u.id}">ID #0</div>
               </div>
             </div>
           </td>
           <td>
-            <span th:if="${u.admin}"         class="role-badge role-admin">
+            <span th:if="${u.admin}" class="role-badge role-admin">
               <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Administrador
             </span>
-            <span th:if="${!u.admin and u.cliente != null}" class="role-badge role-client">
+            <span th:if="${!u.admin and hasCliente}" class="role-badge role-client">
               <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               Cliente
             </span>
-            <span th:if="${!u.admin and u.cliente == null}" class="role-badge role-simple">
+            <span th:if="${!u.admin and !hasCliente}" class="role-badge role-simple">
               Só acesso
             </span>
           </td>
           <td>
-            <span th:if="${u.cliente != null}" style="font-size:12.5px;color:var(--text-muted);"
-                  th:text="${u.cliente.tipoCliente != null ? u.cliente.tipoCliente : 'Cliente'}">—</span>
-            <span th:if="${u.cliente == null}" style="font-size:12.5px;color:var(--text-faint);">—</span>
+            <span th:if="${hasCliente}" style="font-size:12.5px;color:var(--text-muted);"
+                  th:text="${u.cliente.tipoCliente != null and !#strings.isEmpty(u.cliente.tipoCliente) ? u.cliente.tipoCliente : 'Cliente'}">—</span>
+            <span th:unless="${hasCliente}" style="font-size:12.5px;color:var(--text-faint);">—</span>
           </td>
           <td>
-            <div class="actions">
+            <div class="actions" style="justify-content:flex-end">
+              <a th:href="@{/usuarios/{id}/visualizar(id=${u.id})}" class="btn-act btn-view">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Ver
+              </a>
               <a th:href="@{/usuarios/{id}/editar(id=${u.id})}" class="btn-act btn-edit">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Editar
               </a>
               <form th:action="@{/usuarios/{id}/excluir(id=${u.id})}" method="post"
-                    th:onsubmit="'return confirm(\'Excluir ' + ${u.login} + '?\')'">
+                    onsubmit="return confirm('Excluir este usuário?')">
                 <button type="submit" class="btn-act btn-del">
                   <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                   Excluir
@@ -200,13 +205,16 @@
   function filtrar() {
     const t = document.getElementById('searchInput').value.toLowerCase();
     const rows = document.querySelectorAll('#userTable tbody tr');
-    let vis = 0;
+    let vis = 0, total = 0;
     rows.forEach(r => {
+      if (r.querySelector('.empty-state')) return;
+      total++;
       const show = r.textContent.toLowerCase().includes(t);
       r.style.display = show ? '' : 'none';
       if (show) vis++;
     });
-    document.getElementById('countLabel').textContent = t ? vis + ' resultado(s)' : '';
+    const label = document.getElementById('countLabel');
+    if (label) label.textContent = t ? vis + ' resultado(s)' : total + ' usuário(s)';
   }
 </script>
 </body>
