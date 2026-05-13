@@ -27,6 +27,14 @@ public class Usuario {
     @Column(name = "is_admin", nullable = false)
     private boolean admin = false;
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = true)
     private Cliente cliente;

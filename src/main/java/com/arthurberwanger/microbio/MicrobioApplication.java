@@ -19,14 +19,21 @@ public class MicrobioApplication {
 	CommandLineRunner initUsuarios(UsuarioRepository repository,
 								   PasswordEncoder encoder) {
 		return args -> {
-			if (repository.count() == 0) {
-				repository.save(new Usuario(
-						"admin",
-						encoder.encode("admin123")
-				));
-				System.out.println("=== Usuário admin criado! ===");
-				System.out.println("    login: admin / senha: admin123");
-			}
+			repository.findByLogin("admin").ifPresentOrElse(
+					admin -> {
+						if (!admin.isAdmin()) {
+							admin.setAdmin(true);
+							repository.save(admin);
+							System.out.println("=== Usuário admin corrigido: is_admin = true ===");
+						}
+					},
+					() -> {
+						Usuario admin = new Usuario("admin", encoder.encode("admin123"), true);
+						repository.save(admin);
+						System.out.println("=== Usuário admin criado! ===");
+						System.out.println("    login: admin / senha: admin123");
+					}
+			);
 		};
 	}
 }

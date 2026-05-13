@@ -20,9 +20,12 @@ public interface OrcamentoRepository extends JpaRepository<Orcamento, Long> {
     List<Orcamento> findAllComDetalhes();
 
     @Query("""
-        SELECT o FROM Orcamento o
-        LEFT JOIN FETCH o.pessoa
+        SELECT DISTINCT o FROM Orcamento o
+        LEFT JOIN FETCH o.pessoa p
+        LEFT JOIN FETCH p.cliente c
+        LEFT JOIN FETCH c.endereco
         LEFT JOIN FETCH o.usuario
+        LEFT JOIN FETCH o.pedidos
         WHERE o.id = :id
     """)
     Optional<Orcamento> findByIdComDetalhes(Long id);

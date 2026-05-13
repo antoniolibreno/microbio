@@ -6,58 +6,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Cliente - Microbio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a702b; --primary-hover: #135c22;
-            --primary-light: #e8f5e9;
-            --brown: #9c5f32; --brown-hover: #824f29;
-            --sidebar-w: 240px;
-            --text-dark: #1f2937; --text-muted: #6b7280;
-            --bg: #f3f4f6;
-            --font: 'Inter', system-ui, sans-serif;
+            --primary:#1a702b; --primary-hover:#135c22; --primary-light:#e8f5e9;
+            --brown:#9c5f32; --brown-hover:#824f29;
+            --sidebar-w:240px;
+            --text-dark:#1f2937; --text-muted:#6b7280; --text-faint:#9ca3af;
+            --bg:#f3f4f6; --border:#e5e7eb;
+            --font:'Inter',system-ui,sans-serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
-
-        /* SIDEBAR */
-        .sidebar { width:var(--sidebar-w); background:#fff; border-right:1px solid #e5e7eb; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; }
-        .sidebar-brand { padding:24px 20px 20px; border-bottom:1px solid #e5e7eb; }
-        .sidebar-brand h1 { color:var(--primary); font-size:20px; font-weight:700; }
-        .sidebar-brand p { color:var(--text-muted); font-size:11px; margin-top:2px; }
-        .sidebar-nav { flex:1; padding:16px 12px; }
-        .nav-section { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; padding:12px 8px 6px; display:block; }
-        .nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:var(--text-muted); text-decoration:none; font-size:14px; font-weight:500; transition:background .15s,color .15s; margin-bottom:2px; }
-        .nav-link:hover, .nav-link.active { background:var(--primary-light); color:var(--primary); }
-        .nav-link.active { font-weight:600; }
-        .sidebar-footer { padding:16px 12px; border-top:1px solid #e5e7eb; }
-        .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
-        .user-avatar { width:32px; height:32px; background:var(--brown); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
-        .user-name { font-size:13px; font-weight:600; }
-        .user-role { font-size:11px; color:var(--text-muted); }
-        .btn-logout { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:9px; background:none; border:1px solid #e5e7eb; border-radius:8px; color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s,color .15s; }
-        .btn-logout:hover { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
-
-        /* MAIN */
-        .main { margin-left:var(--sidebar-w); flex:1; padding:32px; }
-        .page-header { margin-bottom:28px; }
-        .page-header h2 { font-size:22px; font-weight:700; }
-        .page-header p { color:var(--text-muted); font-size:14px; margin-top:4px; }
-
-        /* Cards */
-        .cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:16px; margin-bottom:32px; }
-        .summary-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-        .summary-card .label { font-size:12px; color:var(--text-muted); font-weight:500; }
-        .summary-card .value { font-size:28px; font-weight:700; color:var(--primary); margin-top:4px; }
-
-        /* Aviso construção */
-        .wip-banner { background:#fef9c3; border:1px solid #fde68a; border-radius:12px; padding:24px; display:flex; align-items:center; gap:16px; }
-        .wip-banner .icon { font-size:32px; }
-        .wip-banner h3 { font-size:16px; font-weight:700; color:#92400e; margin-bottom:4px; }
-        .wip-banner p { font-size:14px; color:#b45309; }
-
-        /* Botão solicitar */
-        .btn-primary { display:inline-flex; align-items:center; gap:8px; padding:11px 20px; background:var(--brown); color:#fff; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; transition:background .2s; border:none; cursor:pointer; margin-top:20px; }
-        .btn-primary:hover { background:var(--brown-hover); }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display:flex;min-height:100vh}
+        .sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0}
+        .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+        .sidebar-brand h1{color:var(--primary);font-size:20px;font-weight:700}
+        .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
+        .sidebar-nav{flex:1;padding:16px 12px}
+        .nav-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px;display:block}
+        .nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
+        .nav-link:hover,.nav-link.active{background:var(--primary-light);color:var(--primary)}
+        .nav-link.active{font-weight:600}
+        .sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+        .user-info{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:8px}
+        .user-avatar{width:32px;height:32px;background:var(--brown);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+        .user-name{font-size:13px;font-weight:600}
+        .user-role{font-size:11px;color:var(--text-muted)}
+        .btn-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,color .15s}
+        .btn-logout:hover{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+        .main{margin-left:var(--sidebar-w);flex:1;padding:32px}
+        .page-header{margin-bottom:28px}
+        .page-header h2{font-size:22px;font-weight:700}
+        .page-header p{color:var(--text-muted);font-size:14px;margin-top:4px}
+        .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+        .summary-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid var(--border);text-decoration:none;display:block;transition:box-shadow .15s,border-color .15s}
+        .summary-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);border-color:#d1d5db}
+        .summary-card .label{font-size:12px;color:var(--text-muted);font-weight:500}
+        .summary-card .value{font-size:28px;font-weight:700;color:var(--primary);margin-top:4px}
+        .summary-card .sub{font-size:11px;color:var(--text-faint);margin-top:4px}
+        .cta-card{background:linear-gradient(135deg,#1a702b,#2d9e45);border-radius:12px;padding:24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+        .cta-card .cta-text h3{font-size:17px;font-weight:700;color:#fff}
+        .cta-card .cta-text p{font-size:13px;color:rgba(255,255,255,.8);margin-top:4px}
+        .btn-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#fff;color:var(--primary);border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;transition:background .2s;white-space:nowrap}
+        .btn-cta:hover{background:#f0fdf4}
+        .section-header{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+        .section-header a{font-size:13px;font-weight:500;color:var(--primary);text-decoration:none}
+        .section-header a:hover{text-decoration:underline}
+        .table-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:24px}
+        .t-head th{padding:11px 16px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;background:#f9fafb;border-bottom:1px solid var(--border);text-align:left}
+        .t-row td{padding:13px 16px;border-bottom:1px solid #f3f4f6;font-size:14px;color:var(--text-dark);vertical-align:middle}
+        .t-row:last-child td{border-bottom:none}
+        .t-row:hover td{background:#fafafa}
+        .status-badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;display:inline-block}
+        .s-pendente{background:#fef9c3;color:#854d0e}
+        .s-em_andamento{background:#dbeafe;color:#1d4ed8}
+        .s-concluido{background:#dcfce7;color:#15803d}
+        .s-cancelado{background:#fee2e2;color:#b91c1c}
+        .link-ver{color:var(--primary);text-decoration:none;font-weight:500;font-size:13px}
+        .link-ver:hover{text-decoration:underline}
+        .empty-state{padding:40px;text-align:center;color:var(--text-muted)}
+        .empty-state p{font-size:14px;margin-bottom:12px}
+        .alert{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .alert-ok{background:#dcfce7;border:1px solid #86efac;color:#15803d}
+        .alert-err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c}
     </style>
 </head>
 <body>
@@ -74,7 +85,7 @@
             Início
         </a>
         <a th:href="@{/painel/orcamentos}" class="nav-link">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Meus Orçamentos
         </a>
         <a th:href="@{/painel/pedidos}" class="nav-link">
@@ -101,33 +112,71 @@
 
 <main class="main">
     <div class="page-header">
-        <h2>Bem-vindo ao seu painel, <span sec:authentication="name">cliente</span>!</h2>
-        <p>Acompanhe seus orçamentos e pedidos.</p>
+        <h2>Bem-vindo, <span sec:authentication="name">cliente</span>!</h2>
+        <p>Acompanhe seus orçamentos e pedidos em tempo real.</p>
     </div>
 
+    <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
+    <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
+
+    <!-- Resumo numérico -->
     <div class="cards-grid">
-        <div class="summary-card">
+        <a th:href="@{/painel/orcamentos}" class="summary-card">
             <div class="label">Orçamentos</div>
-            <div class="value">—</div>
-        </div>
-        <div class="summary-card">
+            <div class="value" th:text="${totalOrcamentos}">0</div>
+            <div class="sub">Ver todos →</div>
+        </a>
+        <a th:href="@{/painel/pedidos}" class="summary-card">
             <div class="label">Pedidos</div>
-            <div class="value">—</div>
-        </div>
-        <div class="summary-card">
-            <div class="label">Pendentes</div>
-            <div class="value">—</div>
+            <div class="value" th:text="${totalPedidos}">0</div>
+            <div class="sub">Ver todos →</div>
+        </a>
+        <div class="summary-card" style="cursor:default">
+            <div class="label">Em andamento</div>
+            <div class="value" th:text="${pendentes}">0</div>
+            <div class="sub">orçamentos ativos</div>
         </div>
     </div>
 
-    <div class="wip-banner">
-        <div class="icon">🔧</div>
-        <div>
-            <h3>Painel em construção</h3>
-            <p>Em breve você poderá visualizar seus orçamentos, acompanhar pedidos e solicitar novos serviços diretamente por aqui.</p>
+    <!-- CTA solicitar orçamento -->
+    <div class="cta-card">
+        <div class="cta-text">
+            <h3>Precisa de um novo serviço?</h3>
+            <p>Solicite um orçamento e nossa equipe entrará em contato.</p>
         </div>
+        <a th:href="@{/painel/orcamentos/novo}" class="btn-cta">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Solicitar orçamento
+        </a>
+    </div>
+
+    <!-- Orçamentos recentes -->
+    <div class="section-header">
+        <span>Orçamentos recentes</span>
+        <a th:href="@{/painel/orcamentos}">Ver todos</a>
+    </div>
+
+    <div class="table-card">
+        <div th:if="${#lists.isEmpty(recentesOrcamentos)}" class="empty-state">
+            <p>Nenhum orçamento encontrado.</p>
+            <a th:href="@{/painel/orcamentos/novo}" style="color:var(--primary);font-weight:600;font-size:14px">+ Solicitar primeiro orçamento</a>
+        </div>
+        <table th:unless="${#lists.isEmpty(recentesOrcamentos)}" style="width:100%;border-collapse:collapse">
+            <thead><tr class="t-head">
+                <th>Nº</th><th>Serviço</th><th>Data</th><th>Valor</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody>
+            <tr th:each="orc : ${recentesOrcamentos}" class="t-row">
+                <td style="font-weight:600;color:var(--text-muted);font-size:13px" th:text="'#' + ${orc.id}">—</td>
+                <td th:text="${orc.pessoa != null and orc.pessoa.tipoServico != null ? orc.pessoa.tipoServico : 'Serviço laboratorial'}">—</td>
+                <td th:text="${#temporals.format(orc.dataOrcamento,'dd/MM/yyyy')}">—</td>
+                <td th:text="${orc.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(orc.valorTotal,1,'POINT',2,'COMMA') : '—'}">—</td>
+                <td><span class="status-badge" th:classappend="'s-' + ${orc.status.name().toLowerCase()}" th:text="${orc.status.label}">—</span></td>
+                <td><a th:href="@{/painel/orcamentos/{id}(id=${orc.id})}" class="link-ver">Ver →</a></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </main>
-
 </body>
 </html>
