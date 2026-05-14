@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microbio - Análises Clínicas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="container navbar-container">
+
+        <!-- LOGO -->
+        <div class="navbar-logo">
+            <img th:src="@{/img/logo.png}" alt="Microbio Logo">
+        </div>
+
+        <!-- MENU (links + botão juntos) -->
+        <div class="navbar-menu">
+            <ul class="navbar-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="https://microbio.uniexames.com.br/cms/inicio">Área da Saúde</a></li>
+                <li><a href="#" onclick="abrirModal(); return false;">Solicitar Orçamento</a></li>
+
+                <!-- Thymeleaf Security: mostra "Painel" se logado, "Login" se não -->
+                <a sec:authorize="isAuthenticated()"
+                   th:href="@{/meu-painel}"
+                   id="linkPainel">
+                    <button class="btn btn-brown">Meu Painel</button>
+                </a>
+                <a sec:authorize="!isAuthenticated()" th:href="@{/login}">
+                    <button class="btn btn-brown">Login</button>
+                </a>
+        </div>
+
+    </div>
+</nav>
+
+
+<header id="home" class="hero">
+    <div class="container hero-container">
+        <div class="hero-content">
+            <div class="tag">
+                <span class="dot"></span> TECNOLOGIA DE PONTA EM TOLEDO, PR
+            </div>
+            <h1>Precisão que<br><span class="highlight">Gera Confiança.</span></h1>
+            <p>Líder em biotecnologia e diagnósticos de saúde em Toledo, PR. Unimos alta tecnologia a um atendimento
+                humanizado para resultados laboratoriais impecáveis.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-green" onclick="abrirModal()">Começar Agora</button>
+                <a href="#servicos"><button class="btn btn-brown">Nossos Exames</button></a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="image-placeholder scientist-placeholder">
+                <img th:src="@{/img/microbio.png}" alt="fundo1">
+            </div>
+        </div>
+    </div>
+</header>
+
+<section id="sobre" class="about section-light-green">
+
+    <div class="container">
+        <div class="section-header center">
+            <h2>Sobre a Microbio</h2>
+            <p>Combinamos padrões rigorosos de qualidade com as mais recentes inovações globais para servir a
+                comunidade de Toledo.</p>
+        </div>
+        <div class="about-grid">
+            <div class="card card-green">
+                <i class="fa-solid fa-microscope icon"></i>
+                <h3>Tecnologia Avançada</h3>
+                <p>Instrumentação de última geração para detecção precoce e análise minuciosa de patologias.</p>
+            </div>
+            <div class="card card-green">
+                <i class="fa-solid fa-certificate icon"></i>
+                <h3>Qualidade Certificada</h3>
+                <p>Aderência total aos protocolos internacionais de segurança e precisão diagnóstica.</p>
+            </div>
+            <div class="card card-green">
+                <i class="fa-solid fa-location-dot icon"></i>
+                <h3>Presença Local</h3>
+                <p>Profundamente enraizados no ecossistema de saúde de Toledo, conhecemos sua história.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="servicos" class="especialidades-section">
+    <div class="especialidades-header">
+        <div class="header-text">
+            <h2>Nossas Especialidades</h2>
+            <p>Explore nosso catálogo completo de análises clínicas.</p>
+        </div>
+    </div>
+
+    <div class="cards2-container">
+        <div class="card2">
+            <img th:src="@{/img/bioinsumo.jpg}" alt="Bioinsumos" class="card2-img">
+            <div class="card2-body">
+                <h3>Controle de Qualidade em Bioinsumos</h3>
+                <p class="card2-desc">Contagem de microrganismos viáveis (UFC ou esporos)</p>
+
+                <div class="card2-expandable">
+                    <p>Análise de pureza microbiológica</p>
+                </div>
+
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/nematoides.jpg}" alt="Nematoides" class="card2-img">
+            <div class="card2-body">
+                <h3>Análise de Nematóides</h3>
+                <p class="card2-desc">Extração e quantificação de nematóides do solo</p>
+                <div class="card2-expandable">
+                    <p>Extração e quantificação de nematóides em raízes
+                        Identificação de gêneros de nematóides fitopatogênicos
+                        Estimativa de população e nível de infestação
+                    </p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/metagenomicas.jpg}" alt="Metagenomica" class="card2-img">
+            <div class="card2-body">
+                <h3>Metagenômica do Solo</h3>
+                <p class="card2-desc">Análise da diversidade microbiana do solo</p>
+                <div class="card2-expandable">
+                    <p>Perfil da comunidade bacteriana e fúngica
+                        Identificação de microrganismos benéficos e potenciais patógenos</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/agua.jpg}" alt="Agua" class="card2-img">
+            <div class="card2-body">
+                <h3>Análise Microbiológica de Água</h3>
+                <p class="card2-desc">Contagem de bactérias heterotróficas</p>
+                <div class="card2-expandable">
+                    <p>Pesquisa de coliformes totais e E. coli
+                        Avaliação microbiológica para uso agrícola
+                        Monitoramento da qualidade microbiológica de água para preparo de bioinsumos</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/agro.jpg}" alt="agro" class="card2-img">
+            <div class="card2-body">
+                <h3>Análises Microbiológicas Agronômicas</h3>
+                <p class="card2-desc">Contagem de bactérias totais do solo</p>
+                <div class="card2-expandable">
+                    <p>Contagem de fungos do solo
+                        Carbono da biomassa microbiana</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/solo.jpg}" alt="Solo" class="card2-img">
+            <div class="card2-body">
+                <h3>BioAS – Bioanálise de Saúde do Solo</h3>
+                <p class="card2-desc">Quantificação da enzima arilsulfatas </p>
+                <div class="card2-expandable">
+                    <p>Quantificação da enzima beta-glicosidase.</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="cta section-dark-green">
+    <div class="container center">
+        <h2>Pronto para cuidar da sua saúde?</h2>
+        <p>Solicite seu orçamento online agora mesmo de forma rápida e segura.<br>Nossa equipe entrará em contato em
+            minutos.</p>
+        <div class="cta-buttons">
+            <button class="btn btn-brown" onclick="abrirModal()">Solicitar Orçamento Grátis</button>
+            <a href="https://microbio.uniexames.com.br/cms/inicio"><button class="btn btn-brown">Conheça nossa área da saúde</button></a>
+        </div>
+    </div>
+</section>
+
+<footer id="contato" class="footer section-light-green">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-info">
+                <div class="logo">
+                    <i class="fa-solid fa-vial-virus"></i> MICROBIO
+                </div>
+                <p class="footer-desc">Sua referência em diagnósticos laboratoriais em Toledo, PR. Qualidade que
+                    você vê, confiança que você sente.</p>
+                <ul class="contact-list">
+                    <li><i class="fa-solid fa-phone"></i> (45) 3333-4444</li>
+                    <li><i class="fa-solid fa-envelope"></i> contato@microbio.lab.br</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Toledo, PR - Centro Profissional</li>
+                </ul>
+                <div class="socials">
+                    <a href="https://wa.me/554599865119?text=Ol%C3%A1%20me%20interessei%20pelo%20seu%20trabalho%20e%20gostaria%20de%20realizar%20uma%20avalia%C3%A7%C3%A3o."><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/microbiolaboratorio/"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="map-container">
+                <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.5804609901415!2d-53.446871699999996!3d-24.946358300000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f3d470dd8c8fd5%3A0xec68a11460d6f801!2sR.%20Volunt%C3%A1rios%20da%20P%C3%A1tria%2C%201670%20-%20Centro%2C%20Cascavel%20-%20PR%2C%2085812-160!5e0!3m2!1spt-BR!2sbr!4v1749645608896!5m2!1spt-BR!2sbr"
+                        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="map">
+                </iframe>
+            </div>
+            <span>TOLEDO, PR</span>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 Microbio Análises Clínicas. </p>
+    </div>
+    </div>
+    </div>
+</footer>
+<script th:src="@{/js/script.js}"></script>
+<script th:src="@{/js/orcamento.js}"></script>
+</body>
+
+<!-- MODAL SOLICITAÇÃO DE ORÇAMENTO -->
+<div id="modalOrcamento" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+
+        <div class="modal-header">
+            <div class="modal-icon"><i class="fa-solid fa-flask"></i></div>
+            <div>
+                <h2 id="modalTitulo">Solicitar Orçamento</h2>
+                <p>Preencha seus dados e entraremos em contato.</p>
+            </div>
+            <button class="modal-close" onclick="fecharModal()" aria-label="Fechar">&times;</button>
+        </div>
+
+        <form id="formOrcamento" novalidate>
+            <div class="modal-field">
+                <label for="orcNome">Nome completo <span class="req">*</span></label>
+                <input type="text" id="orcNome" placeholder="Ex.: João da Silva" maxlength="150" required>
+                <span class="field-error" id="errNome"></span>
+            </div>
+
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label for="orcEmail">E-mail</label>
+                    <input type="email" id="orcEmail" placeholder="joao@email.com" maxlength="150">
+                    <span class="field-error" id="errEmail"></span>
+                </div>
+                <div class="modal-field">
+                    <label for="orcTelefone">Telefone / WhatsApp</label>
+                    <input type="tel" id="orcTelefone" placeholder="(45) 99999-0000" maxlength="20">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label for="orcServico">Tipo de serviço <span class="req">*</span></label>
+                <select id="orcServico" required>
+                    <option value="" disabled selected>Selecione uma especialidade...</option>
+                    <option value="Microbiologia">🔬 Microbiologia</option>
+                    <option value="Bioquimica">⚗️ Bioquímica</option>
+                    <option value="Hematologia">🩸 Hematologia</option>
+                    <option value="Imunologia">🧬 Imunologia</option>
+                    <option value="Controle de Qualidade em Bioinsumos">🧪 Controle de Qualidade em Bioinsumos</option>
+                    <option value="Outro">📋 Outro / Não sei ainda</option>
+                </select>
+                <span class="field-error" id="errServico"></span>
+            </div>
+
+            <p class="modal-notice">
+                <i class="fa-solid fa-circle-info"></i>
+                Após o envio, nossa equipe analisará sua solicitação e entrará em contato
+                para realizar o cadastro completo e liberar o acesso ao painel do cliente.
+            </p>
+
+            <div id="modalFeedback" class="modal-feedback" style="display:none;"></div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn-enviar" id="btnEnviar">
+                    <span id="btnTexto">Enviar Solicitação</span>
+                    <span id="btnLoader" style="display:none;"><i class="fa-solid fa-spinner fa-spin"></i> Enviando...</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+    .modal-overlay.ativo{opacity:1;visibility:visible}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,.18);border-top:5px solid #177d33;transform:translateY(20px);transition:transform .25s;max-height:90vh;overflow-y:auto}
+    .modal-overlay.ativo .modal-box{transform:translateY(0)}
+    .modal-header{display:flex;align-items:center;gap:14px;padding:24px 28px 20px;border-bottom:1px solid #e5e7eb}
+    .modal-icon{width:44px;height:44px;flex-shrink:0;background:#e8f5e9;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#177d33;font-size:20px}
+    .modal-header h2{font-size:18px;font-weight:700;color:#1f2937;margin:0 0 2px}
+    .modal-header p{font-size:13px;color:#6b7280;margin:0}
+    .modal-close{margin-left:auto;background:none;border:none;font-size:24px;color:#9ca3af;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s,color .15s;line-height:1}
+    .modal-close:hover{background:#f3f4f6;color:#374151}
+    form#formOrcamento{padding:24px 28px}
+    .modal-field{display:flex;flex-direction:column;margin-bottom:18px}
+    .modal-field label{font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+    .req{color:#dc2626}
+    .modal-field input,.modal-field select{padding:11px 14px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;color:#1f2937;transition:border-color .2s,box-shadow .2s;outline:none;background:#fff}
+    .modal-field input:focus,.modal-field select:focus{border-color:#177d33;box-shadow:0 0 0 3px rgba(23,125,51,.12)}
+    .modal-field input.erro,.modal-field select.erro{border-color:#dc2626}
+    .field-error{font-size:12px;color:#dc2626;margin-top:4px;min-height:16px}
+    .modal-row{display:flex;gap:14px}
+    .modal-row .modal-field{flex:1}
+    .modal-notice{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:13px;color:#15803d;margin-bottom:20px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+    .modal-notice i{margin-top:2px;flex-shrink:0}
+    .modal-feedback{padding:12px 14px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .modal-feedback.ok{background:#f0fdf4;border:1px solid #86efac;color:#15803d}
+    .modal-feedback.err{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+    .btn-cancelar{padding:11px 20px;border:1.5px solid #d1d5db;background:#fff;color:#374151;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-cancelar:hover{background:#f9fafb}
+    .btn-enviar{padding:11px 24px;background:#9c5f32;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;min-width:160px}
+    .btn-enviar:hover{background:#824f29}
+    .btn-enviar:active{transform:scale(.98)}
+    .btn-enviar:disabled{opacity:.65;cursor:not-allowed}
+    @media(max-width:500px){.modal-row{flex-direction:column;gap:0}.modal-header,form#formOrcamento{padding-left:18px;padding-right:18px}.modal-actions{flex-direction:column-reverse}.btn-cancelar,.btn-enviar{width:100%;text-align:center}}
+</style>
+
+</html>
