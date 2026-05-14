@@ -181,6 +181,27 @@ public class PainelClienteController {
         return "painel/pedidos";
     }
 
+    // ── Meu Cadastro ─────────────────────────────────────────────────────
+
+    @GetMapping("/meu-cadastro")
+    public String meuCadastro(Model model, Authentication auth) {
+        Usuario usuario = usuarioLogado(auth);
+        List<Orcamento> orcamentos = orcamentosDoUsuario(usuario);
+
+        long totalOrcamentos  = orcamentos.size();
+        long totalPedidos     = orcamentos.stream().mapToLong(o -> o.getPedidos().size()).sum();
+        long pedidosConcluidos = orcamentos.stream()
+                .flatMap(o -> o.getPedidos().stream())
+                .filter(p -> "CONCLUIDO".equals(p.getStatus()))
+                .count();
+
+        model.addAttribute("usuario",          usuario);
+        model.addAttribute("totalOrcamentos",  totalOrcamentos);
+        model.addAttribute("totalPedidos",     totalPedidos);
+        model.addAttribute("pedidosConcluidos", pedidosConcluidos);
+        return "painel/meu-cadastro";
+    }
+
     @GetMapping("/pedidos/{id}")
     public String verPedido(@PathVariable Long id, Model model, Authentication auth,
                             RedirectAttributes ra) {
