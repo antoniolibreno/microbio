@@ -13,9 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <aside th:fragment="sidebar(activePage)" class="sidebar">
-  <div class="sidebar-brand">
-    <h1>🧫 Microbio</h1>
-    <p>Laboratório de microbiologia</p>
+  <div class="sidebar-brand" style="display:flex;align-items:center;justify-content:center;">
+    <img th:src="@{/logo.png}" alt="Microbio" style="max-width:100%;height:auto;max-height:80px;object-fit:contain;"/>
   </div>
   <nav class="sidebar-nav">
     <span class="nav-section">Geral</span>
