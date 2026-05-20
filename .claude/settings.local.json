@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mvn clean *)"
+      "Bash(mvn clean *)",
+      "Bash(./mvnw -q compile)",
+      "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:org.xhtmlrenderer+AND+a:flying-saucer-pdf-openpdf&rows=5&wt=json\")",
+      "Bash(./mvnw -q -U compile)",
+      "Bash(xargs cat)",
+      "Bash(git -C /Users/brenoantonioli/IdeaProjects/microbio status --short)"
     ]
   }
 }

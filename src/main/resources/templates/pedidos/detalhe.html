@@ -16,7 +16,7 @@
       --border:#e2e8f0; --border-color:#e2e8f0; --border-light:#f1f5f9;
       --radius-sm:6px; --radius-md:8px; --radius-lg:10px;
       --shadow-md:0 2px 8px rgba(0,0,0,0.06); --shadow-lg:0 8px 24px rgba(0,0,0,0.1);
-      --sidebar-w:248px;
+      --sidebar-w:240px;
       --font:'Plus Jakarta Sans',system-ui,sans-serif;
     }
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -25,9 +25,6 @@
 
     .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);
              display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
-    .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
-    .sidebar-brand h1{color:var(--primary);font-size:18px;font-weight:700}
-    .sidebar-brand p{color:var(--text-muted);font-size:11px;margin-top:2px}
     .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
     .nav-section{font-size:11px;font-weight:600;color:var(--text-faint);text-transform:uppercase;
                  letter-spacing:.5px;padding:10px 12px 6px;display:block}
@@ -192,14 +189,16 @@
             </svg>
             Cancelar
           </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()">
+          <a th:href="@{/pedidos/{id}/pdf(id=${pedido.id})}" target="_blank"
+             class="btn btn-secondary btn-sm" title="Gerar PDF do pedido">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <polyline points="6 9 6 2 18 2 18 9"/>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-              <rect x="6" y="14" width="12" height="8"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <polyline points="9 15 12 18 15 15"/>
             </svg>
-            Imprimir
-          </button>
+            Gerar PDF
+          </a>
           <button type="submit" class="btn btn-primary">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>

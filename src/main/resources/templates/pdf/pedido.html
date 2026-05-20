@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="'Pedido #' + ${pedido.id}">Pedido</title>
+  <style>
+    body { font-family: Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; margin: 24px; }
+    h1 { color: #16a34a; font-size: 22px; margin-bottom: 4px; }
+    .sub { color: #6b7280; font-size: 11px; margin-bottom: 18px; }
+    .section { margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }
+    .section h2 { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    td.lbl { color: #6b7280; width: 35%; padding: 3px 0; }
+    td.val { color: #1f2937; padding: 3px 0; }
+    .total { font-size: 16px; color: #16a34a; font-weight: bold; }
+    .status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; background: #fef9c3; color: #854d0e; }
+    .obs { white-space: pre-wrap; line-height: 1.5; }
+    table.data { margin-top: 6px; }
+    table.data th { text-align: left; font-size: 11px; color: #6b7280; padding: 6px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+    table.data td { padding: 6px; border-bottom: 1px solid #f1f5f9; }
+    .right { text-align: right; }
+  </style>
+</head>
+<body>
+  <h1 th:text="'Pedido #' + ${pedido.id}">Pedido</h1>
+  <div class="sub">
+    Emitido em
+    <span th:text="${#temporals.format(pedido.dataPedido,'dd/MM/yyyy HH:mm')}">--</span>
+    &nbsp;|&nbsp;
+    Status: <span class="status" th:text="${pedido.status}">--</span>
+    <span th:if="${pedido.orcamento != null}">
+      &nbsp;|&nbsp; Origem: <span th:text="'ORC-' + ${pedido.orcamento.id}">--</span>
+    </span>
+  </div>
+
+  <div class="section">
+    <h2>Dados do cliente</h2>
+    <table th:if="${pedido.orcamento != null and pedido.orcamento.pessoa != null}">
+      <tr><td class="lbl">Nome</td><td class="val" th:text="${pedido.orcamento.pessoa.nome}">--</td></tr>
+      <tr><td class="lbl">E-mail</td><td class="val" th:text="${pedido.orcamento.pessoa.email ?: '—'}">--</td></tr>
+      <tr><td class="lbl">Telefone</td><td class="val" th:text="${pedido.orcamento.pessoa.telefone ?: '—'}">--</td></tr>
+      <tr><td class="lbl">Tipo</td><td class="val" th:text="${pedido.orcamento.pessoa.tipoServico ?: '—'}">--</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Análises</h2>
+    <p th:if="${#lists.isEmpty(pedido.analises)}">Nenhuma análise vinculada.</p>
+    <table class="data" th:unless="${#lists.isEmpty(pedido.analises)}">
+      <thead>
+        <tr><th>ID</th><th>Análise</th><th>Descrição</th><th class="right">Valor</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="pa : ${pedido.analises}" th:with="a=${pa.analise}">
+          <td th:text="'#' + ${a.id}">--</td>
+          <td th:text="${a.nome}">--</td>
+          <td th:text="${a.descricao ?: '—'}">--</td>
+          <td class="right" th:text="${a.valor != null ? 'R$ ' + #numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA') : '—'}">--</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Valor total</h2>
+    <p class="total"
+       th:with="v=${pedido.orcamento != null ? pedido.orcamento.valorTotal : null}"
+       th:text="${v != null ? 'R$ ' + #numbers.formatDecimal(v,1,'POINT',2,'COMMA') : 'R$ 0,00'}">
+      R$ 0,00
+    </p>
+  </div>
+
+  <div class="section" th:if="${pedido.observacoes != null and !pedido.observacoes.isBlank()}">
+    <h2>Observações</h2>
+    <p class="obs" th:text="${pedido.observacoes}">--</p>
+  </div>
+</body>
+</html>

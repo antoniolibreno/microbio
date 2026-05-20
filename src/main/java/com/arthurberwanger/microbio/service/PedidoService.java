@@ -37,12 +37,17 @@ public class PedidoService {
 
     /** Cria um pedido a partir de um orçamento existente. */
     @Transactional
-    public Pedido criarDe(Long orcamentoId) {
+    public Pedido criarDe(Long orcamentoId, String observacoes) {
         Orcamento orc = orcamentoRepository.findById(orcamentoId)
                 .orElseThrow(() -> new EntityNotFoundException("Orçamento #" + orcamentoId + " não encontrado"));
+        if (observacoes != null && !observacoes.isBlank()) {
+            orc.setObservacoes(observacoes);
+            orcamentoRepository.save(orc);
+        }
         Pedido pedido = new Pedido();
         pedido.setOrcamento(orc);
         pedido.setStatus("PENDENTE");
+        pedido.setObservacoes(observacoes != null && !observacoes.isBlank() ? observacoes : orc.getObservacoes());
         return pedidoRepository.save(pedido);
     }
 

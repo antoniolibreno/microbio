@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="'Orçamento #' + ${orcamento.id}">Orçamento</title>
+  <style>
+    body { font-family: Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; margin: 24px; }
+    h1 { color: #1a702b; font-size: 22px; margin-bottom: 4px; }
+    .sub { color: #6b7280; font-size: 11px; margin-bottom: 18px; }
+    .section { margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }
+    .section h2 { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    td.lbl { color: #6b7280; width: 35%; padding: 3px 0; }
+    td.val { color: #1f2937; padding: 3px 0; }
+    .total { font-size: 16px; color: #1a702b; font-weight: bold; }
+    .status { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; background: #fef9c3; color: #854d0e; }
+    .obs { white-space: pre-wrap; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <h1 th:text="'Orçamento #' + ${orcamento.id}">Orçamento</h1>
+  <div class="sub">
+    Emitido em
+    <span th:text="${#temporals.format(orcamento.dataOrcamento,'dd/MM/yyyy HH:mm')}">--</span>
+    &nbsp;|&nbsp;
+    Status: <span class="status" th:text="${orcamento.status.label}">--</span>
+  </div>
+
+  <div class="section">
+    <h2>Dados do solicitante</h2>
+    <table th:if="${orcamento.pessoa != null}">
+      <tr><td class="lbl">Nome</td><td class="val" th:text="${orcamento.pessoa.nome}">--</td></tr>
+      <tr><td class="lbl">E-mail</td><td class="val" th:text="${orcamento.pessoa.email ?: '—'}">--</td></tr>
+      <tr><td class="lbl">Telefone</td><td class="val" th:text="${orcamento.pessoa.telefone ?: '—'}">--</td></tr>
+      <tr><td class="lbl">Serviço solicitado</td><td class="val" th:text="${orcamento.pessoa.tipoServico ?: '—'}">--</td></tr>
+      <tr><td class="lbl">Solicitado em</td><td class="val" th:text="${#temporals.format(orcamento.pessoa.dataSol,'dd/MM/yyyy')}">--</td></tr>
+    </table>
+    <p th:unless="${orcamento.pessoa != null}">Nenhum dado de solicitante vinculado.</p>
+  </div>
+
+  <div class="section">
+    <h2>Valor total</h2>
+    <p class="total"
+       th:text="${orcamento.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(orcamento.valorTotal,1,'POINT',2,'COMMA') : 'R$ 0,00'}">
+      R$ 0,00
+    </p>
+  </div>
+
+  <div class="section" th:if="${orcamento.observacoes != null and !orcamento.observacoes.isBlank()}">
+    <h2>Observações</h2>
+    <p class="obs" th:text="${orcamento.observacoes}">--</p>
+  </div>
+</body>
+</html>
