@@ -238,20 +238,15 @@
                 </div>
                 <div class="modal-field">
                     <label for="orcTelefone">Telefone / WhatsApp</label>
-                    <input type="tel" id="orcTelefone" placeholder="(45) 99999-0000" maxlength="20">
+                    <input type="tel" id="orcTelefone" placeholder="(45) 99999-0000" maxlength="16" inputmode="numeric">
+                    <span class="field-error" id="errTelefone"></span>
                 </div>
             </div>
 
             <div class="modal-field">
                 <label for="orcServico">Tipo de serviço <span class="req">*</span></label>
                 <select id="orcServico" required>
-                    <option value="" disabled selected>Selecione uma especialidade...</option>
-                    <option value="Microbiologia">🔬 Microbiologia</option>
-                    <option value="Bioquimica">⚗️ Bioquímica</option>
-                    <option value="Hematologia">🩸 Hematologia</option>
-                    <option value="Imunologia">🧬 Imunologia</option>
-                    <option value="Controle de Qualidade em Bioinsumos">🧪 Controle de Qualidade em Bioinsumos</option>
-                    <option value="Outro">📋 Outro / Não sei ainda</option>
+                    <option value="" disabled selected>Carregando análises...</option>
                 </select>
                 <span class="field-error" id="errServico"></span>
             </div>
@@ -309,6 +304,16 @@
     .btn-enviar:active{transform:scale(.98)}
     .btn-enviar:disabled{opacity:.65;cursor:not-allowed}
     @media(max-width:500px){.modal-row{flex-direction:column;gap:0}.modal-header,form#formOrcamento{padding-left:18px;padding-right:18px}.modal-actions{flex-direction:column-reverse}.btn-cancelar,.btn-enviar{width:100%;text-align:center}}
+
+    /* Toast */
+    .toast-container{position:fixed;top:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{display:flex;align-items:center;gap:10px;min-width:280px;max-width:380px;padding:14px 18px;border-radius:10px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.15);font-size:14px;font-weight:500;color:#1f2937;border-left:4px solid #177d33;opacity:0;transform:translateX(20px);transition:opacity .3s,transform .3s;pointer-events:auto}
+    .toast.visible{opacity:1;transform:translateX(0)}
+    .toast-ok{border-left-color:#177d33}
+    .toast-ok i{color:#177d33;font-size:18px}
+    .toast-err{border-left-color:#dc2626}
+    .toast-err i{color:#dc2626;font-size:18px}
+    @media(max-width:500px){.toast-container{top:16px;right:16px;left:16px}.toast{min-width:0;max-width:none}}
 </style>
 
 </html>

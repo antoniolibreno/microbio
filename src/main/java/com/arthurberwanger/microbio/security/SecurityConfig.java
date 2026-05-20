@@ -31,7 +31,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/login",
                                 "/css/**", "/js/**", "/img/**", "/images/**", "/fonts/**",
-                                "/api/solicitacoes"
+                                "/api/solicitacoes",
+                                "/api/analises/ativas"
                         ).permitAll()
 
                         // Admin

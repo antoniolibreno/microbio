@@ -34,29 +34,6 @@
     /* ── SIDEBAR (fragment) ── */
     .sidebar { width:var(--sidebar-w); background:var(--surface); border-right:1px solid var(--border);
                display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
-    .sidebar-brand { padding:24px 20px 20px; border-bottom:1px solid var(--border); }
-    .sidebar-brand h1 { color:var(--primary); font-size:20px; font-weight:700; }
-    .sidebar-brand p  { color:var(--text-muted); font-size:11px; margin-top:2px; }
-    .sidebar-nav  { flex:1; padding:16px 12px; overflow-y:auto; }
-    .nav-section  { font-size:10px; font-weight:700; color:var(--text-faint); text-transform:uppercase;
-                    letter-spacing:.8px; padding:12px 8px 6px; display:block; }
-    .nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:var(--radius-sm);
-                color:var(--text-muted); text-decoration:none; font-size:14px; font-weight:500;
-                transition:background .15s, color .15s; margin-bottom:2px; }
-    .nav-link:hover, .nav-link.active { background:var(--primary-light); color:var(--primary); }
-    .nav-link.active { font-weight:600; }
-    .sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-    .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
-    .user-avatar { width:32px; height:32px; background:var(--primary); border-radius:50%;
-                   display:flex; align-items:center; justify-content:center;
-                   color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
-    .user-name { font-size:13px; font-weight:600; }
-    .user-role { font-size:11px; color:var(--text-muted); }
-    .btn-logout { width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
-                  padding:9px; background:none; border:1px solid var(--border); border-radius:var(--radius-sm);
-                  color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer;
-                  transition:background .15s, color .15s; }
-    .btn-logout:hover { background:#fff1f2; color:#9f1239; border-color:#fda4af; }
 
     /* ── LAYOUT ── */
     .main { margin-left:var(--sidebar-w); flex:1; padding:32px 36px; display:flex; flex-direction:column; gap:28px; }

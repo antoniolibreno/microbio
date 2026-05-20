@@ -4,6 +4,7 @@ import com.arthurberwanger.microbio.dto.OrcamentoDTO;
 import com.arthurberwanger.microbio.model.Orcamento;
 import com.arthurberwanger.microbio.model.Orcamento.StatusOrcamento;
 import com.arthurberwanger.microbio.model.Pessoa;
+import com.arthurberwanger.microbio.repository.AnaliseRepository;
 import com.arthurberwanger.microbio.repository.OrcamentoRepository;
 import com.arthurberwanger.microbio.repository.PessoaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,11 +23,22 @@ public class OrcamentoService {
 
     private final OrcamentoRepository orcamentoRepository;
     private final PessoaRepository    pessoaRepository;
+    private final AnaliseRepository   analiseRepository;
 
     public OrcamentoService(OrcamentoRepository orcamentoRepository,
-                            PessoaRepository pessoaRepository) {
+                            PessoaRepository pessoaRepository,
+                            AnaliseRepository analiseRepository) {
         this.orcamentoRepository = orcamentoRepository;
         this.pessoaRepository    = pessoaRepository;
+        this.analiseRepository   = analiseRepository;
+    }
+
+    /** Busca o valor cadastrado da análise pelo nome (tipoServico). */
+    private BigDecimal valorDaAnalise(String tipoServico) {
+        if (tipoServico == null || tipoServico.isBlank()) return null;
+        return analiseRepository.findFirstByNomeIgnoreCase(tipoServico)
+                .map(a -> a.getValor())
+                .orElse(null);
     }
 
     // ── Solicitações públicas (site institucional) ─────────────────────────
@@ -43,6 +55,7 @@ public class OrcamentoService {
 
         Orcamento orc = new Orcamento();
         orc.setPessoa(pessoa);
+        orc.setValorTotal(valorDaAnalise(pessoa.getTipoServico()));
         return orcamentoRepository.save(orc);
     }
 
@@ -96,6 +109,7 @@ public class OrcamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação #" + pessoaId + " não encontrada"));
         Orcamento orc = new Orcamento();
         orc.setPessoa(pessoa);
+        orc.setValorTotal(valorDaAnalise(pessoa.getTipoServico()));
         return orcamentoRepository.save(orc);
     }
 
