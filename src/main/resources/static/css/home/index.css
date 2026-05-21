@@ -1,0 +1,43 @@
+.modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.modal-overlay.ativo{opacity:1;visibility:visible}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,.18);border-top:5px solid #177d33;transform:translateY(20px);transition:transform .25s;max-height:90vh;overflow-y:auto}
+.modal-overlay.ativo .modal-box{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;gap:14px;padding:24px 28px 20px;border-bottom:1px solid #e5e7eb}
+.modal-icon{width:44px;height:44px;flex-shrink:0;background:#e8f5e9;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#177d33;font-size:20px}
+.modal-header h2{font-size:18px;font-weight:700;color:#1f2937;margin:0 0 2px}
+.modal-header p{font-size:13px;color:#6b7280;margin:0}
+.modal-close{margin-left:auto;background:none;border:none;font-size:24px;color:#9ca3af;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s,color .15s;line-height:1}
+.modal-close:hover{background:#f3f4f6;color:#374151}
+form#formOrcamento{padding:24px 28px}
+.modal-field{display:flex;flex-direction:column;margin-bottom:18px}
+.modal-field label{font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.req{color:#dc2626}
+.modal-field input,.modal-field select{padding:11px 14px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;color:#1f2937;transition:border-color .2s,box-shadow .2s;outline:none;background:#fff}
+.modal-field input:focus,.modal-field select:focus{border-color:#177d33;box-shadow:0 0 0 3px rgba(23,125,51,.12)}
+.modal-field input.erro,.modal-field select.erro{border-color:#dc2626}
+.field-error{font-size:12px;color:#dc2626;margin-top:4px;min-height:16px}
+.modal-row{display:flex;gap:14px}
+.modal-row .modal-field{flex:1}
+.modal-notice{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:13px;color:#15803d;margin-bottom:20px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.modal-notice i{margin-top:2px;flex-shrink:0}
+.modal-feedback{padding:12px 14px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-feedback.ok{background:#f0fdf4;border:1px solid #86efac;color:#15803d}
+.modal-feedback.err{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.btn-cancelar{padding:11px 20px;border:1.5px solid #d1d5db;background:#fff;color:#374151;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-cancelar:hover{background:#f9fafb}
+.btn-enviar{padding:11px 24px;background:#9c5f32;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;min-width:160px}
+.btn-enviar:hover{background:#824f29}
+.btn-enviar:active{transform:scale(.98)}
+.btn-enviar:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:500px){.modal-row{flex-direction:column;gap:0}.modal-header,form#formOrcamento{padding-left:18px;padding-right:18px}.modal-actions{flex-direction:column-reverse}.btn-cancelar,.btn-enviar{width:100%;text-align:center}}
+
+/* Toast */
+.toast-container{position:fixed;top:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;min-width:280px;max-width:380px;padding:14px 18px;border-radius:10px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.15);font-size:14px;font-weight:500;color:#1f2937;border-left:4px solid #177d33;opacity:0;transform:translateX(20px);transition:opacity .3s,transform .3s;pointer-events:auto}
+.toast.visible{opacity:1;transform:translateX(0)}
+.toast-ok{border-left-color:#177d33}
+.toast-ok i{color:#177d33;font-size:18px}
+.toast-err{border-left-color:#dc2626}
+.toast-err i{color:#dc2626;font-size:18px}
+@media(max-width:500px){.toast-container{top:16px;right:16px;left:16px}.toast{min-width:0;max-width:none}}

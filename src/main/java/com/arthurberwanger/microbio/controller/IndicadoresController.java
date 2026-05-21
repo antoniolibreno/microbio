@@ -59,7 +59,7 @@ public class IndicadoresController {
         model.addAttribute("totalConcluido",   contarStatus(todos, StatusOrcamento.CONCLUIDO));
         model.addAttribute("totalCancelado",   contarStatus(todos, StatusOrcamento.CANCELADO));
         model.addAttribute("statusValues",     StatusOrcamento.values());
-        return "orcamentopainel";
+        return "indicadores/lista";
     }
 
     /** Detalhe de um orçamento específico. */
@@ -78,7 +78,7 @@ public class IndicadoresController {
             model.addAttribute("orcamento", orc);
             model.addAttribute("valorSugerido", valorSugerido);
             model.addAttribute("statusValues", StatusOrcamento.values());
-            return "editarorcamentopainel";
+            return "indicadores/editar";
         } catch (EntityNotFoundException e) {
             ra.addFlashAttribute("erro", e.getMessage());
             return "redirect:/indicadores";

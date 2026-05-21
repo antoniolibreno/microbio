@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Microbio</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/auth/dashboard.css}">
+</head>
+<body>
+
+<aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
+
+<main class="main">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <div class="page-header-text">
+      <h1>
+        <span class="header-icon">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </span>
+        Dashboard
+      </h1>
+      <p>Visão geral e indicadores operacionais do laboratório</p>
+    </div>
+    <span class="header-date" th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd MMM yyyy', #locale)}">segunda-feira, 12 mai 2025</span>
+  </div>
+
+  <!-- ── KPI CARDS ── -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card kc-total">
+      <div class="kpi-top">
+        <span class="kpi-label">Total de orçamentos</span>
+        <span class="kpi-icon icon-total">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${totalOrcamentos}">0</div>
+      <div class="kpi-sub" th:text="${totalClientes} + ' clientes cadastrados'">0 clientes cadastrados</div>
+    </div>
+
+    <div class="kpi-card kc-ativo">
+      <div class="kpi-top">
+        <span class="kpi-label">Em aberto</span>
+        <span class="kpi-icon icon-ativo">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${totalAtivos}">0</div>
+      <div class="kpi-sub" th:text="${totalPendentes} + ' pendentes · ' + ${totalAndamento} + ' em andamento'">—</div>
+    </div>
+
+    <div class="kpi-card kc-concluido">
+      <div class="kpi-top">
+        <span class="kpi-label">Concluídos</span>
+        <span class="kpi-icon icon-concluido">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${totalConcluidos}">0</div>
+      <div class="kpi-sub" th:text="${totalCancelados} + ' cancelados'">0 cancelados</div>
+    </div>
+
+    <div class="kpi-card kc-taxa">
+      <div class="kpi-top">
+        <span class="kpi-label">Taxa de conclusão</span>
+        <span class="kpi-icon icon-taxa">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${taxaConclusao} + '%'">0%</div>
+      <div class="kpi-sub">dos orçamentos ativos foram concluídos</div>
+    </div>
+
+  </div>
+
+  <!-- ── CHARTS ROW ── -->
+  <div class="charts-row">
+
+    <!-- Bar chart: orçamentos por mês -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Orçamentos por mês</div>
+          <div class="chart-sub">Últimos 6 meses</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap" style="height:240px;">
+        <canvas id="barChart"
+                th:attr="data-labels=${labelsMesesJson},
+                         data-valores=${contagemPorMesJson}"></canvas>
+      </div>
+    </div>
+
+    <!-- Donut chart: distribuição por status -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Distribuição por status</div>
+          <div class="chart-sub">Situação atual</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap" style="height:180px;">
+        <canvas id="donutChart"
+                th:attr="data-pendente=${totalPendentes},
+                         data-andamento=${totalAndamento},
+                         data-concluido=${totalConcluidos},
+                         data-cancelado=${totalCancelados}"></canvas>
+      </div>
+      <div class="donut-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f59e0b"></div>
+          <span class="legend-label">Pendente</span>
+          <span class="legend-val" th:text="${totalPendentes}">0</span>
+          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalPendentes * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#3b82f6"></div>
+          <span class="legend-label">Em andamento</span>
+          <span class="legend-val" th:text="${totalAndamento}">0</span>
+          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalAndamento * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#22c55e"></div>
+          <span class="legend-label">Concluído</span>
+          <span class="legend-val" th:text="${totalConcluidos}">0</span>
+          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalConcluidos * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f43f5e"></div>
+          <span class="legend-label">Cancelado</span>
+          <span class="legend-val" th:text="${totalCancelados}">0</span>
+          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalCancelados * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ORÇAMENTOS RECENTES ── -->
+  <div class="recent-card">
+    <div class="recent-header">
+      <h3>Orçamentos recentes</h3>
+      <a th:href="@{/indicadores}" class="see-all">
+        Ver todos
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cliente / Solicitante</th>
+          <th>Serviço</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:if="${#lists.isEmpty(orcamentosRecentes)}" class="empty-row">
+          <td colspan="6">Nenhum orçamento cadastrado ainda.</td>
+        </tr>
+        <tr th:each="orc : ${orcamentosRecentes}">
+          <td class="td-id" th:text="'#' + ${orc.id}">—</td>
+          <td>
+            <div class="td-cliente">
+              <div class="mini-avatar"
+                   th:text="${orc.pessoa != null ? #strings.substring(orc.pessoa.nome, 0, (orc.pessoa.nome.length() > 1 ? 2 : 1)) : (orc.usuario != null ? #strings.substring(orc.usuario.login, 0, 2) : '?')}">
+                ??
+              </div>
+              <span th:text="${orc.pessoa != null ? orc.pessoa.nome : (orc.usuario != null ? orc.usuario.login : '—')}">—</span>
+            </div>
+          </td>
+          <td>
+            <span th:if="${orc.pessoa != null and orc.pessoa.tipoServico != null}"
+                  style="font-size:12px;padding:3px 9px;border-radius:6px;background:var(--primary-light);color:var(--primary);font-weight:600;"
+                  th:text="${orc.pessoa.tipoServico}">—</span>
+            <span th:if="${orc.pessoa == null or orc.pessoa.tipoServico == null}"
+                  style="color:var(--text-faint);font-size:12px;">—</span>
+          </td>
+          <td class="td-date" th:text="${#temporals.format(orc.dataOrcamento,'dd/MM/yyyy')}">—</td>
+          <td>
+            <span class="status-badge"
+                  th:classappend="${orc.status.cssClass}"
+                  th:text="${orc.status.label}">—</span>
+          </td>
+          <td>
+            <a th:href="@{/indicadores/{id}(id=${orc.id})}" class="td-link">
+              Abrir
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</main>
+
+<script th:src="@{/js/auth/dashboard.js}" defer></script>
+
+</body>
+</html>

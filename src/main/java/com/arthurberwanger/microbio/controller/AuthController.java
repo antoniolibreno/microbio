@@ -5,6 +5,8 @@ import com.arthurberwanger.microbio.repository.ClienteRepository;
 import com.arthurberwanger.microbio.service.OrcamentoService;
 import com.arthurberwanger.microbio.service.PedidoService;
 import com.arthurberwanger.microbio.service.UsuarioService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -31,7 +33,7 @@ public class AuthController {
     }
 
     @GetMapping("/")
-    public String home() { return "index"; }
+    public String home() { return "home/index"; }
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String erro,
@@ -39,7 +41,7 @@ public class AuthController {
                             Model model) {
         if (erro   != null) model.addAttribute("mensagemErro",    "Login ou senha inválidos. Tente novamente.");
         if (logout != null) model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/dashboard")
@@ -66,9 +68,19 @@ public class AuthController {
         model.addAttribute("totalAtivos",   ativos);
 
         model.addAttribute("orcamentosRecentes", orcamentoService.listarRecentes(6));
-        model.addAttribute("contagemPorMes",     orcamentoService.contagemPorMes(6));
-        model.addAttribute("labelsMeses",        orcamentoService.labelsMeses(6));
-        return "dashboard";
+        var contagem = orcamentoService.contagemPorMes(6);
+        var labels   = orcamentoService.labelsMeses(6);
+        model.addAttribute("contagemPorMes",     contagem);
+        model.addAttribute("labelsMeses",        labels);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            model.addAttribute("contagemPorMesJson", mapper.writeValueAsString(contagem));
+            model.addAttribute("labelsMesesJson",    mapper.writeValueAsString(labels));
+        } catch (JsonProcessingException e) {
+            model.addAttribute("contagemPorMesJson", "[]");
+            model.addAttribute("labelsMesesJson",    "[]");
+        }
+        return "auth/dashboard";
     }
 
     @GetMapping("/meu-painel")
