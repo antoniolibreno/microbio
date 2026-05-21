@@ -6,83 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitações de Orçamento - Microbio</title>
-    <style>
-        :root {
-            --primary:       #1a702b;
-            --primary-hover: #135c22;
-            --primary-light: #e8f5e9;
-            --sidebar-w:     240px;
-            --text-dark:     #1f2937;
-            --text-muted:    #6b7280;
-            --bg:            #f3f4f6;
-            --font:          'Inter', system-ui, -apple-system, sans-serif;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
-
-        /* ── SIDEBAR (igual ao dashboard) ── */
-        .sidebar { width:var(--sidebar-w); background:#fff; border-right:1px solid #e5e7eb; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; }
-        .sidebar-nav  { flex:1; padding:16px 12px; overflow-y:auto; }
-        .nav-section  { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; padding:12px 8px 6px; display:block; }
-        .nav-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; color:var(--text-muted); text-decoration:none; font-size:14px; font-weight:500; transition:background .15s,color .15s; margin-bottom:2px; }
-        .nav-link:hover,.nav-link.active { background:var(--primary-light); color:var(--primary); }
-        .nav-link.active { font-weight:600; }
-        .sidebar-footer { padding:16px 12px; border-top:1px solid #e5e7eb; }
-        .user-info { display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:8px; }
-        .user-avatar { width:32px; height:32px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
-        .user-name { font-size:13px; font-weight:600; }
-        .user-role { font-size:11px; color:var(--text-muted); }
-        .btn-logout { width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:9px; background:none; border:1px solid #e5e7eb; border-radius:8px; color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s,color .15s; }
-        .btn-logout:hover { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
-
-        /* ── MAIN ── */
-        .main { margin-left:var(--sidebar-w); flex:1; padding:32px; }
-        .page-header { margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
-        .page-header-text h2 { font-size:22px; font-weight:700; }
-        .page-header-text p  { color:var(--text-muted); font-size:14px; margin-top:4px; }
-
-        /* badge de contagem */
-        .badge { background:var(--primary); color:#fff; font-size:12px; font-weight:700; border-radius:20px; padding:2px 10px; vertical-align:middle; margin-left:8px; }
-
-        /* ── TABELA ── */
-        .table-card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); overflow:hidden; }
-        .table-toolbar { padding:16px 20px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-        .search-box { display:flex; align-items:center; gap:8px; border:1.5px solid #d1d5db; border-radius:8px; padding:8px 12px; background:#fff; }
-        .search-box input { border:none; outline:none; font-size:14px; color:var(--text-dark); width:220px; }
-        .search-box svg { color:var(--text-muted); flex-shrink:0; }
-
-        table { width:100%; border-collapse:collapse; }
-        thead th { background:#f9fafb; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); padding:12px 16px; text-align:left; border-bottom:1px solid #e5e7eb; }
-        tbody tr { border-bottom:1px solid #f3f4f6; transition:background .1s; }
-        tbody tr:hover { background:#fafafa; }
-        tbody tr:last-child { border-bottom:none; }
-        td { padding:14px 16px; font-size:14px; vertical-align:middle; }
-        td.nome { font-weight:600; color:var(--text-dark); }
-        td.contato { color:var(--text-muted); font-size:13px; }
-        td.contato span { display:block; }
-
-        /* chips de serviço */
-        .chip { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-        .chip-micro  { background:#e8f5e9; color:#1a702b; }
-        .chip-bio    { background:#fef9c3; color:#854d0e; }
-        .chip-hema   { background:#fee2e2; color:#b91c1c; }
-        .chip-imuno  { background:#ede9fe; color:#6d28d9; }
-        .chip-qual   { background:#e0f2fe; color:#0369a1; }
-        .chip-outro  { background:#f3f4f6; color:#374151; }
-
-        /* status vinculação */
-        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-        .status-pendente  { background:#fef9c3; color:#854d0e; }
-        .status-vinculado { background:#e8f5e9; color:#1a702b; }
-
-        .data { color:var(--text-muted); font-size:13px; white-space:nowrap; }
-
-        /* empty state */
-        .empty-state { padding:60px 20px; text-align:center; color:var(--text-muted); }
-        .empty-state svg { margin-bottom:16px; opacity:.4; }
-        .empty-state h3 { font-size:16px; font-weight:600; margin-bottom:6px; color:var(--text-dark); }
-        .empty-state p  { font-size:14px; }
-    </style>
+  <link rel="stylesheet" th:href="@{/css/solicitacoes/lista.css}">
 </head>
 <body>
 
@@ -161,16 +85,7 @@
     </div>
 </main>
 
-<script>
-    function filtrarTabela() {
-        const termo = document.getElementById('searchInput').value.toLowerCase();
-        const linhas = document.querySelectorAll('#tabelaSolicitacoes tbody tr');
-        linhas.forEach(tr => {
-            const texto = tr.textContent.toLowerCase();
-            tr.style.display = texto.includes(termo) ? '' : 'none';
-        });
-    }
-</script>
+<script th:src="@{/js/solicitacoes/lista.js}" defer></script>
 
 </body>
 </html>
