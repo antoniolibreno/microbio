@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @GetMapping("/")
-    public String home() { return "index"; }
+    public String home() { return "home/index"; }
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String erro,
@@ -39,7 +39,7 @@ public class AuthController {
                             Model model) {
         if (erro   != null) model.addAttribute("mensagemErro",    "Login ou senha inválidos. Tente novamente.");
         if (logout != null) model.addAttribute("mensagemSucesso", "Você saiu com sucesso.");
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/dashboard")
@@ -68,7 +68,7 @@ public class AuthController {
         model.addAttribute("orcamentosRecentes", orcamentoService.listarRecentes(6));
         model.addAttribute("contagemPorMes",     orcamentoService.contagemPorMes(6));
         model.addAttribute("labelsMeses",        orcamentoService.labelsMeses(6));
-        return "dashboard";
+        return "auth/dashboard";
     }
 
     @GetMapping("/meu-painel")
