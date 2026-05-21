@@ -3,11 +3,13 @@ package com.arthurberwanger.microbio.controller;
 import com.arthurberwanger.microbio.dto.OrcamentoDTO;
 import com.arthurberwanger.microbio.model.Orcamento;
 import com.arthurberwanger.microbio.service.OrcamentoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.Map;
+import java.util.Map;
 
 /**
  * Endpoint público — acessível sem login pelo site institucional.
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/solicitacoes")
+@Tag(name = "Solicitações de Orçamento", description = "Recebe pedidos de orçamento enviados pelo site institucional (endpoint público).")
 public class OrcamentoController {
 
     private final OrcamentoService service;
@@ -23,10 +26,10 @@ public class OrcamentoController {
         this.service = service;
     }
 
-    /**
-     * POST /api/solicitacoes
-     * Body JSON: { nome, email, telefone, tipoServico }
-     */
+    @Operation(
+            summary = "Registra uma nova solicitação de orçamento",
+            description = "Cria uma solicitação a partir dos dados de contato do interessado (nome, email, telefone, tipo de serviço). Retorna o id gerado em caso de sucesso."
+    )
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody OrcamentoDTO dto) {
         try {

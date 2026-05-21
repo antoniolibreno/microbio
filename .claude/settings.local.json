@@ -6,7 +6,11 @@
       "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:org.xhtmlrenderer+AND+a:flying-saucer-pdf-openpdf&rows=5&wt=json\")",
       "Bash(./mvnw -q -U compile)",
       "Bash(xargs cat)",
-      "Bash(git -C /Users/brenoantonioli/IdeaProjects/microbio status --short)"
+      "Bash(git -C /Users/brenoantonioli/IdeaProjects/microbio status --short)",
+      "Bash(./mvnw -q dependency:resolve -Dartifact=org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0)",
+      "Bash(./mvnw compile *)",
+      "Bash(./mvnw clean *)",
+      "Bash(./mvnw spring-boot:run *)"
     ]
   }
 }

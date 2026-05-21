@@ -43,7 +43,8 @@ public class SecurityConfig {
                                 "/solicitacoes", "/solicitacoes/**",
                                 "/pedidos", "/pedidos/**",
                                 "/analises", "/analises/**",
-                                "/clientes", "/clientes/**"
+                                "/clientes", "/clientes/**",
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
                         ).hasRole("ADMIN")
 
                         // Cliente

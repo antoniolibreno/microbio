@@ -1,6 +1,8 @@
 package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.service.AnaliseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analises")
+@Tag(name = "Análises", description = "Consulta de análises microbiológicas disponíveis no catálogo.")
 public class AnaliseApiController {
 
     private final AnaliseService service;
@@ -18,6 +21,10 @@ public class AnaliseApiController {
         this.service = service;
     }
 
+    @Operation(
+            summary = "Lista análises ativas",
+            description = "Retorna id e nome de todas as análises com status ATIVA. Endpoint público, usado pelo site institucional para popular o formulário de solicitação de orçamento."
+    )
     @GetMapping("/ativas")
     public List<Map<String, Object>> listarAtivas() {
         return service.listarTodas().stream()
