@@ -25,5 +25,6 @@ A proposta é desenvolver um sistema que permita:
 - **Thymeleaf**
 - **PostgreSQL**
 - **Git** (Git Flow)
+- **Swagger** (para documentação da API)
 
 ---
