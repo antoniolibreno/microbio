@@ -5,6 +5,8 @@ import com.arthurberwanger.microbio.model.Pedido;
 import com.arthurberwanger.microbio.repository.OrcamentoRepository;
 import com.arthurberwanger.microbio.repository.PedidoRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,17 @@ public class PedidoService {
     public Pedido buscarPorId(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido #" + id + " não encontrado"));
+    }
+
+    public Pedido buscarComDetalhes(Long id) {
+        return pedidoRepository.findByIdComDetalhes(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido #" + id + " não encontrado"));
+    }
+
+    public List<Pedido> listarRecentes(int limit) {
+        return pedidoRepository.findAll(
+                PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "dataPedido"))
+        ).getContent();
     }
 
     /** Cria um pedido a partir de um orçamento existente. */
