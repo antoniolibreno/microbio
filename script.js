@@ -13,32 +13,32 @@ function initMap() {
     title: "Casa de Francisco"
   });
 }
+
 document.addEventListener('DOMContentLoaded', () => {
-    const botoes = document.querySelectorAll('.btn-detalhes');
+    // Usa event delegation no container pai em vez de buscar os botões diretamente
+    const container = document.querySelector('.cards2-container');
 
-    botoes.forEach(botao => {
-        botao.addEventListener('click', function() {
-            const cardPai = this.closest('.card2');
-            
-            // 1. (Opcional) Fecha outros cards que possam estar abertos
-            document.querySelectorAll('.card2').forEach(outroCard => {
-                if (outroCard !== cardPai) {
-                    outroCard.classList.remove('active');
-                    // Reseta o texto dos outros botões para 'DETALHES'
-                    const btnOutro = outroCard.querySelector('.btn-detalhes');
-                    if(btnOutro) btnOutro.textContent = 'DETALHES';
-                }
-            });
+    if (!container) return;
 
-            // 2. Abre ou fecha o card atual
-            cardPai.classList.toggle('active');
+    container.addEventListener('click', function(e) {
+        const botao = e.target.closest('.btn-detalhes');
+        if (!botao) return;
 
-            // 3. Muda o texto do botão atual
-            if (cardPai.classList.contains('active')) {
-                this.textContent = 'FECHAR';
-            } else {
-                this.textContent = 'DETALHES';
-            }
+        const cardPai = botao.closest('.card2');
+        const isActive = cardPai.classList.contains('active');
+
+        // Fecha todos
+        document.querySelectorAll('.card2').forEach(card => {
+            card.classList.remove('active');
+            const btn = card.querySelector('.btn-detalhes');
+            if (btn) btn.textContent = 'DETALHES';
         });
+
+        // Abre só o clicado se não estava ativo
+        if (!isActive) {
+            cardPai.classList.add('active');
+            botao.textContent = 'FECHAR';
+        }
+
     });
 });

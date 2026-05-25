@@ -456,13 +456,23 @@ p {
 /* Container dos Cards */
 .cards2-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
     align-items: start;
 }
+@media (max-width: 992px) {
+    .cards2-container {
+        grid-template-columns: repeat(2, 1fr); /* Fica 2 por linha em tablets */
+    }
+}
 
+@media (max-width: 768px) {
+    .cards2-container {
+        grid-template-columns: 1fr; /* Fica 1 por linha em celulares */
+    }
+}
 /* O Card 2 */
 .card2 {
     background-color: #aed982;
@@ -473,6 +483,7 @@ p {
     flex-direction: column;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease;
+    /*height: 100%;*/
 }
 
 .card2:hover {
@@ -484,6 +495,7 @@ p {
     height: 140px;
     width: 100%;
     /* Aqui você pode usar background-image: url('caminho/para/imagem.jpg'); no seu projeto real */
+    object-fit: cover;
 }
 
 /* Corpo do card */
@@ -492,6 +504,7 @@ p {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    justify-content: space-between;
 }
 
 .card2-body h3 {
