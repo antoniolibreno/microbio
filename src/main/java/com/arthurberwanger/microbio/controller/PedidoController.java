@@ -1,6 +1,7 @@
 package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.model.Pedido;
+import com.arthurberwanger.microbio.service.AnaliseService;
 import com.arthurberwanger.microbio.service.PdfService;
 import com.arthurberwanger.microbio.service.PedidoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,19 +14,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    private final PedidoService pedidoService;
-    private final PdfService pdfService;
+    private final PedidoService  pedidoService;
+    private final AnaliseService analiseService;
+    private final PdfService     pdfService;
 
     public PedidoController(PedidoService pedidoService,
+                            AnaliseService analiseService,
                             PdfService pdfService) {
-        this.pedidoService = pedidoService;
-        this.pdfService = pdfService;
+        this.pedidoService  = pedidoService;
+        this.analiseService = analiseService;
+        this.pdfService     = pdfService;
     }
 
     @GetMapping
@@ -47,12 +53,66 @@ public class PedidoController {
     @GetMapping("/{id}")
     public String detalhe(@PathVariable Long id, Model model, RedirectAttributes ra) {
         try {
-            model.addAttribute("pedido", pedidoService.buscarPorId(id));
+            Pedido pedido = pedidoService.buscarComDetalhes(id);
+            model.addAttribute("pedido", pedido);
+
+            Set<Long> vinculadas = new java.util.HashSet<>();
+            pedido.getAnalises().forEach(pa -> vinculadas.add(pa.getAnalise().getId()));
+            var disponiveis = analiseService.listarTodas().stream()
+                    .filter(a -> "ATIVA".equals(a.getStatus()) && !vinculadas.contains(a.getId()))
+                    .toList();
+            model.addAttribute("analisesDisponiveis", disponiveis);
             return "pedidos/detalhe";
         } catch (EntityNotFoundException e) {
             ra.addFlashAttribute("erro", e.getMessage());
             return "redirect:/pedidos";
         }
+    }
+
+    @PostMapping("/{id}/analises/adicionar")
+    public String adicionarAnalise(@PathVariable Long id,
+                                   @RequestParam Long analiseId,
+                                   RedirectAttributes ra) {
+        try {
+            pedidoService.adicionarAnalise(id, analiseId);
+            ra.addFlashAttribute("sucesso", "Análise vinculada ao pedido.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/pedidos/" + id;
+    }
+
+    @PostMapping("/{id}/analises/{paId}/remover")
+    public String removerAnalise(@PathVariable Long id,
+                                 @PathVariable Long paId,
+                                 RedirectAttributes ra) {
+        try {
+            pedidoService.removerAnalise(paId);
+            ra.addFlashAttribute("sucesso", "Análise removida do pedido.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/pedidos/" + id;
+    }
+
+    @PostMapping("/{id}/analises/{paId}/resultado")
+    public String registrarResultado(@PathVariable Long id,
+                                     @PathVariable Long paId,
+                                     @RequestParam(required = false) String resultado,
+                                     @RequestParam(required = false) String valorReferencia,
+                                     @RequestParam(required = false) String conformidade,
+                                     @RequestParam(required = false) String dataRealizacao,
+                                     @RequestParam(required = false) String observacoes,
+                                     RedirectAttributes ra) {
+        try {
+            java.time.LocalDate data = (dataRealizacao != null && !dataRealizacao.isBlank())
+                    ? java.time.LocalDate.parse(dataRealizacao) : null;
+            pedidoService.atualizarResultado(paId, resultado, valorReferencia, conformidade, data, observacoes);
+            ra.addFlashAttribute("sucesso", "Resultado registrado com sucesso.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", "Erro ao registrar resultado: " + e.getMessage());
+        }
+        return "redirect:/pedidos/" + id;
     }
 
     @PostMapping("/{id}/promover")

@@ -1,11 +1,14 @@
 package com.arthurberwanger.microbio.controller;
 
-import com.arthurberwanger.microbio.dto.OrcamentoDTO;
+import com.arthurberwanger.microbio.model.Analise;
 import com.arthurberwanger.microbio.model.Cliente;
 import com.arthurberwanger.microbio.model.Orcamento;
+import com.arthurberwanger.microbio.model.OrcamentoAnalise;
 import com.arthurberwanger.microbio.model.Pedido;
 import com.arthurberwanger.microbio.model.Pessoa;
 import com.arthurberwanger.microbio.model.Usuario;
+import com.arthurberwanger.microbio.repository.AnaliseRepository;
+import com.arthurberwanger.microbio.repository.OrcamentoAnaliseRepository;
 import com.arthurberwanger.microbio.repository.OrcamentoRepository;
 import com.arthurberwanger.microbio.repository.PedidoRepository;
 import com.arthurberwanger.microbio.repository.PessoaRepository;
@@ -25,25 +28,31 @@ import java.util.List;
 @RequestMapping("/painel")
 public class PainelClienteController {
 
-    private final UsuarioRepository    usuarioRepository;
-    private final OrcamentoRepository  orcamentoRepository;
-    private final PedidoRepository     pedidoRepository;
-    private final PessoaRepository     pessoaRepository;
-    private final OrcamentoService     orcamentoService;
-    private final PedidoService        pedidoService;
+    private final UsuarioRepository          usuarioRepository;
+    private final OrcamentoRepository        orcamentoRepository;
+    private final OrcamentoAnaliseRepository orcamentoAnaliseRepository;
+    private final AnaliseRepository          analiseRepository;
+    private final PedidoRepository           pedidoRepository;
+    private final PessoaRepository           pessoaRepository;
+    private final OrcamentoService           orcamentoService;
+    private final PedidoService              pedidoService;
 
     public PainelClienteController(UsuarioRepository usuarioRepository,
                                    OrcamentoRepository orcamentoRepository,
+                                   OrcamentoAnaliseRepository orcamentoAnaliseRepository,
+                                   AnaliseRepository analiseRepository,
                                    PedidoRepository pedidoRepository,
                                    PessoaRepository pessoaRepository,
                                    OrcamentoService orcamentoService,
                                    PedidoService pedidoService) {
-        this.usuarioRepository   = usuarioRepository;
-        this.orcamentoRepository = orcamentoRepository;
-        this.pedidoRepository    = pedidoRepository;
-        this.pessoaRepository    = pessoaRepository;
-        this.orcamentoService    = orcamentoService;
-        this.pedidoService       = pedidoService;
+        this.usuarioRepository          = usuarioRepository;
+        this.orcamentoRepository        = orcamentoRepository;
+        this.orcamentoAnaliseRepository = orcamentoAnaliseRepository;
+        this.analiseRepository          = analiseRepository;
+        this.pedidoRepository           = pedidoRepository;
+        this.pessoaRepository           = pessoaRepository;
+        this.orcamentoService           = orcamentoService;
+        this.pedidoService              = pedidoService;
     }
 
     // ── helpers ──────────────────────────────────────────────────────────
@@ -118,46 +127,58 @@ public class PainelClienteController {
             pessoaRepository.findFirstByClienteOrderByDataSolAsc(cliente)
                     .ifPresent(p -> model.addAttribute("pessoaCliente", p));
         }
-        model.addAttribute("dto", new OrcamentoDTO());
+        var analisesDisponiveis = analiseRepository.findAll().stream()
+                .filter(a -> "ATIVA".equals(a.getStatus()))
+                .toList();
+        model.addAttribute("analisesDisponiveis", analisesDisponiveis);
         return "painel/orcamento-novo";
     }
 
     /** Solicitar novo orçamento — POST cria a solicitação */
     @PostMapping("/orcamentos/novo")
-    public String novoOrcamentoSubmit(@ModelAttribute OrcamentoDTO dto,
+    public String novoOrcamentoSubmit(@RequestParam(required = false) List<Long> analiseIds,
+                                      @RequestParam(required = false) String observacoes,
                                       Authentication auth,
                                       RedirectAttributes ra) {
         try {
             Usuario usuario = usuarioLogado(auth);
             Cliente cliente = usuario.getCliente();
 
+            List<Analise> selecionadas = (analiseIds != null && !analiseIds.isEmpty())
+                    ? analiseRepository.findAllById(analiseIds)
+                    : List.of();
+
             Pessoa pessoa = new Pessoa();
-            pessoa.setTipoServico(dto.getTipoServico());
+            String tipoServico = selecionadas.stream()
+                    .map(Analise::getNome)
+                    .collect(java.util.stream.Collectors.joining(", "));
+            pessoa.setTipoServico(tipoServico.isBlank() ? "Análise laboratorial" : tipoServico);
 
             if (cliente != null) {
-                // Preenche com dados do cadastro já existente
                 pessoaRepository.findFirstByClienteOrderByDataSolAsc(cliente).ifPresentOrElse(
-                        p -> {
-                            pessoa.setNome(p.getNome());
-                            pessoa.setEmail(p.getEmail());
-                            pessoa.setTelefone(p.getTelefone());
-                        },
+                        p -> { pessoa.setNome(p.getNome()); pessoa.setEmail(p.getEmail()); pessoa.setTelefone(p.getTelefone()); },
                         () -> pessoa.setNome(usuario.getLogin())
                 );
                 pessoa.setCliente(cliente);
             } else {
-                pessoa.setNome(dto.getNome() != null ? dto.getNome().trim() : usuario.getLogin());
-                pessoa.setEmail(dto.getEmail() != null ? dto.getEmail().trim() : null);
-                pessoa.setTelefone(dto.getTelefone() != null ? dto.getTelefone().trim() : null);
+                pessoa.setNome(usuario.getLogin());
             }
             pessoaRepository.save(pessoa);
 
             Orcamento orc = new Orcamento();
             orc.setPessoa(pessoa);
             orc.setUsuario(usuario);
+            if (observacoes != null && !observacoes.isBlank()) orc.setObservacoes(observacoes);
             orcamentoRepository.save(orc);
 
-            ra.addFlashAttribute("sucesso", "Solicitação enviada com sucesso! Em breve entraremos em contato.");
+            for (Analise a : selecionadas) {
+                OrcamentoAnalise oa = new OrcamentoAnalise();
+                oa.setOrcamento(orc);
+                oa.setAnalise(a);
+                orcamentoAnaliseRepository.save(oa);
+            }
+
+            ra.addFlashAttribute("sucesso", "Solicitação enviada! Em breve entraremos em contato.");
             return "redirect:/painel/orcamentos";
         } catch (Exception e) {
             ra.addFlashAttribute("erro", "Erro ao registrar solicitação. Tente novamente.");

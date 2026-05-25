@@ -91,36 +91,50 @@
             </div>
         </div>
 
-        <!-- Análises do pedido (resultado laboratorial) -->
+        <!-- Resultados laboratoriais -->
         <div class="card">
             <div class="card-header">
-                <h3>Análises laboratoriais (<span th:text="${#lists.size(pedido.analises)}">0</span>)</h3>
+                <h3>Resultados laboratoriais (<span th:text="${#lists.size(pedido.analises)}">0</span>)</h3>
             </div>
             <div th:if="${#lists.isEmpty(pedido.analises)}" class="empty-small">
                 🔬 As análises serão exibidas aqui quando o laboratório processar seu pedido.
             </div>
-            <div th:unless="${#lists.isEmpty(pedido.analises)}">
-                <table style="width:100%;border-collapse:collapse">
-                    <thead><tr class="t-head">
-                        <th>Análise</th>
-                        <th>Descrição</th>
-                        <th style="text-align:right">Valor</th>
-                    </tr></thead>
-                    <tbody>
-                    <tr th:each="pa : ${pedido.analises}" th:with="a=${pa.analise}" class="t-row">
-                        <td>
-                            <span class="analise-tag" th:text="${a.nome}">—</span>
-                        </td>
-                        <td style="color:var(--text-muted);font-size:13px" th:text="${a.descricao != null ? a.descricao : '—'}">—</td>
-                        <td style="text-align:right;font-weight:600"
-                            th:text="${a.valor != null ? 'R$ ' + #numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA') : '—'}">—</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="total-bar">
-                    <span>Total do pedido</span>
-                    <span class="total-val" th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+            <div th:unless="${#lists.isEmpty(pedido.analises)}" class="analise-results">
+                <div th:each="pa : ${pedido.analises}" th:with="a=${pa.analise}" class="ar-item">
+                    <div class="ar-header">
+                        <span class="ar-nome" th:text="${a.nome}">—</span>
+                        <span class="conf-badge"
+                              th:classappend="${pa.conformidade == 'CONFORME'} ? ' conf-conforme' : (${pa.conformidade == 'NAO_CONFORME'} ? ' conf-nao-conforme' : ' conf-pendente')"
+                              th:text="${pa.conformidade == 'CONFORME'} ? 'Conforme' : (${pa.conformidade == 'NAO_CONFORME'} ? 'Não conforme' : 'Em análise')">
+                        </span>
+                    </div>
+                    <!-- Resultado disponível -->
+                    <div th:if="${pa.resultado != null}" class="ar-body">
+                        <div class="ar-grid">
+                            <div>
+                                <div class="ar-lbl">Resultado encontrado</div>
+                                <div class="ar-val" th:text="${pa.resultado}">—</div>
+                            </div>
+                            <div th:if="${pa.valorReferencia != null}">
+                                <div class="ar-lbl">Valor de referência</div>
+                                <div class="ar-val" th:text="${pa.valorReferencia}">—</div>
+                            </div>
+                            <div th:if="${pa.dataRealizacao != null}">
+                                <div class="ar-lbl">Data de realização</div>
+                                <div class="ar-val" th:text="${#temporals.format(pa.dataRealizacao,'dd/MM/yyyy')}">—</div>
+                            </div>
+                        </div>
+                        <div th:if="${pa.observacoes != null}" class="ar-obs" th:text="${pa.observacoes}"></div>
+                    </div>
+                    <!-- Aguardando resultado -->
+                    <div th:unless="${pa.resultado != null}" class="ar-pending">
+                        🔬 Análise em processamento pelo laboratório...
+                    </div>
                 </div>
+            </div>
+            <div th:unless="${#lists.isEmpty(pedido.analises)}" class="total-bar">
+                <span>Total do pedido</span>
+                <span class="total-val" th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
             </div>
         </div>
 

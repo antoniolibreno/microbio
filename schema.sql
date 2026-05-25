@@ -113,12 +113,26 @@ CREATE TABLE amostra_necessaria (
 );
 
 -- ============================================================
--- TABELA: pedido_analise (N:N)
+-- TABELA: pedido_analise (N:N + resultado laboratorial)
 -- ============================================================
 CREATE TABLE pedido_analise (
-                                id         SERIAL PRIMARY KEY,
-                                pedido_id  INT NOT NULL REFERENCES pedido(id)  ON DELETE CASCADE,
-                                analise_id INT NOT NULL REFERENCES analise(id) ON DELETE CASCADE
+    id               SERIAL PRIMARY KEY,
+    pedido_id        INT NOT NULL REFERENCES pedido(id)  ON DELETE CASCADE,
+    analise_id       INT NOT NULL REFERENCES analise(id) ON DELETE CASCADE,
+    resultado        TEXT,
+    valor_referencia VARCHAR(200),
+    conformidade     VARCHAR(20)  DEFAULT 'PENDENTE',
+    data_realizacao  DATE,
+    observacoes      TEXT
+);
+
+-- ============================================================
+-- TABELA: orcamento_analise (análises solicitadas no orçamento)
+-- ============================================================
+CREATE TABLE orcamento_analise (
+    id           SERIAL PRIMARY KEY,
+    orcamento_id INT NOT NULL REFERENCES orcamento(id) ON DELETE CASCADE,
+    analise_id   INT NOT NULL REFERENCES analise(id)   ON DELETE CASCADE
 );
 
 -- ============================================================
@@ -130,7 +144,9 @@ CREATE INDEX idx_orcamento_usuario  ON orcamento(usuario_id);
 CREATE INDEX idx_orcamento_pessoa   ON orcamento(pessoa_id);
 CREATE INDEX idx_pedido_orcamento   ON pedido(orcamento_id);
 CREATE INDEX idx_pedido_analise_p   ON pedido_analise(pedido_id);
-CREATE INDEX idx_pedido_analise_a   ON pedido_analise(analise_id);
+CREATE INDEX idx_pedido_analise_a     ON pedido_analise(analise_id);
+CREATE INDEX idx_orcamento_analise_o  ON orcamento_analise(orcamento_id);
+CREATE INDEX idx_orcamento_analise_a  ON orcamento_analise(analise_id);
 
 -- ============================================================
 -- DADOS INICIAIS

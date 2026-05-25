@@ -49,3 +49,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display
 .alert-err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c}
 .info-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:#15803d;display:flex;align-items:flex-start;gap:10px}
 .info-box svg{flex-shrink:0;margin-top:1px}
+.form-card-header{padding:12px 20px;border-bottom:1px solid var(--border);background:#f9fafb;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+
+/* ── Lista de análises ── */
+.analise-list{display:flex;flex-direction:column;gap:2px}
+.analise-check{display:flex;align-items:flex-start;gap:14px;padding:14px;border-radius:8px;cursor:pointer;transition:background .15s;border:1.5px solid transparent}
+.analise-check:hover{background:#f9fafb;border-color:var(--border)}
+.analise-check input[type=checkbox]{width:17px;height:17px;accent-color:var(--primary);flex-shrink:0;margin-top:2px;cursor:pointer}
+.analise-check:has(input:checked){background:var(--primary-light);border-color:#86efac}
+.ac-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ac-nome{font-size:14px;font-weight:600;color:var(--text-dark)}
+.ac-desc{font-size:13px;color:var(--text-muted);line-height:1.4}
+.ac-meta{display:flex;gap:14px;margin-top:4px;flex-wrap:wrap}
+.ac-valor{font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-light);padding:2px 8px;border-radius:10px}
+.ac-tempo{font-size:12px;color:var(--text-muted)}
