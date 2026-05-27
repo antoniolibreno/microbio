@@ -73,7 +73,8 @@
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">
-      <div class="user-avatar">A</div>
+      <div class="user-avatar"
+           th:text="${#strings.toUpperCase(#strings.substring(#authentication.name, 0, 1))}">A</div>
       <div>
         <div class="user-name" sec:authentication="name">admin</div>
         <div class="user-role">Administrador</div>

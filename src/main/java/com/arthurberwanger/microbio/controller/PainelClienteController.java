@@ -185,9 +185,14 @@ public class PainelClienteController {
     public String verPedido(@PathVariable Long id, Model model, Authentication auth,
                             RedirectAttributes ra) {
         Usuario usuario = usuarioLogado(auth);
-        Pedido pedido = pedidoService.buscarPorId(id);
+        Pedido pedido;
+        try {
+            pedido = pedidoService.buscarComDetalhes(id);
+        } catch (EntityNotFoundException e) {
+            ra.addFlashAttribute("erro", "Pedido não encontrado.");
+            return "redirect:/painel/pedidos";
+        }
 
-        // Garante que o pedido é do usuário logado (via orçamento)
         Orcamento orc = pedido.getOrcamento();
         if (orc == null || orc.getUsuario() == null
                 || !orc.getUsuario().getId().equals(usuario.getId())) {
@@ -197,5 +202,20 @@ public class PainelClienteController {
 
         model.addAttribute("pedido", pedido);
         return "painel/pedido-detalhe";
+    }
+
+    @GetMapping("/meus-dados")
+    public String meusDados(Model model, Authentication auth) {
+        Usuario usuario = usuarioLogado(auth);
+        Cliente cliente = usuario.getCliente();
+        Pessoa pessoaCliente = null;
+        if (cliente != null) {
+            pessoaCliente = pessoaRepository
+                    .findFirstByClienteOrderByDataSolAsc(cliente).orElse(null);
+        }
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("pessoaCliente", pessoaCliente);
+        return "painel/meus-dados";
     }
 }
