@@ -85,9 +85,40 @@
         </span>
       </div>
       <div class="kpi-value" th:text="${taxaConclusao} + '%'">0%</div>
-      <div class="kpi-sub">dos orçamentos ativos foram concluídos</div>
+      <div class="kpi-sub">dos orçamentos foram concluídos</div>
     </div>
 
+  </div>
+
+  <!-- ── PEDIDOS KPI ROW ── -->
+  <div class="pedidos-row">
+    <div class="pedidos-row-title">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <rect x="8" y="2" width="8" height="4" rx="1"/>
+        <path d="M9 14l2 2 4-4"/>
+      </svg>
+      Pedidos de análise
+      <a th:href="@{/pedidos}" class="pedidos-row-link">Ver todos →</a>
+    </div>
+    <div class="pedidos-stats">
+      <div class="pstat pstat-total">
+        <div class="pstat-val" th:text="${totalPedidos}">0</div>
+        <div class="pstat-lbl">Total</div>
+      </div>
+      <div class="pstat pstat-pendente">
+        <div class="pstat-val" th:text="${pedidosPendentes}">0</div>
+        <div class="pstat-lbl">Pendentes</div>
+      </div>
+      <div class="pstat pstat-andamento">
+        <div class="pstat-val" th:text="${pedidosAndamento}">0</div>
+        <div class="pstat-lbl">Em andamento</div>
+      </div>
+      <div class="pstat pstat-concluido">
+        <div class="pstat-val" th:text="${pedidosConcluidos}">0</div>
+        <div class="pstat-lbl">Concluídos</div>
+      </div>
+    </div>
   </div>
 
   <!-- ── CHARTS ROW ── -->
@@ -153,6 +184,9 @@
 
   </div>
 
+  <!-- ── RECENT TABLES ROW ── -->
+  <div class="recent-tables-row">
+
   <!-- ── ORÇAMENTOS RECENTES ── -->
   <div class="recent-card">
     <div class="recent-header">
@@ -212,6 +246,57 @@
     </table>
   </div>
 
+  <!-- ── PEDIDOS RECENTES ── -->
+  <div class="recent-card">
+    <div class="recent-header">
+      <h3>Pedidos recentes</h3>
+      <a th:href="@{/pedidos}" class="see-all">
+        Ver todos
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cliente</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:if="${#lists.isEmpty(pedidosRecentes)}" class="empty-row">
+          <td colspan="5">Nenhum pedido registrado ainda.</td>
+        </tr>
+        <tr th:each="ped : ${pedidosRecentes}"
+            th:with="orc=${ped.orcamento}, nome=${orc != null and orc.pessoa != null ? orc.pessoa.nome : (orc != null and orc.usuario != null ? orc.usuario.login : '—')}">
+          <td class="td-id" th:text="'#PED-' + ${ped.id}">—</td>
+          <td>
+            <div class="td-cliente">
+              <div class="mini-avatar"
+                   th:text="${nome != null and nome.length() > 1 ? #strings.toUpperCase(nome.substring(0,2)) : '?'}">??</div>
+              <span th:text="${nome}">—</span>
+            </div>
+          </td>
+          <td class="td-date" th:text="${#temporals.format(ped.dataPedido,'dd/MM/yyyy')}">—</td>
+          <td>
+            <span class="status-badge"
+                  th:classappend="${ped.status == 'PENDENTE'} ? 'status-pendente' : (${ped.status == 'EM_ANDAMENTO'} ? 'status-andamento' : (${ped.status == 'CONCLUIDO'} ? 'status-concluido' : 'status-cancelado'))"
+                  th:text="${ped.status == 'PENDENTE' ? 'Pendente' : (ped.status == 'EM_ANDAMENTO' ? 'Em andamento' : (ped.status == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'))}">—</span>
+          </td>
+          <td>
+            <a th:href="@{/pedidos/{id}(id=${ped.id})}" class="td-link">
+              Abrir
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </div><!-- /recent-tables-row -->
 
 </main>
 
