@@ -1,6 +1,8 @@
 package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.service.AnaliseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/analises")
+@Tag(name = "Análises", description = "Consulta, cadastro, edição e exclusão de análises microbiológicas do catálogo.")
 public class AnaliseController {
 
     private final AnaliseService service;
@@ -39,6 +42,10 @@ public class AnaliseController {
         return "analises/nova";
     }
 
+    @Operation(
+            summary = "Cadastra uma nova análise",
+            description = "Cria uma análise no catálogo a partir de nome, descrição, valor, tempo de produção, status e listas de tipos, quantidades e formas de conservação suportadas."
+    )
     @PostMapping
     public String criar(@RequestParam String nome,
                         @RequestParam(required = false) String descricao,
