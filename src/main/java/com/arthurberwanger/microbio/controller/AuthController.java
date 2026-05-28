@@ -68,6 +68,14 @@ public class AuthController {
         model.addAttribute("totalAtivos",   ativos);
 
         model.addAttribute("orcamentosRecentes", orcamentoService.listarRecentes(6));
+        model.addAttribute("pedidosRecentes",   pedidoService.listarRecentes(5));
+
+        long pedidosPendentes  = pedidoService.contarPorStatus("PENDENTE");
+        long pedidosAndamento  = pedidoService.contarPorStatus("EM_ANDAMENTO");
+        long pedidosConcluidos = pedidoService.contarPorStatus("CONCLUIDO");
+        model.addAttribute("pedidosPendentes",  pedidosPendentes);
+        model.addAttribute("pedidosAndamento",  pedidosAndamento);
+        model.addAttribute("pedidosConcluidos", pedidosConcluidos);
         var contagem = orcamentoService.contagemPorMes(6);
         var labels   = orcamentoService.labelsMeses(6);
         model.addAttribute("contagemPorMes",     contagem);

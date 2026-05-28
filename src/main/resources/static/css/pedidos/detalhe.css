@@ -133,3 +133,51 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .modal-title{font-size:18px;font-weight:600;margin-bottom:8px;color:var(--text-primary)}
 .modal-body{color:var(--text-secondary);font-size:14px;line-height:1.6}
 .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
+
+/* ── Adicionar análise ── */
+.add-analise-section{padding:12px 20px 14px;border-bottom:1px solid var(--border-light);background:var(--bg-page)}
+.add-analise-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.add-analise-select{
+  flex:1;min-width:200px;font-family:inherit;font-size:13px;padding:8px 10px;
+  border:1px solid var(--border-color);border-radius:var(--radius-sm);
+  color:var(--text-primary);background:#fff;outline:none;cursor:pointer;
+  transition:border-color .15s;
+}
+.add-analise-select:focus{border-color:var(--primary)}
+
+/* ── Botão remover análise ── */
+.btn-remove-analise{
+  width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;border-radius:var(--radius-sm);
+  color:var(--text-tertiary);cursor:pointer;transition:all .15s;padding:0;
+}
+.btn-remove-analise:hover{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+
+/* ── Botão toggle resultado ── */
+.btn-result{
+  width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;border-radius:var(--radius-sm);
+  color:var(--text-tertiary);cursor:pointer;transition:all .15s;padding:0;vertical-align:middle;
+}
+.btn-result:hover{background:var(--primary-50);color:var(--primary);border-color:var(--primary-light)}
+
+/* ── Badges de conformidade ── */
+.cbadge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;
+        font-size:12px;font-weight:600;white-space:nowrap}
+.cbadge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.cbadge.pendente    {background:#fffbeb;color:#b45309}
+.cbadge.conforme    {background:#f0fdf4;color:#15803d}
+.cbadge.nao-conforme{background:#fef2f2;color:#b91c1c}
+
+/* ── Linha de resultado (toggle) ── */
+.result-detail-row > td{padding:0;background:var(--bg-page);border-bottom:2px solid var(--border-color)}
+.result-form{padding:16px 20px}
+.result-readonly{padding:16px 20px}
+
+.result-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:760px){.result-form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.result-form-grid{grid-template-columns:1fr}}
+.result-full{grid-column:1/-1}
+
+.res-lbl{font-size:11px;font-weight:600;color:var(--text-secondary);
+         text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}

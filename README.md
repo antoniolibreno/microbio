@@ -25,6 +25,6 @@ A proposta é desenvolver um sistema que permita:
 - **Thymeleaf**
 - **PostgreSQL**
 - **Git** (Git Flow)
-- Testes com **SonarQube**
+- **Swagger** (para documentação da API)
 
 ---

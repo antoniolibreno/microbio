@@ -48,6 +48,9 @@ public class Orcamento {
     @OneToMany(mappedBy = "orcamento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido> pedidos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "orcamento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrcamentoAnalise> analises = new ArrayList<>();
+
     public enum StatusOrcamento {
         PENDENTE, EM_ANDAMENTO, CONCLUIDO, CANCELADO;
 

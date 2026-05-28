@@ -66,3 +66,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display
 .alert{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:10px}
 .alert-ok{background:#dcfce7;border:1px solid #86efac;color:#15803d}
 .alert-err{background:#fee2e2;border:1px solid #fca5a5;color:#b91c1c}
+
+/* ── Resultados laboratoriais ── */
+.analise-results{display:flex;flex-direction:column}
+.ar-item{padding:16px 20px;border-bottom:1px solid var(--border)}
+.ar-item:last-child{border-bottom:none}
+.ar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px;flex-wrap:wrap}
+.ar-nome{font-size:14px;font-weight:600;color:var(--text-dark)}
+.conf-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.conf-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.conf-pendente    {background:#fef9c3;color:#854d0e}
+.conf-conforme    {background:#dcfce7;color:#15803d}
+.conf-nao-conforme{background:#fee2e2;color:#b91c1c}
+.ar-body{display:flex;flex-direction:column;gap:10px}
+.ar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.ar-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:3px}
+.ar-val{font-size:14px;color:var(--text-dark);white-space:pre-line}
+.ar-obs{font-size:13px;color:var(--text-muted);background:#f9fafb;padding:8px 12px;border-radius:6px;border-left:3px solid var(--border);line-height:1.6}
+.ar-pending{font-size:13px;color:var(--text-muted);padding:4px 0}
