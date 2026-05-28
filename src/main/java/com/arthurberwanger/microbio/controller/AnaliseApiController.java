@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analises")
-@Tag(name = "Análises", description = "Consulta de análises microbiológicas disponíveis no catálogo.")
+@Tag(name = "Análises", description = "Consulta, cadastro, edição e exclusão de análises microbiológicas do catálogo.")
 public class AnaliseApiController {
 
     private final AnaliseService service;

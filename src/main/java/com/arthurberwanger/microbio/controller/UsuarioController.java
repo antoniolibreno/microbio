@@ -1,6 +1,8 @@
 package com.arthurberwanger.microbio.controller;
 
 import com.arthurberwanger.microbio.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/usuarios")
+@Tag(name = "Usuários", description = "Cadastro, edição e exclusão de usuários do sistema.")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -22,6 +25,10 @@ public class UsuarioController {
     @GetMapping("/novo")
     public String paginaCadastro() { return "usuarios/novo"; }
 
+    @Operation(
+            summary = "Cadastra um usuário (modo simples)",
+            description = "Cria um novo usuário apenas com login, senha e flag de administrador. Valida confirmação de senha e tamanho mínimo de 6 caracteres."
+    )
     @PostMapping("/salvar-simples")
     public String salvarSimples(@RequestParam String login,
                                 @RequestParam String senha,
@@ -41,6 +48,10 @@ public class UsuarioController {
         }
     }
 
+    @Operation(
+            summary = "Cadastra um usuário (modo completo)",
+            description = "Cria um usuário com dados de acesso e dados cadastrais (tipo de cliente, CPF/CNPJ e endereço completo)."
+    )
     @PostMapping("/salvar-completo")
     public String salvarCompleto(@RequestParam String login,
                                  @RequestParam String senha,
