@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Microbio</title>
+  <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" th:href="@{/css/auth/dashboard.css}">
 </head>
@@ -300,7 +301,9 @@
 
 </main>
 
+<div th:replace="~{fragments/toast :: root}"></div>
 <script th:src="@{/js/auth/dashboard.js}" defer></script>
+<script th:replace="~{fragments/toast :: script}"></script>
 
 </body>
 </html>

@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="'Pedido #' + ${pedido.id} + ' · Microbio'">Pedido</title>
+  <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/pedidos/detalhe.css}">
 </head>
@@ -24,7 +25,7 @@
          cnpj=${orc != null and orc.pessoa != null and orc.pessoa.cliente != null ? orc.pessoa.cliente.cpfCnpj : ''},
          st=${pedido.status},
          editable=${st != 'CONCLUIDO' and st != 'CANCELADO'},
-         valorOrc=${orc != null ? orc.valorTotal : null}">
+         valorPed=${pedido.valorTotal}">
 
     <!--
       formSalvar é um form "fantasma" — os campos status e observações referenciam
@@ -80,9 +81,6 @@
         </button>
       </div>
     </div>
-
-    <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
-    <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
 
     <div class="detail-layout">
       <div class="detail-main">
@@ -280,7 +278,7 @@
           <div class="total-bar">
             <span>Valor total do pedido</span>
             <span style="font-weight:700;font-size:16px;color:var(--text-primary)"
-                  th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+                  th:text="${valorPed != null ? 'R$ ' + #numbers.formatDecimal(valorPed,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
           </div>
         </div>
 
@@ -326,7 +324,7 @@
             <div class="summary-total">
               <span style="font-weight:700;color:var(--text-primary)">Valor total</span>
               <span style="font-weight:700;color:var(--primary);font-size:16px"
-                    th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+                    th:text="${valorPed != null ? 'R$ ' + #numbers.formatDecimal(valorPed,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
             </div>
           </div>
         </div>
@@ -384,5 +382,7 @@ function toggleResult(id) {
   if (r) r.hidden = !r.hidden;
 }
 </script>
+<div th:replace="~{fragments/toast :: root}"></div>
+<script th:replace="~{fragments/toast :: script}"></script>
 </body>
 </html>

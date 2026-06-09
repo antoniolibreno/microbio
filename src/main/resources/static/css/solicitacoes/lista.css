@@ -1,13 +1,4 @@
-:root {
-    --primary:       #1a702b;
-    --primary-hover: #135c22;
-    --primary-light: #e8f5e9;
-    --sidebar-w:     240px;
-    --text-dark:     #1f2937;
-    --text-muted:    #6b7280;
-    --bg:            #f3f4f6;
-    --font:          'Inter', system-ui, -apple-system, sans-serif;
-}
+/* Variáveis globais vêm de /css/tokens/design-tokens.css */
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:var(--font); background:var(--bg); color:var(--text-dark); display:flex; min-height:100vh; }
 
@@ -54,17 +45,17 @@ td.contato span { display:block; }
 
 /* chips de serviço */
 .chip { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-.chip-micro  { background:#e8f5e9; color:#1a702b; }
-.chip-bio    { background:#fef9c3; color:#854d0e; }
-.chip-hema   { background:#fee2e2; color:#b91c1c; }
-.chip-imuno  { background:#ede9fe; color:#6d28d9; }
-.chip-qual   { background:#e0f2fe; color:#0369a1; }
-.chip-outro  { background:#f3f4f6; color:#374151; }
+.chip-micro  { background:var(--primary-light);         color:var(--primary-hover); }
+.chip-bio    { background:var(--status-pendente-bg);    color:var(--status-pendente-fg); }
+.chip-hema   { background:var(--status-cancelado-bg);   color:var(--status-cancelado-fg); }
+.chip-imuno  { background:#ede9fe;                       color:#6d28d9; }
+.chip-qual   { background:var(--status-info-bg);        color:var(--status-info-fg); }
+.chip-outro  { background:var(--neutral-100);           color:var(--neutral-700); }
 
 /* status vinculação */
 .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-.status-pendente  { background:#fef9c3; color:#854d0e; }
-.status-vinculado { background:#e8f5e9; color:#1a702b; }
+.status-pendente  { background:var(--status-pendente-bg);  color:var(--status-pendente-fg); }
+.status-vinculado { background:var(--status-concluido-bg); color:var(--status-concluido-fg); }
 
 .data { color:var(--text-muted); font-size:13px; white-space:nowrap; }
 

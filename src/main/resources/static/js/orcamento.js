@@ -168,14 +168,14 @@ async function enviarSolicitacao() {
 
         if (response.ok && data.sucesso) {
             fecharModal();
-            mostrarToast('Solicitação enviada! Entraremos em contato em breve.', 'ok');
+            notify('Solicitação enviada! Entraremos em contato em breve.', 'success');
             reativarBtn(btn, texto, loader);
         } else {
             exibirFeedback('err', data.mensagem || 'Erro ao enviar. Tente novamente.');
             reativarBtn(btn, texto, loader);
         }
     } catch {
-        exibirFeedback('err', '❌ Não foi possível conectar ao servidor. Verifique sua conexão.');
+        exibirFeedback('err', 'Não foi possível conectar ao servidor. Verifique sua conexão.');
         reativarBtn(btn, texto, loader);
     }
 }
@@ -188,23 +188,10 @@ function exibirFeedback(tipo, msg) {
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function mostrarToast(mensagem, tipo = 'ok') {
-    let container = document.getElementById('toastContainer');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toastContainer';
-        container.className = 'toast-container';
-        document.body.appendChild(container);
+function notify(mensagem, tipo) {
+    if (typeof window.toast === 'function') {
+        window.toast(mensagem, tipo || 'info');
     }
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${tipo}`;
-    toast.innerHTML = `<i class="fa-solid ${tipo === 'ok' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i><span>${mensagem}</span>`;
-    container.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('visible'));
-    setTimeout(() => {
-        toast.classList.remove('visible');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
 }
 
 function reativarBtn(btn, texto, loader) {

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,9 @@ public class Pedido {
 
     @Column(name = "data_pedido")
     private LocalDateTime dataPedido = LocalDateTime.now();
+
+    @Column(name = "valor_total", precision = 10, scale = 2)
+    private BigDecimal valorTotal;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoAnalise> analises = new ArrayList<>();

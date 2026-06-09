@@ -16,7 +16,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PedidoService {
@@ -75,7 +78,6 @@ public class PedidoService {
         pedido.setObservacoes(observacoes != null && !observacoes.isBlank() ? observacoes : orc.getObservacoes());
         pedidoRepository.save(pedido);
 
-        // Copia as análises do orçamento para o pedido
         List<OrcamentoAnalise> orcAnalises = orcamentoAnaliseRepository.findByOrcamentoId(orcamentoId);
         for (OrcamentoAnalise oa : orcAnalises) {
             PedidoAnalise pa = new PedidoAnalise();
@@ -84,18 +86,30 @@ public class PedidoService {
             pedidoAnaliseRepository.save(pa);
         }
 
-        return pedido;
+        Pedido recarregado = pedidoRepository.findByIdComDetalhes(pedido.getId()).orElse(pedido);
+        recalcularValorTotal(recarregado);
+        pedidoRepository.save(recarregado);
+
+        if (orc.getValorTotal() == null && recarregado.getValorTotal() != null) {
+            orc.setValorTotal(recarregado.getValorTotal());
+            orcamentoRepository.save(orc);
+        }
+
+        return recarregado;
     }
 
     /** Avança o status: PENDENTE → EM_ANDAMENTO → CONCLUIDO */
     @Transactional
     public Pedido promoverStatus(Long id) {
-        Pedido p = buscarPorId(id);
+        Pedido p = buscarComDetalhes(id);
         String proximo = switch (p.getStatus()) {
             case "PENDENTE"     -> "EM_ANDAMENTO";
             case "EM_ANDAMENTO" -> "CONCLUIDO";
             default -> throw new IllegalStateException("Pedido com status '" + p.getStatus() + "' não pode ser promovido.");
         };
+        if ("CONCLUIDO".equals(proximo)) {
+            assertPodeConcluir(p);
+        }
         p.setStatus(proximo);
         return pedidoRepository.save(p);
     }
@@ -103,8 +117,13 @@ public class PedidoService {
     /** Atualiza status + observações em uma única chamada. */
     @Transactional
     public Pedido atualizar(Long id, String status, String observacoes) {
-        Pedido p = buscarPorId(id);
-        if (status != null && !status.isBlank()) p.setStatus(status);
+        Pedido p = buscarComDetalhes(id);
+        if (status != null && !status.isBlank()) {
+            if ("CONCLUIDO".equals(status) && !"CONCLUIDO".equals(p.getStatus())) {
+                assertPodeConcluir(p);
+            }
+            p.setStatus(status);
+        }
         p.setObservacoes(observacoes);
         return pedidoRepository.save(p);
     }
@@ -133,16 +152,25 @@ public class PedidoService {
         Analise analise = analiseRepository.findById(analiseId)
                 .orElseThrow(() -> new EntityNotFoundException("Análise #" + analiseId + " não encontrada"));
 
+        if (!"ATIVA".equals(analise.getStatus()))
+            throw new IllegalStateException("Análise '" + analise.getNome() + "' está inativa e não pode ser vinculada.");
+
         PedidoAnalise pa = new PedidoAnalise();
         pa.setPedido(pedido);
         pa.setAnalise(analise);
-        return pedidoAnaliseRepository.save(pa);
+        PedidoAnalise salvo = pedidoAnaliseRepository.save(pa);
+
+        atualizarTotaisAposMudancaAnalise(pedidoId);
+        return salvo;
     }
 
     @Transactional
     public PedidoAnalise atualizarResultado(Long paId, String resultado, String valorReferencia,
-                                            String conformidade, java.time.LocalDate dataRealizacao,
+                                            String conformidade, LocalDate dataRealizacao,
                                             String observacoes) {
+        if (dataRealizacao != null && dataRealizacao.isAfter(LocalDate.now()))
+            throw new IllegalArgumentException("Data de realização não pode ser futura.");
+
         PedidoAnalise pa = pedidoAnaliseRepository.findById(paId)
                 .orElseThrow(() -> new EntityNotFoundException("Vínculo de análise não encontrado."));
         pa.setResultado(resultado != null && !resultado.isBlank() ? resultado : null);
@@ -160,7 +188,9 @@ public class PedidoService {
         Pedido pedido = pa.getPedido();
         if ("CONCLUIDO".equals(pedido.getStatus()) || "CANCELADO".equals(pedido.getStatus()))
             throw new IllegalStateException("Não é possível modificar análises de um pedido com status " + pedido.getStatus() + ".");
+        Long pedidoId = pedido.getId();
         pedidoAnaliseRepository.delete(pa);
+        atualizarTotaisAposMudancaAnalise(pedidoId);
     }
 
     public long contarTodos() { return pedidoRepository.count(); }
@@ -168,5 +198,38 @@ public class PedidoService {
     public long contarPorStatus(String status) {
         return pedidoRepository.findAll().stream()
                 .filter(p -> status.equals(p.getStatus())).count();
+    }
+
+    /** Recalcula valor_total do pedido somando os valores das análises vinculadas. */
+    private void recalcularValorTotal(Pedido pedido) {
+        BigDecimal total = pedido.getAnalises().stream()
+                .map(pa -> pa.getAnalise() != null ? pa.getAnalise().getValor() : null)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        pedido.setValorTotal(total);
+    }
+
+    /** Bloqueia conclusão de pedido com análises de conformidade PENDENTE. */
+    private void assertPodeConcluir(Pedido p) {
+        if (p.getAnalises() == null || p.getAnalises().isEmpty())
+            throw new IllegalStateException("Não é possível concluir um pedido sem análises vinculadas.");
+        boolean temPendente = p.getAnalises().stream()
+                .anyMatch(pa -> "PENDENTE".equals(pa.getConformidade()));
+        if (temPendente)
+            throw new IllegalStateException("Não é possível concluir: existem análises com conformidade PENDENTE.");
+    }
+
+    /** Recarrega pedido + recalcula + propaga ao orçamento quando este ainda não tinha total. */
+    private void atualizarTotaisAposMudancaAnalise(Long pedidoId) {
+        Pedido recarregado = pedidoRepository.findByIdComDetalhes(pedidoId)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido #" + pedidoId + " não encontrado"));
+        recalcularValorTotal(recarregado);
+        pedidoRepository.save(recarregado);
+
+        Orcamento orc = recarregado.getOrcamento();
+        if (orc != null && orc.getValorTotal() == null && recarregado.getValorTotal() != null) {
+            orc.setValorTotal(recarregado.getValorTotal());
+            orcamentoRepository.save(orc);
+        }
     }
 }

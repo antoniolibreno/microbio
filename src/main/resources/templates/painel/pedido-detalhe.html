@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="'Pedido #' + ${pedido.id} + ' - Microbio'">Pedido</title>
+    <th:block th:replace="~{fragments/toast :: head}"></th:block>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/painel/pedido-detalhe.css}">
 </head>
@@ -16,7 +17,7 @@
     <div class="inner"
          th:with="orc=${pedido.orcamento},
                 st=${pedido.status},
-                valorOrc=${orc != null ? orc.valorTotal : null}">
+                valorPed=${pedido.valorTotal}">
 
         <div class="breadcrumb">
             <a th:href="@{/painel}">Início</a><span>›</span>
@@ -24,8 +25,6 @@
             <span th:text="'Pedido #PED-' + ${pedido.id}">Pedido</span>
         </div>
 
-        <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
-        <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
 
         <div class="page-header">
             <div>
@@ -55,13 +54,13 @@
                     </div>
                     <div class="tl-line" th:classappend="${st == 'CONCLUIDO'} ? 'done'"></div>
                     <div class="tl-step">
-                        <div class="tl-dot" th:classappend="${st == 'CONCLUIDO'} ? 'done'">✓</div>
+                        <div class="tl-dot" th:classappend="${st == 'CONCLUIDO'} ? 'done'"><i class="fa-solid fa-check"></i></div>
                         <div class="tl-label" th:classappend="${st == 'CONCLUIDO'} ? 'done'">Concluído</div>
                     </div>
                 </div>
                 <div th:if="${st == 'CANCELADO'}"
                      style="margin-top:14px;padding:10px 14px;background:#fee2e2;border-radius:8px;font-size:13px;color:#b91c1c;font-weight:600;text-align:center">
-                    ⚠️ Este pedido foi cancelado.
+                    <i class="fa-solid fa-triangle-exclamation"></i> Este pedido foi cancelado.
                 </div>
             </div>
         </div>
@@ -83,9 +82,9 @@
                         <div class="lbl">Data do pedido</div>
                         <div class="val" th:text="${#temporals.format(pedido.dataPedido,'dd/MM/yyyy')}">—</div>
                     </div>
-                    <div class="info-item" th:if="${valorOrc != null}">
+                    <div class="info-item" th:if="${valorPed != null}">
                         <div class="lbl">Valor total</div>
-                        <div class="val" style="color:var(--primary)" th:text="'R$ ' + ${#numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA')}">—</div>
+                        <div class="val" style="color:var(--primary)" th:text="'R$ ' + ${#numbers.formatDecimal(valorPed,1,'POINT',2,'COMMA')}">—</div>
                     </div>
                 </div>
             </div>
@@ -97,7 +96,7 @@
                 <h3>Resultados laboratoriais (<span th:text="${#lists.size(pedido.analises)}">0</span>)</h3>
             </div>
             <div th:if="${#lists.isEmpty(pedido.analises)}" class="empty-small">
-                🔬 As análises serão exibidas aqui quando o laboratório processar seu pedido.
+                <i class="fa-solid fa-microscope"></i> As análises serão exibidas aqui quando o laboratório processar seu pedido.
             </div>
             <div th:unless="${#lists.isEmpty(pedido.analises)}" class="analise-results">
                 <div th:each="pa : ${pedido.analises}" th:with="a=${pa.analise}" class="ar-item">
@@ -128,13 +127,13 @@
                     </div>
                     <!-- Aguardando resultado -->
                     <div th:unless="${pa.resultado != null}" class="ar-pending">
-                        🔬 Análise em processamento pelo laboratório...
+                        <i class="fa-solid fa-microscope"></i> Análise em processamento pelo laboratório...
                     </div>
                 </div>
             </div>
             <div th:unless="${#lists.isEmpty(pedido.analises)}" class="total-bar">
                 <span>Total do pedido</span>
-                <span class="total-val" th:text="${valorOrc != null ? 'R$ ' + #numbers.formatDecimal(valorOrc,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
+                <span class="total-val" th:text="${valorPed != null ? 'R$ ' + #numbers.formatDecimal(valorPed,1,'POINT',2,'COMMA') : 'R$ 0,00'}">R$ 0,00</span>
             </div>
         </div>
 
@@ -148,5 +147,7 @@
 
     </div><!-- /inner -->
 </main>
+<div th:replace="~{fragments/toast :: root}"></div>
+<script th:replace="~{fragments/toast :: script}"></script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 /* Variáveis de Cores e Estilos */
 :root {
-    --primary-color: #1a702b;
-    --primary-hover: #135c22;
+    --primary-color: #16a34a;
+    --primary-hover: #15803d;
     --text-dark: #1f2937;
     --text-muted: #6b7280;
     --bg-input: #f3f4f6;
-    --bg-page: linear-gradient(135deg, #e8f5e9 0%, #faf5f5 50%, #f4f1f1 100%);
+    --bg-page: linear-gradient(135deg, #dcfce7 0%, #faf5f5 50%, #f4f1f1 100%);
     --font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 

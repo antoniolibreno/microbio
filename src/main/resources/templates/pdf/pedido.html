@@ -64,7 +64,7 @@
   <div class="section">
     <h2>Valor total</h2>
     <p class="total"
-       th:with="v=${pedido.orcamento != null ? pedido.orcamento.valorTotal : null}"
+       th:with="v=${pedido.valorTotal != null ? pedido.valorTotal : (pedido.orcamento != null ? pedido.orcamento.valorTotal : null)}"
        th:text="${v != null ? 'R$ ' + #numbers.formatDecimal(v,1,'POINT',2,'COMMA') : 'R$ 0,00'}">
       R$ 0,00
     </p>

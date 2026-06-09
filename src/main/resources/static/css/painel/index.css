@@ -1,5 +1,5 @@
 :root {
-    --primary:#1a702b; --primary-hover:#135c22; --primary-light:#e8f5e9;
+    --primary:#16a34a; --primary-hover:#15803d; --primary-light:#dcfce7;
     --brown:#9c5f32; --brown-hover:#824f29;
     --sidebar-w:240px;
     --text-dark:#1f2937; --text-muted:#6b7280; --text-faint:#9ca3af;
@@ -34,7 +34,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display
 .summary-card .label{font-size:12px;color:var(--text-muted);font-weight:500}
 .summary-card .value{font-size:28px;font-weight:700;color:var(--primary);margin-top:4px}
 .summary-card .sub{font-size:11px;color:var(--text-faint);margin-top:4px}
-.cta-card{background:linear-gradient(135deg,#1a702b,#2d9e45);border-radius:12px;padding:24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.cta-card{background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:12px;padding:24px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .cta-card .cta-text h3{font-size:17px;font-weight:700;color:#fff}
 .cta-card .cta-text p{font-size:13px;color:rgba(255,255,255,.8);margin-top:4px}
 .btn-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#fff;color:var(--primary);border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;transition:background .2s;white-space:nowrap}

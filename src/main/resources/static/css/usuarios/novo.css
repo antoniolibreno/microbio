@@ -1,5 +1,5 @@
 :root{
-  --primary:#1a702b;--primary-hover:#135c22;--primary-light:#e8f5e9;--primary-glow:rgba(26,112,43,.12);
+  --primary:#16a34a;--primary-hover:#15803d;--primary-light:#dcfce7;--primary-glow:rgba(22,163,74,.12);
   --sidebar-w:240px;--text-dark:#0f172a;--text-body:#334155;--text-muted:#64748b;--text-faint:#94a3b8;
   --bg:#f8fafc;--surface:#fff;--border:#e2e8f0;--border-faint:#f1f5f9;
   --font:'Inter',system-ui,sans-serif;--radius-sm:8px;--radius-md:12px;

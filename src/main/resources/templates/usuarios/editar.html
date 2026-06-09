@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="'Editar ' + ${usuario.login} + ' - Microbio'">Editar Usuário</title>
+  <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <link rel="stylesheet" th:href="@{/css/usuarios/editar.css}">
 </head>
 <body th:attr="data-tem-cliente=${usuario.cliente != null}">
@@ -26,8 +27,6 @@
     <span th:if="${!usuario.admin and usuario.cliente == null}" class="topbar-badge badge-simple">Só acesso</span>
   </div>
 
-  <div th:if="${erro}"    class="alert alert-danger" >❌ <span th:text="${erro}"></span></div>
-  <div th:if="${sucesso}" class="alert alert-success">✅ <span th:text="${sucesso}"></span></div>
 
   <div class="form-card">
 
@@ -204,6 +203,8 @@
   </div>
 </main>
 
+<div th:replace="~{fragments/toast :: root}"></div>
 <script th:src="@{/js/usuarios/editar.js}" defer></script>
+<script th:replace="~{fragments/toast :: script}"></script>
 </body>
 </html>

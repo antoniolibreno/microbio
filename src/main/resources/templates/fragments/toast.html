@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/tokens/design-tokens.css}">
+        <link rel="stylesheet" th:href="@{/css/toast.css}">
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <meta th:if="${sucesso}" name="flash-sucesso" th:attr="content=${sucesso}">
+        <meta th:if="${erro}"    name="flash-erro"    th:attr="content=${erro}">
+        <meta th:if="${mensagemSucesso}" name="flash-sucesso" th:attr="content=${mensagemSucesso}">
+        <meta th:if="${mensagemErro}"    name="flash-erro"    th:attr="content=${mensagemErro}">
+    </th:block>
+</head>
+<body>
+    <div th:fragment="root" id="toastRoot" class="toast-root" aria-live="polite"></div>
+    <script th:fragment="script" th:src="@{/js/toast.js}" defer></script>
+</body>
+</html>

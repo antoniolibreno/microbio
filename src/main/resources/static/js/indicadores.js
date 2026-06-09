@@ -5,26 +5,11 @@
     const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
     function toast(message, type = 'info') {
-        const root = $('#toastRoot');
-        if (!root) { console.log(`[toast:${type}]`, message); return; }
-
-        const el = document.createElement('div');
-        el.className = `toast toast--${type}`;
-        el.setAttribute('role', type === 'error' ? 'alert' : 'status');
-        el.innerHTML = `
-      <span class="material-symbols-outlined">${
-            type === 'success' ? 'check_circle'
-                : type === 'error' ? 'error'
-                    : 'info'
-        }</span>
-      <span>${message}</span>
-    `;
-        root.appendChild(el);
-
-        setTimeout(() => {
-            el.classList.add('is-leaving');
-            el.addEventListener('animationend', () => el.remove(), { once: true });
-        }, 2600);
+        if (typeof window.toast === 'function') {
+            window.toast(message, type);
+        } else {
+            console.log(`[toast:${type}]`, message);
+        }
     }
 
     function withLoading(btn, fn) {

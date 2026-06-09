@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitações de Orçamento - Microbio</title>
+    <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <link rel="stylesheet" th:href="@{/css/solicitacoes/lista.css}">
 </head>
 <body>
@@ -13,12 +14,6 @@
 <aside th:replace="~{fragments/sidebar :: sidebar('')}"></aside>
 
 <main class="main">
-    <div th:if="${sucesso}" style="margin:20px 32px 0;padding:12px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;color:#15803d;font-size:14px;font-weight:500">
-        ✅ <span th:text="${sucesso}"></span>
-    </div>
-    <div th:if="${erro}" style="margin:20px 32px 0;padding:12px 16px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#b91c1c;font-size:14px;font-weight:500">
-        ❌ <span th:text="${erro}"></span>
-    </div>
     <div class="page-header">
         <div class="page-header-text">
             <h2>
@@ -75,8 +70,8 @@
                         </span>
                 </td>
                 <td>
-                    <span th:if="${p.cliente != null}"   class="status-badge status-vinculado">✓ Cadastrado</span>
-                    <span th:if="${p.cliente == null}"   class="status-badge status-pendente">⏳ Pendente</span>
+                    <span th:if="${p.cliente != null}"   class="status-badge status-vinculado">Cadastrado</span>
+                    <span th:if="${p.cliente == null}"   class="status-badge status-pendente">Pendente</span>
                 </td>
                 <td class="data" th:text="${#temporals.format(p.dataSol, 'dd/MM/yyyy HH:mm')}">—</td>
             </tr>
@@ -85,7 +80,9 @@
     </div>
 </main>
 
+<div th:replace="~{fragments/toast :: root}"></div>
 <script th:src="@{/js/solicitacoes/lista.js}" defer></script>
+<script th:replace="~{fragments/toast :: script}"></script>
 
 </body>
 </html>

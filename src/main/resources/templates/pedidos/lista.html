@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pedidos · Microbio</title>
+  <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/pedidos/lista.css}">
 </head>
@@ -28,9 +29,6 @@
         <input type="text" id="searchInput" placeholder="Buscar cliente ou ID..." oninput="filtrar()">
       </div>
     </div>
-
-    <div th:if="${sucesso}" class="alert alert-ok">✅ <span th:text="${sucesso}"></span></div>
-    <div th:if="${erro}"    class="alert alert-err">❌ <span th:text="${erro}"></span></div>
 
     <div class="tab-bar">
       <a th:href="@{/pedidos}" th:classappend="${statusFiltro == null} ? 'active'" class="tab">
@@ -146,6 +144,8 @@
   </div>
 </main>
 
+<div th:replace="~{fragments/toast :: root}"></div>
 <script th:src="@{/js/pedidos/lista.js}" defer></script>
+<script th:replace="~{fragments/toast :: script}"></script>
 </body>
 </html>

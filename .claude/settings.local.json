@@ -16,7 +16,10 @@
       "Bash(python3 *)",
       "Bash(./mvnw -q -DskipTests compile)",
       "Bash(./mvnw -DskipTests compile)",
-      "Bash(./mvnw -DskipTests clean compile)"
+      "Bash(./mvnw -DskipTests clean compile)",
+      "Bash(xargs -I {} bash -c 'echo \"=== {} ===\" && grep -n \"❌\\\\|✅\" {}')",
+      "Bash(cat)",
+      "Read(//tmp/**)"
     ]
   }
 }

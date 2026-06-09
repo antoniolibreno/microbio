@@ -84,7 +84,8 @@ CREATE TABLE pedido (
                         orcamento_id INT REFERENCES orcamento(id) ON DELETE SET NULL,
                         status       VARCHAR(20) DEFAULT 'PENDENTE',
                         observacoes  TEXT,
-                        data_pedido  TIMESTAMP DEFAULT NOW()
+                        data_pedido  TIMESTAMP DEFAULT NOW(),
+                        valor_total  DECIMAL(10, 2)
 );
 
 -- ============================================================

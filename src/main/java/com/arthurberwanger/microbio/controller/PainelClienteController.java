@@ -22,7 +22,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/painel")
@@ -177,6 +179,13 @@ public class PainelClienteController {
                 oa.setAnalise(a);
                 orcamentoAnaliseRepository.save(oa);
             }
+
+            BigDecimal total = selecionadas.stream()
+                    .map(Analise::getValor)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            orc.setValorTotal(total);
+            orcamentoRepository.save(orc);
 
             ra.addFlashAttribute("sucesso", "Solicitação enviada! Em breve entraremos em contato.");
             return "redirect:/painel/orcamentos";

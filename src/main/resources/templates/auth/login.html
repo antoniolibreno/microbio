@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Microbio</title>
+  <th:block th:replace="~{fragments/toast :: head}"></th:block>
   <!--
       th:href="@{/css/login.css}" faz o Thymeleaf resolver o caminho correto.
       O arquivo CSS fica em: src/main/resources/static/css/login.css
@@ -19,12 +20,6 @@
   </div>
 
   <h2 class="title">Acesse sua conta</h2>
-
-  <!-- Aparece quando o login/senha estão errados (?erro=true na URL) -->
-  <div th:if="${mensagemErro}" class="alert alert-danger" th:text="${mensagemErro}"></div>
-
-  <!-- Aparece após o logout (?logout=true na URL) -->
-  <div th:if="${mensagemSucesso}" class="alert alert-success" th:text="${mensagemSucesso}"></div>
 
   <!--
       REGRAS OBRIGATÓRIAS DO SPRING SECURITY:
@@ -92,5 +87,7 @@
   </form>
 </div>
 
+<div th:replace="~{fragments/toast :: root}"></div>
+<script th:replace="~{fragments/toast :: script}"></script>
 </body>
 </html>

@@ -3,6 +3,21 @@
   const donutCanvas = document.getElementById('donutChart');
   if (!barCanvas || !donutCanvas || typeof Chart === 'undefined') return;
 
+  const css = getComputedStyle(document.documentElement);
+  const token = (name, fallback) => {
+    const v = css.getPropertyValue(name).trim();
+    return v || fallback;
+  };
+  const primary       = token('--primary',       '#16a34a');
+  const primaryGlow   = token('--primary-glow',  'rgba(22,163,74,.15)');
+  const colorPendente   = token('--chart-pendente',   '#92400e');
+  const colorAndamento  = token('--chart-andamento',  '#1e40af');
+  const colorConcluido  = token('--chart-concluido',  '#15803d');
+  const colorCancelado  = token('--chart-cancelado',  '#991b1b');
+  const textMuted     = token('--text-muted',    '#64748b');
+  const borderFaint   = token('--border-faint',  '#f1f5f9');
+  const textDark      = token('--text-dark',     '#0f172a');
+
   const labelsMeses = JSON.parse(barCanvas.dataset.labels || '[]');
   const contagemMeses = JSON.parse(barCanvas.dataset.valores || '[]');
   const statusData = [
@@ -13,7 +28,7 @@
   ];
 
   Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
-  Chart.defaults.color = '#64748b';
+  Chart.defaults.color = textMuted;
 
   new Chart(barCanvas, {
     type: 'bar',
@@ -22,8 +37,8 @@
       datasets: [{
         label: 'Orçamentos',
         data: contagemMeses,
-        backgroundColor: 'rgba(26,112,43,.15)',
-        borderColor: '#1a702b',
+        backgroundColor: primaryGlow,
+        borderColor: primary,
         borderWidth: 2,
         borderRadius: 6,
         borderSkipped: false,
@@ -35,7 +50,7 @@
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#0f172a',
+          backgroundColor: textDark,
           titleColor: '#f8fafc',
           bodyColor: '#94a3b8',
           padding: 10,
@@ -47,7 +62,7 @@
       scales: {
         x: { grid: { display: false }, border: { display: false },
              ticks: { font: { size: 12 } } },
-        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false },
+        y: { beginAtZero: true, grid: { color: borderFaint }, border: { display: false },
              ticks: { precision: 0, font: { size: 12 } } }
       }
     }
@@ -59,7 +74,7 @@
       labels: ['Pendente', 'Em andamento', 'Concluído', 'Cancelado'],
       datasets: [{
         data: statusData,
-        backgroundColor: ['#f59e0b', '#3b82f6', '#22c55e', '#f43f5e'],
+        backgroundColor: [colorPendente, colorAndamento, colorConcluido, colorCancelado],
         borderColor: '#ffffff',
         borderWidth: 3,
         hoverOffset: 6
@@ -72,7 +87,7 @@
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#0f172a',
+          backgroundColor: textDark,
           titleColor: '#f8fafc',
           bodyColor: '#94a3b8',
           padding: 10,

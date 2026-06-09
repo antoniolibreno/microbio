@@ -1,0 +1,98 @@
+/*
+ * Microbio · Design Tokens
+ * Paleta minimalista neutra com acento verde único.
+ * Carregado antes do CSS por página via fragments/toast.html :: head.
+ * Arquivos por página podem sobrescrever variáveis específicas se necessário,
+ * mas devem evitar redefinir cores fundamentais (status, primary).
+ */
+
+:root {
+  /* ── Neutros (slate) ─────────────────────────────────────────────── */
+  --neutral-50:  #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+
+  /* ── Verde primário (marca, único tom) ───────────────────────────── */
+  --primary:        #16a34a;
+  --primary-hover:  #15803d;
+  --primary-active: #166534;
+  --primary-light:  #dcfce7;
+  --primary-50:     #f0fdf4;
+  --primary-glow:   rgba(22, 163, 74, .12);
+
+  /* ── Status (uma família por estado, mesmas cores em badge e gráfico) ── */
+  --status-pendente-bg:    #fef3c7;
+  --status-pendente-fg:    #92400e;
+  --status-pendente-bd:    #fcd34d;
+
+  --status-andamento-bg:   #dbeafe;
+  --status-andamento-fg:   #1e40af;
+  --status-andamento-bd:   #93c5fd;
+
+  --status-concluido-bg:   #dcfce7;
+  --status-concluido-fg:   #15803d;
+  --status-concluido-bd:   #86efac;
+
+  --status-cancelado-bg:   #fee2e2;
+  --status-cancelado-fg:   #991b1b;
+  --status-cancelado-bd:   #fca5a5;
+
+  --status-info-bg:        #e0f2fe;
+  --status-info-fg:        #075985;
+  --status-info-bd:        #7dd3fc;
+
+  --status-neutro-bg:      var(--neutral-100);
+  --status-neutro-fg:      var(--neutral-600);
+  --status-neutro-bd:      var(--neutral-300);
+
+  /* ── Conformidade de análises ────────────────────────────────────── */
+  --conf-conforme-bg:      var(--status-concluido-bg);
+  --conf-conforme-fg:      var(--status-concluido-fg);
+  --conf-nao-conforme-bg:  var(--status-cancelado-bg);
+  --conf-nao-conforme-fg:  var(--status-cancelado-fg);
+  --conf-pendente-bg:      var(--status-pendente-bg);
+  --conf-pendente-fg:      var(--status-pendente-fg);
+
+  /* ── Charts ──────────────────────────────────────────────────────── */
+  --chart-pendente:    var(--status-pendente-fg);
+  --chart-andamento:   var(--status-andamento-fg);
+  --chart-concluido:   var(--status-concluido-fg);
+  --chart-cancelado:   var(--status-cancelado-fg);
+  --chart-bar-fill:    rgba(22, 163, 74, .18);
+  --chart-bar-border:  var(--primary);
+
+  /* ── Texto ───────────────────────────────────────────────────────── */
+  --text-dark:   var(--neutral-900);
+  --text-body:   var(--neutral-700);
+  --text-muted:  var(--neutral-500);
+  --text-faint:  var(--neutral-400);
+
+  /* ── Superfícies ─────────────────────────────────────────────────── */
+  --bg:           var(--neutral-50);
+  --bg-page:      var(--neutral-100);
+  --surface:      #ffffff;
+  --surface-hover: var(--neutral-50);
+  --border:       var(--neutral-200);
+  --border-faint: var(--neutral-100);
+
+  /* ── Tipografia e raios ──────────────────────────────────────────── */
+  --font:        'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-full: 999px;
+
+  --shadow-sm:   0 1px 2px rgba(15, 23, 42, .04);
+  --shadow-md:   0 2px 8px rgba(15, 23, 42, .06);
+  --shadow-lg:   0 4px 16px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+
+  /* ── Layout ──────────────────────────────────────────────────────── */
+  --sidebar-w:   240px;
+}

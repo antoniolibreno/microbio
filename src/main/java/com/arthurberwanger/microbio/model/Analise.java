@@ -1,6 +1,10 @@
 package com.arthurberwanger.microbio.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,12 +23,16 @@ public class Analise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome da análise é obrigatório")
+    @Size(max = 150, message = "Nome deve ter no máximo 150 caracteres")
     @Column(nullable = false, length = 150)
     private String nome;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
+    @NotNull(message = "Valor é obrigatório")
+    @Positive(message = "Valor deve ser maior que zero")
     @Column(precision = 10, scale = 2)
     private BigDecimal valor;
 

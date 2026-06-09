@@ -58,10 +58,10 @@ body{font-family:var(--font);background:var(--bg-page);color:var(--text-primary)
 .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
        font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
 .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.badge.pendente {background:#fffbeb;color:#b45309;border-color:#fde68a}
-.badge.andamento{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
-.badge.concluido{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
-.badge.cancelado{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.badge.pendente {background:var(--status-pendente-bg); color:var(--status-pendente-fg); border-color:var(--status-pendente-bd)}
+.badge.andamento{background:var(--status-andamento-bg);color:var(--status-andamento-fg);border-color:var(--status-andamento-bd)}
+.badge.concluido{background:var(--status-concluido-bg);color:var(--status-concluido-fg);border-color:var(--status-concluido-bd)}
+.badge.cancelado{background:var(--status-cancelado-bg);color:var(--status-cancelado-fg);border-color:var(--status-cancelado-bd)}
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;

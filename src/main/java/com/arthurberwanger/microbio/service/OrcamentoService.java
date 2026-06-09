@@ -4,7 +4,6 @@ import com.arthurberwanger.microbio.dto.OrcamentoDTO;
 import com.arthurberwanger.microbio.model.Orcamento;
 import com.arthurberwanger.microbio.model.Orcamento.StatusOrcamento;
 import com.arthurberwanger.microbio.model.Pessoa;
-import com.arthurberwanger.microbio.repository.AnaliseRepository;
 import com.arthurberwanger.microbio.repository.OrcamentoRepository;
 import com.arthurberwanger.microbio.repository.PessoaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,27 +22,17 @@ public class OrcamentoService {
 
     private final OrcamentoRepository orcamentoRepository;
     private final PessoaRepository    pessoaRepository;
-    private final AnaliseRepository   analiseRepository;
 
     public OrcamentoService(OrcamentoRepository orcamentoRepository,
-                            PessoaRepository pessoaRepository,
-                            AnaliseRepository analiseRepository) {
+                            PessoaRepository pessoaRepository) {
         this.orcamentoRepository = orcamentoRepository;
         this.pessoaRepository    = pessoaRepository;
-        this.analiseRepository   = analiseRepository;
-    }
-
-    /** Busca o valor cadastrado da análise pelo nome (tipoServico). */
-    private BigDecimal valorDaAnalise(String tipoServico) {
-        if (tipoServico == null || tipoServico.isBlank()) return null;
-        return analiseRepository.findFirstByNomeIgnoreCase(tipoServico)
-                .map(a -> a.getValor())
-                .orElse(null);
     }
 
     // ── Solicitações públicas (site institucional) ─────────────────────────
 
-    /** Recebe uma solicitação do site, cria a Pessoa e já gera o Orçamento PENDENTE vinculado. */
+    /** Recebe uma solicitação do site, cria a Pessoa e já gera o Orçamento PENDENTE vinculado.
+     *  valorTotal fica null e será calculado quando o admin agregar as análises. */
     @Transactional
     public Orcamento registrarSolicitacao(OrcamentoDTO dto) {
         Pessoa pessoa = new Pessoa();
@@ -55,7 +44,6 @@ public class OrcamentoService {
 
         Orcamento orc = new Orcamento();
         orc.setPessoa(pessoa);
-        orc.setValorTotal(valorDaAnalise(pessoa.getTipoServico()));
         return orcamentoRepository.save(orc);
     }
 
@@ -102,14 +90,14 @@ public class OrcamentoService {
         return orcamentoRepository.save(orc);
     }
 
-    /** Cria um orçamento formal a partir de uma solicitação (Pessoa). */
+    /** Cria um orçamento formal a partir de uma solicitação (Pessoa).
+     *  valorTotal fica null até que análises sejam adicionadas. */
     @Transactional
     public Orcamento criarDesolicitacao(Long pessoaId) {
         Pessoa pessoa = pessoaRepository.findById(pessoaId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação #" + pessoaId + " não encontrada"));
         Orcamento orc = new Orcamento();
         orc.setPessoa(pessoa);
-        orc.setValorTotal(valorDaAnalise(pessoa.getTipoServico()));
         return orcamentoRepository.save(orc);
     }
 
