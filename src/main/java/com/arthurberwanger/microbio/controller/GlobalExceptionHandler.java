@@ -1,5 +1,6 @@
 package com.arthurberwanger.microbio.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.validation.FieldError;
@@ -32,6 +33,24 @@ public class GlobalExceptionHandler {
                 .map(v -> v.getMessage())
                 .collect(Collectors.joining("; "));
         ra.addFlashAttribute("erro", msg.isBlank() ? "Dados inválidos." : msg);
+        return "redirect:" + referer(req);
+    }
+
+    /** Entidade não encontrada (orçamento/pedido/análise inexistente) → mensagem amigável, sem 500. */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public String handleNotFound(EntityNotFoundException ex,
+                                 RedirectAttributes ra,
+                                 HttpServletRequest req) {
+        ra.addFlashAttribute("erro", ex.getMessage() != null ? ex.getMessage() : "Registro não encontrado.");
+        return "redirect:" + referer(req);
+    }
+
+    /** Regras de negócio violadas (transição inválida, análise inativa, etc.). */
+    @ExceptionHandler({IllegalStateException.class, IllegalArgumentException.class})
+    public String handleRegraNegocio(RuntimeException ex,
+                                     RedirectAttributes ra,
+                                     HttpServletRequest req) {
+        ra.addFlashAttribute("erro", ex.getMessage() != null ? ex.getMessage() : "Operação não permitida.");
         return "redirect:" + referer(req);
     }
 

@@ -1,5 +1,6 @@
 package com.arthurberwanger.microbio.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,6 +10,7 @@ public class OrcamentoDTO {
     @Size(max = 150)
     private String nome;
 
+    @Email(message = "E-mail inválido")
     @Size(max = 150)
     private String email;
 

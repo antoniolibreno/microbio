@@ -2,6 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:fragment="head">
+        <!-- Tema: define data-theme antes da pintura para evitar flash -->
+        <script>
+          (function () {
+            try {
+              var t = localStorage.getItem('theme')
+                   || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+              document.documentElement.setAttribute('data-theme', t);
+              var m = document.querySelector('meta[name="theme-color"]');
+              if (m) m.setAttribute('content', t === 'dark' ? '#0f1220' : '#fcfcfc');
+            } catch (e) {}
+          })();
+        </script>
+        <meta name="theme-color" content="#fcfcfc">
+
+        <!-- Tipografia única: Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" th:href="@{/css/tokens/design-tokens.css}">
         <link rel="stylesheet" th:href="@{/css/toast.css}">
         <link rel="stylesheet"
@@ -14,6 +33,23 @@
 </head>
 <body>
     <div th:fragment="root" id="toastRoot" class="toast-root" aria-live="polite"></div>
-    <script th:fragment="script" th:src="@{/js/toast.js}" defer></script>
+    <th:block th:fragment="script">
+        <script th:src="@{/js/toast.js}" defer></script>
+        <script th:src="@{/js/theme.js}" defer></script>
+    </th:block>
+
+    <!-- Botão de alternância de tema (reutilizável): th:replace="~{fragments/toast :: themeToggle}" -->
+    <button th:fragment="themeToggle" type="button" class="theme-toggle" data-theme-toggle
+            aria-label="Alternar tema" title="Alternar tema">
+        <svg data-icon-moon width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg data-icon-sun style="display:none" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <script th:fragment="themeScript" th:src="@{/js/theme.js}" defer></script>
 </body>
 </html>

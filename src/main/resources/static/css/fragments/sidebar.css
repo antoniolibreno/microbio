@@ -1,4 +1,4 @@
-.sidebar, .sidebar * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+.sidebar, .sidebar * { font-family: var(--font); }
 .sidebar { width: 240px; background: #ffffff; border-right: 1px solid #e2e8f0;
            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
 .sidebar-brand { display: flex; align-items: center; justify-content: center;

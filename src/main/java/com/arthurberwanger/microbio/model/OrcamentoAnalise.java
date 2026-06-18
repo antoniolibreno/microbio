@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "orcamento_analise")
 @Data
@@ -21,4 +23,11 @@ public class OrcamentoAnalise {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "analise_id", nullable = false)
     private Analise analise;
+
+    /**
+     * Snapshot do valor da análise no momento em que foi adicionada ao orçamento.
+     * Congela o preço para que alterações no catálogo não mudem totais já registrados.
+     */
+    @Column(name = "valor_unitario", precision = 10, scale = 2)
+    private BigDecimal valorUnitario;
 }

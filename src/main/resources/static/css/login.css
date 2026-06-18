@@ -1,13 +1,4 @@
-/* Variáveis de Cores e Estilos */
-:root {
-    --primary-color: #16a34a;
-    --primary-hover: #15803d;
-    --text-dark: #1f2937;
-    --text-muted: #6b7280;
-    --bg-input: #f3f4f6;
-    --bg-page: linear-gradient(135deg, #dcfce7 0%, #faf5f5 50%, #f4f1f1 100%);
-    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
+/* Login — usa os tokens globais (design-tokens.css). Funciona em light/dark. */
 
 * {
     margin: 0;
@@ -16,22 +7,24 @@
 }
 
 body {
-    font-family: var(--font-family);
+    font-family: var(--font);
     background: var(--bg-page);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    color: var(--text-dark);
+    color: var(--text);
+    padding: 24px;
 }
 
 .login-container {
-    background-color: #ffffff;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     width: 100%;
     max-width: 420px;
     padding: 48px 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-overlay);
 }
 
 .header {
@@ -40,45 +33,46 @@ body {
 }
 
 .brand-name {
-    color: var(--primary-color);
-    font-size: 24px;
+    color: var(--primary);
+    font-size: var(--text-2xl);
     font-weight: 700;
+    letter-spacing: -.3px;
     margin-bottom: 4px;
 }
 
 .brand-subtitle {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: var(--text-sm);
 }
 
 .title {
-    font-size: 22px;
+    font-size: var(--text-xl);
     font-weight: 600;
     text-align: center;
     margin-bottom: 24px;
+    color: var(--text);
 }
 
-/* ── Alertas de erro e sucesso (adicionado para o Thymeleaf) ── */
+/* ── Alertas ── */
 .alert {
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin-bottom: 20px;
-    font-size: 14px;
+    font-size: var(--text-base);
     font-weight: 500;
 }
 
 .alert-danger {
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
+    background-color: var(--status-cancelado-bg);
+    color: var(--status-cancelado-fg);
+    border: 1px solid var(--status-cancelado-bd);
 }
 
 .alert-success {
-    background-color: #dcfce7;
-    color: #15803d;
-    border: 1px solid #86efac;
+    background-color: var(--status-concluido-bg);
+    color: var(--status-concluido-fg);
+    border: 1px solid var(--status-concluido-bd);
 }
-/* ─────────────────────────────────────────────────────────── */
 
 .form-group {
     margin-bottom: 20px;
@@ -86,24 +80,25 @@ body {
 
 .form-group label {
     display: block;
-    font-size: 14px;
+    font-size: var(--text-base);
     font-weight: 500;
     margin-bottom: 8px;
-    color: var(--text-dark);
+    color: var(--text);
 }
 
 .input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    background-color: var(--bg-input);
-    border-radius: 8px;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
+    background-color: var(--input-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    transition: border-color var(--transition);
 }
 
 .input-wrapper:focus-within {
-    border-color: var(--primary-color);
+    border-color: var(--primary);
+    outline: 3px solid var(--primary-glow);
 }
 
 .input-icon {
@@ -118,16 +113,16 @@ body {
     background: transparent;
     border: none;
     outline: none;
-    font-size: 14px;
-    color: var(--text-dark);
+    font-size: 16px; /* ≥16px evita auto-zoom do iOS */
+    color: var(--text);
 }
 
 .forgot-password {
     display: block;
     text-align: right;
-    color: var(--primary-color);
+    color: var(--primary);
     text-decoration: none;
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 500;
     margin-top: 12px;
     margin-bottom: 24px;
@@ -139,21 +134,28 @@ body {
 
 .btn-submit {
     width: 100%;
-    background-color: var(--primary-color);
-    color: #ffffff;
+    background-color: var(--primary-strong);
+    color: var(--on-primary);
     border: none;
     padding: 14px;
-    border-radius: 8px;
-    font-size: 15px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-md);
     font-weight: 600;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition);
 }
 
 .btn-submit:hover {
-    background-color: var(--primary-hover);
+    background-color: var(--primary-strong-hover);
+}
+
+/* Toggle de tema no canto superior direito */
+.login-theme {
+    position: fixed;
+    top: 20px;
+    right: 20px;
 }
