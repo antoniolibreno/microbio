@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pedidos · Microbio</title>
   <th:block th:replace="~{fragments/toast :: head}"></th:block>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/pedidos/lista.css}">
 </head>
 <body>
@@ -127,7 +128,8 @@
             <span class="tag-analysis" th:text="${tipo}">Análise</span>
             <span>📅 <span th:text="${#temporals.format(p.dataPedido,'dd/MM/yyyy')}">—</span></span>
             <span style="font-weight:600;color:var(--text-primary)"
-                  th:text="${orc != null and orc.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(orc.valorTotal,1,'POINT',2,'COMMA') : '—'}">R$ 0,00</span>
+                  th:with="vp=${p.valorTotal != null ? p.valorTotal : (orc != null ? orc.valorTotal : null)}"
+                  th:text="${vp != null ? 'R$ ' + #numbers.formatDecimal(vp,1,'POINT',2,'COMMA') : '—'}">R$ 0,00</span>
           </div>
         </div>
         <div class="row-right">

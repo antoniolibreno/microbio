@@ -17,7 +17,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-body);display
 .topbar-divider{width:1px;height:20px;background:var(--border)}
 .topbar-title{font-size:18px;font-weight:800;color:var(--text-dark);letter-spacing:-.3px}
 .topbar-badge{padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700}
-.badge-admin {background:var(--status-andamento-bg);color:var(--secondary);border:1px solid var(--status-andamento-bd)}
+.badge-admin {background:#faf5ff;color:#7c3aed;border:1px solid #ddd6fe}
 .badge-client{background:var(--primary-light);color:var(--primary);border:1px solid #bbf7d0}
 .badge-simple{background:#f8fafc;color:var(--text-muted);border:1px solid var(--border)}
 
@@ -43,9 +43,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-body);display
 .role-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);cursor:pointer;transition:all .2s;background:var(--bg)}
 .role-option input:checked + .role-card{border-color:var(--primary);background:var(--primary-light)}
 .role-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.icon-admin {background:var(--status-andamento-bg);color:var(--secondary)}
+.icon-admin {background:#ede9fe;color:#7c3aed}
 .icon-client{background:var(--primary-light);color:var(--primary)}
-.role-option input:checked + .role-card .icon-admin {background:var(--status-andamento-bd)}
+.role-option input:checked + .role-card .icon-admin {background:#ddd6fe}
 .role-option input:checked + .role-card .icon-client{background:#bbf7d0}
 .role-text strong{display:block;font-size:13.5px;font-weight:700;color:var(--text-dark);margin-bottom:2px}
 .role-text span{font-size:11.5px;color:var(--text-muted);line-height:1.4}

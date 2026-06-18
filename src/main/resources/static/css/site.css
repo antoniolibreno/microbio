@@ -1,20 +1,20 @@
-/* Paleta unificada (teal) — alinhada ao design system do app. */
+/* Variáveis de Cores baseadas no protótipo */
 :root {
     --white: #ffffff;
-    --text-dark: #1e293b;
-    --text-gray: #475569;
+    --text-dark: #1a1e23;
+    --text-gray: #4b5563;
 
-    --green-primary: #0a8074;   /* teal-strong (texto branco passa em AA) */
-    --green-dark: #097064;
-    --green-light-bg: #e6faf8;  /* teal muito claro (navbar/hero) */
-    --green-card: #d1faf5;
+    --green-primary: #1e873a;
+    --green-dark: #297c31;
+    --green-light-bg: #b6dc8d;
+    --green-card: #d3efb0;
 
-    --brown: #0a8074;           /* "marrom" legado -> teal */
-    --brown-text: #0a8074;
-    --tan-btn: #e6faf8;
+    --brown: #8d5624;
+    --brown-text: #6b3e15;
+    --tan-btn: #f5e4b6;
 
-    --tag-bg: #e6faf8;
-    --tag-text: #0a8074;
+    --tag-bg: #f5e6ce;
+    --tag-text: #a87238;
 }
 
 html {

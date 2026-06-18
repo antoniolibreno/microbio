@@ -1,20 +1,12 @@
 /*
  * Microbio · Design Tokens
- * Identidade visual adaptada de identidade-visual.md (EvoSales/ProspectAI)
- * para Thymeleaf + CSS puro. Camada semântica única (light + dark).
- *
- * Tema escuro via html[data-theme="dark"] (definido pelo script anti-flash
- * no fragmento de head). Aliases legados (--text-dark, --brown, --green-*,
- * --primary-color…) apontam para os tokens novos via var(), então páginas
- * antigas herdam a nova paleta e o dark mode automaticamente.
- *
- * Regra de contraste (§3.4): nunca texto/ícone branco sobre --primary (teal).
- * Use os tokens *-strong para qualquer preenchimento com texto branco.
+ * Paleta minimalista neutra com acento verde único.
+ * Carregado antes do CSS por página via fragments/toast.html :: head.
+ * Arquivos por página podem sobrescrever variáveis específicas se necessário,
+ * mas devem evitar redefinir cores fundamentais (status, primary).
  */
 
 :root {
-  color-scheme: light;
-
   /* ── Neutros (slate) ─────────────────────────────────────────────── */
   --neutral-50:  #f8fafc;
   --neutral-100: #f1f5f9;
@@ -27,42 +19,15 @@
   --neutral-800: #1e293b;
   --neutral-900: #0f172a;
 
-  /* ── Primary: teal (acento/borda/ativo) + strong (preenchimento c/ branco) ── */
-  --primary:             #00c9b7;
-  --primary-hover:       #00b5a5;
-  --primary-active:      #0a8074;
-  --primary-light:       #e6faf8;
-  --primary-50:          #f0fdfa;
-  --primary-strong:      #0a8074;  /* ≈4.8:1 com branco — botões/badges preenchidos */
-  --primary-strong-hover:#097064;
-  --on-primary:          #ffffff;
-  --primary-glow:        rgba(0, 201, 183, .14);
+  /* ── Verde primário (marca, único tom) ───────────────────────────── */
+  --primary:        #16a34a;
+  --primary-hover:  #15803d;
+  --primary-active: #166534;
+  --primary-light:  #dcfce7;
+  --primary-50:     #f0fdf4;
+  --primary-glow:   rgba(22, 163, 74, .12);
 
-  /* ── Secundário e semânticas ─────────────────────────────────────── */
-  --secondary:           #2563eb;
-  --secondary-hover:     #1d4ed8;
-  --success:             #10b981;
-  --success-strong:      #047857;
-  --destructive:         #ef4444;
-  --destructive-strong:  #b91c1c;
-  --warning:             #f59e0b;
-  --info:                #3b82f6;
-
-  /* ── Superfícies / texto / borda (LIGHT) ─────────────────────────── */
-  --surface:        #ffffff;
-  --surface-hover:  #f1f5f9;
-  --bg:             #fcfcfc;
-  --bg-page:        #fcfcfc;
-  --input-bg:       #ffffff;
-  --border:         #e2e8f0;
-  --border-faint:   #eef2f6;
-
-  --text:       #1e293b;
-  --text-body:  #475569;
-  --text-muted: #64748b;
-  --text-faint: #94a3b8;
-
-  /* ── Status (LIGHT) — pendente=warning, andamento=info, concluido=success, cancelado=destructive ── */
+  /* ── Status (uma família por estado, mesmas cores em badge e gráfico) ── */
   --status-pendente-bg:    #fef3c7;
   --status-pendente-fg:    #92400e;
   --status-pendente-bd:    #fcd34d;
@@ -71,12 +36,12 @@
   --status-andamento-fg:   #1e40af;
   --status-andamento-bd:   #93c5fd;
 
-  --status-concluido-bg:   #d1fae5;
-  --status-concluido-fg:   #047857;
-  --status-concluido-bd:   #6ee7b7;
+  --status-concluido-bg:   #dcfce7;
+  --status-concluido-fg:   #15803d;
+  --status-concluido-bd:   #86efac;
 
   --status-cancelado-bg:   #fee2e2;
-  --status-cancelado-fg:   #b91c1c;
+  --status-cancelado-fg:   #991b1b;
   --status-cancelado-bd:   #fca5a5;
 
   --status-info-bg:        #e0f2fe;
@@ -100,264 +65,34 @@
   --chart-andamento:   var(--status-andamento-fg);
   --chart-concluido:   var(--status-concluido-fg);
   --chart-cancelado:   var(--status-cancelado-fg);
-  --chart-bar-fill:    var(--primary-glow);
+  --chart-bar-fill:    rgba(22, 163, 74, .18);
   --chart-bar-border:  var(--primary);
 
-  /* ── Tipografia (família única: Inter) ───────────────────────────── */
-  --font:        'Inter', system-ui, -apple-system, sans-serif;
-  --text-xs:    12px;
-  --text-sm:    13px;
-  --text-base:  14px;
-  --text-md:    15px;
-  --text-lg:    18px;
-  --text-xl:    22px;
-  --text-2xl:   28px;
-  --text-3xl:   34px;
-  --lh-tight:   1.15;
-  --lh-snug:    1.35;
-  --lh-normal:  1.6;
+  /* ── Texto ───────────────────────────────────────────────────────── */
+  --text-dark:   var(--neutral-900);
+  --text-body:   var(--neutral-700);
+  --text-muted:  var(--neutral-500);
+  --text-faint:  var(--neutral-400);
 
-  /* ── Raios ───────────────────────────────────────────────────────── */
-  --radius-sm:   .375rem;
-  --radius-md:   .5rem;
-  --radius-lg:   .75rem;
+  /* ── Superfícies ─────────────────────────────────────────────────── */
+  --bg:           var(--neutral-50);
+  --bg-page:      var(--neutral-100);
+  --surface:      #ffffff;
+  --surface-hover: var(--neutral-50);
+  --border:       var(--neutral-200);
+  --border-faint: var(--neutral-100);
+
+  /* ── Tipografia e raios ──────────────────────────────────────────── */
+  --font:        'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
   --radius-full: 999px;
-  --radius:      var(--radius-md);
 
-  /* ── Sombras: conteúdo sem sombra (separação por borda); só overlays ── */
-  --shadow-sm:      none;
-  --shadow-md:      none;
-  --shadow:         none;
-  --shadow-overlay: 0 8px 24px rgba(15, 23, 42, .12), 0 2px 6px rgba(15, 23, 42, .06);
-  --shadow-lg:      var(--shadow-overlay);
-
-  --transition: .18s cubic-bezier(.4, 0, .2, 1);
+  --shadow-sm:   0 1px 2px rgba(15, 23, 42, .04);
+  --shadow-md:   0 2px 8px rgba(15, 23, 42, .06);
+  --shadow-lg:   0 4px 16px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
 
   /* ── Layout ──────────────────────────────────────────────────────── */
   --sidebar-w:   240px;
-
-  /* ── Aliases de compatibilidade (nomes legados → tokens novos) ───── */
-  --primary-color:   var(--primary-strong);   /* usado como preenchimento de botão com texto branco */
-  --primary-dark:    var(--primary-strong-hover);
-  --primary-soft:    var(--primary-light);
-
-  --secondary-color: var(--secondary);
-
-  --text-primary:    var(--text);
-  --text-dark:       var(--text);
-  --text-secondary:  var(--text-body);
-  --text-tertiary:   var(--text-muted);
-  --text-gray:       var(--text-body);
-
-  --bg-card:     var(--surface);
-  --bg-input:    var(--input-bg);
-  --surface-elev:var(--surface);
-  --surface-high:var(--surface-hover);
-  --surface-low: var(--bg-page);
-  --on-surface:      var(--text);
-  --on-surface-mute: var(--text-muted);
-  --on-surface-soft: var(--text-faint);
-
-  --border-color: var(--border);
-  --border-light: var(--border-faint);
-  --outline:      var(--border);
-  --outline-soft: var(--border-faint);
-
-  --white: #ffffff;
-
-  --danger:        var(--destructive);
-  --danger-soft:   var(--status-cancelado-bg);
-  --success-soft:  var(--status-concluido-bg);
-  --warning-soft:  var(--status-pendente-bg);
-  --info-soft:     var(--status-andamento-bg);
-
-  /* Acentos legados do site público e painel do cliente → paleta nova */
-  --green-primary:  var(--primary-strong);
-  --green-dark:     var(--primary-strong-hover);
-  --green-light-bg: var(--primary-light);
-  --green-card:     var(--primary-light);
-  --brown:          var(--primary-strong);
-  --brown-hover:    var(--primary-strong-hover);
-  --brown-text:     var(--primary-strong);
-  --tan-btn:        var(--primary-light);
-  --tag-bg:         var(--primary-light);
-  --tag-text:       var(--primary-strong);
-
-  /* Status curtos (padrão badge .s-pendente etc.) */
-  --pendente-bg:  var(--status-pendente-bg);  --pendente-txt:  var(--status-pendente-fg);
-  --andamento-bg: var(--status-andamento-bg); --andamento-txt: var(--status-andamento-fg);
-  --concluido-bg: var(--status-concluido-bg); --concluido-txt: var(--status-concluido-fg);
-  --cancelado-bg: var(--status-cancelado-bg); --cancelado-txt: var(--status-cancelado-fg);
-
-  --font-family: var(--font);
-  --font-body:   var(--font);
-  --font-display:var(--font);
 }
-
-/* ════════════════════════════════════════════════════════════════════
-   TEMA ESCURO
-   primary vira azul (teal não tem contraste em fundo escuro);
-   superfícies/texto/borda invertem; status com fundo translúcido.
-   ════════════════════════════════════════════════════════════════════ */
-html[data-theme="dark"] {
-  color-scheme: dark;
-
-  --primary:             #60a5fa;
-  --primary-hover:       #3b82f6;
-  --primary-active:      #2563eb;
-  --primary-light:       #1c2035;
-  --primary-50:          #161b2e;
-  --primary-strong:      #1e40af;
-  --primary-strong-hover:#1e3a8a;
-  --primary-glow:        rgba(96, 165, 250, .16);
-
-  --secondary:           #3b82f6;
-  --secondary-hover:     #2563eb;
-
-  --surface:        #151929;
-  --surface-hover:  #1c2035;
-  --bg:             #0f1220;
-  --bg-page:        #0f1220;
-  --input-bg:       #151929;
-  --border:         #1e2438;
-  --border-faint:   #181d2e;
-
-  --text:       #f6f7fb;
-  --text-body:  #c7cde0;
-  --text-muted: #b8bfd7;
-  --text-faint: #8a92ad;
-
-  --status-pendente-bg:  rgba(245, 158, 11, .14);  --status-pendente-fg:  #fcd34d;  --status-pendente-bd:  rgba(245, 158, 11, .35);
-  --status-andamento-bg: rgba(59, 130, 246, .14);  --status-andamento-fg: #93c5fd;  --status-andamento-bd: rgba(59, 130, 246, .35);
-  --status-concluido-bg: rgba(16, 185, 129, .14);  --status-concluido-fg: #6ee7b7;  --status-concluido-bd: rgba(16, 185, 129, .35);
-  --status-cancelado-bg: rgba(239, 68, 68, .14);   --status-cancelado-fg: #fca5a5;  --status-cancelado-bd: rgba(239, 68, 68, .35);
-  --status-info-bg:      rgba(56, 189, 248, .14);  --status-info-fg:      #7dd3fc;  --status-info-bd:      rgba(56, 189, 248, .35);
-
-  --shadow-overlay: 0 8px 28px rgba(0, 0, 0, .55), 0 2px 8px rgba(0, 0, 0, .4);
-
-  --danger-soft:  var(--status-cancelado-bg);
-  --success-soft: var(--status-concluido-bg);
-  --warning-soft: var(--status-pendente-bg);
-  --info-soft:    var(--status-andamento-bg);
-}
-
-/* ════════════════════════════════════════════════════════════════════
-   DARK — overrides de superfícies legadas (fundos #fff/cinzas hardcoded).
-   Mira só classes de "superfície" (cards, sidebar, tabelas, modais),
-   nunca elementos coloridos (botões, avatares, badges).
-   Especificidade (html[data-theme] .classe) vence as regras de 1 classe.
-   ════════════════════════════════════════════════════════════════════ */
-html[data-theme="dark"] body { background: var(--bg-page); color: var(--text); }
-
-html[data-theme="dark"] .sidebar,
-html[data-theme="dark"] .card,
-html[data-theme="dark"] .card-header,
-html[data-theme="dark"] .table-card,
-html[data-theme="dark"] .summary-card,
-html[data-theme="dark"] .stat-card,
-html[data-theme="dark"] .view-card,
-html[data-theme="dark"] .form-card,
-html[data-theme="dark"] .form-card-header,
-html[data-theme="dark"] .client-card,
-html[data-theme="dark"] .client-card-header,
-html[data-theme="dark"] .search-box,
-html[data-theme="dark"] .obs-box,
-html[data-theme="dark"] .notice,
-html[data-theme="dark"] .no-client-msg,
-html[data-theme="dark"] .modal-box,
-html[data-theme="dark"] .modal-content,
-html[data-theme="dark"] .modal-field,
-html[data-theme="dark"] .detail-topbar {
-  background-color: var(--surface);
-  border-color: var(--border);
-  color: var(--text);
-}
-
-/* Cabeçalhos e linhas de tabela */
-html[data-theme="dark"] thead th,
-html[data-theme="dark"] .t-head th,
-html[data-theme="dark"] .data-table thead th {
-  background-color: var(--surface-hover);
-  color: var(--text-muted);
-  border-color: var(--border);
-}
-html[data-theme="dark"] td,
-html[data-theme="dark"] th { border-color: var(--border); }
-html[data-theme="dark"] .t-row:hover td,
-html[data-theme="dark"] tbody tr:hover td,
-html[data-theme="dark"] .t-row:hover { background-color: var(--surface-hover); }
-
-/* Campos de formulário */
-html[data-theme="dark"] input,
-html[data-theme="dark"] select,
-html[data-theme="dark"] textarea,
-html[data-theme="dark"] .input-wrapper {
-  background-color: var(--input-bg);
-  color: var(--text);
-  border-color: var(--border);
-}
-html[data-theme="dark"] ::placeholder { color: var(--text-faint); }
-
-/* Transição suave ao trocar de tema (apenas cor/fundo/borda) */
-@media (prefers-reduced-motion: no-preference) {
-  body, .card, .sidebar, .main, header, aside,
-  input, select, textarea, .btn, table, th, td {
-    transition: background-color var(--transition), border-color var(--transition), color var(--transition);
-  }
-}
-
-/* ── Acessibilidade base (global) ────────────────────────────────────── */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* Skip link "Pular para o conteúdo" */
-.skip-link {
-  position: absolute;
-  left: 8px;
-  top: -48px;
-  z-index: 1000;
-  padding: 10px 16px;
-  background: var(--primary-strong);
-  color: var(--on-primary);
-  border-radius: var(--radius-md);
-  font: 600 var(--text-base)/1 var(--font);
-  text-decoration: none;
-  transition: top var(--transition);
-}
-.skip-link:focus { top: 8px; }
-
-/* Disabled padrão */
-:where(input, select, textarea, button):disabled {
-  opacity: .7;
-  cursor: not-allowed;
-}
-
-/* ── Botão de alternância de tema ────────────────────────────────────── */
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition), border-color var(--transition);
-}
-.theme-toggle:hover {
-  background: var(--surface-hover);
-  color: var(--text);
-  border-color: var(--primary);
-}
-.sidebar-footer-actions {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-.sidebar-footer-actions .theme-toggle { flex-shrink: 0; height: auto; }

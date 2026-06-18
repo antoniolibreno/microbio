@@ -244,6 +244,12 @@ public class OrcamentoService {
                 .filter(o -> o.getStatus() == s).count();
     }
 
+    /** Faturamento: soma dos valores dos orçamentos ganhos (CONCLUIDO). */
+    public BigDecimal faturamentoConcluido() {
+        BigDecimal total = orcamentoRepository.somarValorTotalPorStatus(StatusOrcamento.CONCLUIDO);
+        return total != null ? total.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    }
+
     /** Últimos N orçamentos ordenados por data desc. */
     public List<Orcamento> listarRecentes(int limite) {
         return orcamentoRepository.findAllComDetalhes().stream()

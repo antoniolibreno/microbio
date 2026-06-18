@@ -14,290 +14,196 @@
 
 <aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
 
-<main class="main">
+<main class="main"
+      th:with="n=${contagemPorMes != null ? contagemPorMes.size() : 0},
+               mesAtual=${n > 0 ? contagemPorMes[n-1] : 0},
+               mesAnterior=${n > 1 ? contagemPorMes[n-2] : 0},
+               delta=${(n > 0 ? contagemPorMes[n-1] : 0) - (n > 1 ? contagemPorMes[n-2] : 0)}">
 
   <!-- ── PAGE HEADER ── -->
-  <div class="page-header">
-    <div class="page-header-text">
-      <h1>
-        <span class="header-icon">
-          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-          </svg>
-        </span>
-        Dashboard
-      </h1>
+  <header class="page-header">
+    <div>
+      <h1>Olá, <span sec:authentication="name">admin</span></h1>
       <p>Visão geral e indicadores operacionais do laboratório</p>
     </div>
-    <span class="header-date" th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd MMM yyyy', #locale)}">segunda-feira, 12 mai 2025</span>
-  </div>
+    <span class="header-date"
+          th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd MMM yyyy', #locale)}">segunda-feira, 12 mai 2025</span>
+  </header>
 
-  <!-- ── KPI CARDS ── -->
-  <div class="kpi-grid">
+  <!-- ── BENTO GRID ── -->
+  <div class="bento">
 
-    <div class="kpi-card kc-total">
-      <div class="kpi-top">
-        <span class="kpi-label">Total de orçamentos</span>
-        <span class="kpi-icon icon-total">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
+    <!-- DESTAQUE: orçamentos por mês (área) -->
+    <section class="bento-card bento-highlight">
+      <div class="bento-head">
+        <span class="bento-label">Orçamentos este mês</span>
+        <span class="hl-delta"
+              th:classappend="${delta > 0} ? 'up' : (${delta < 0} ? 'down' : 'flat')">
+          <svg th:if="${delta >= 0}" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 15 12 9 18 15"/></svg>
+          <svg th:if="${delta < 0}" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          <span th:text="${delta >= 0 ? '+' + delta : delta}">+0</span>
         </span>
       </div>
-      <div class="kpi-value" th:text="${totalOrcamentos}">0</div>
-      <div class="kpi-sub" th:text="${totalClientes} + ' clientes cadastrados'">0 clientes cadastrados</div>
-    </div>
+      <div class="hl-value" th:text="${mesAtual}">0</div>
+      <div class="bento-sub">
+        <span th:text="${totalOrcamentos}">0</span> no total ·
+        <span th:text="${mesAnterior}">0</span> no mês anterior
+      </div>
+      <div class="hl-chart">
+        <canvas id="areaChart"
+                th:attr="data-labels=${labelsMesesJson}, data-valores=${contagemPorMesJson}"></canvas>
+      </div>
+    </section>
 
-    <div class="kpi-card kc-ativo">
-      <div class="kpi-top">
-        <span class="kpi-label">Em aberto</span>
-        <span class="kpi-icon icon-ativo">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </span>
+    <!-- DONUT: distribuição por status -->
+    <section class="bento-card bento-donut">
+      <div class="bento-head">
+        <span class="bento-label">Distribuição por status</span>
       </div>
-      <div class="kpi-value" th:text="${totalAtivos}">0</div>
-      <div class="kpi-sub" th:text="${totalPendentes} + ' pendentes · ' + ${totalAndamento} + ' em andamento'">—</div>
-    </div>
-
-    <div class="kpi-card kc-concluido">
-      <div class="kpi-top">
-        <span class="kpi-label">Concluídos</span>
-        <span class="kpi-icon icon-concluido">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-        </span>
-      </div>
-      <div class="kpi-value" th:text="${totalConcluidos}">0</div>
-      <div class="kpi-sub" th:text="${totalCancelados} + ' cancelados'">0 cancelados</div>
-    </div>
-
-    <div class="kpi-card kc-taxa">
-      <div class="kpi-top">
-        <span class="kpi-label">Taxa de conclusão</span>
-        <span class="kpi-icon icon-taxa">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </span>
-      </div>
-      <div class="kpi-value" th:text="${taxaConclusao} + '%'">0%</div>
-      <div class="kpi-sub">dos orçamentos foram concluídos</div>
-    </div>
-
-  </div>
-
-  <!-- ── PEDIDOS KPI ROW ── -->
-  <div class="pedidos-row">
-    <div class="pedidos-row-title">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-        <rect x="8" y="2" width="8" height="4" rx="1"/>
-        <path d="M9 14l2 2 4-4"/>
-      </svg>
-      Pedidos de análise
-      <a th:href="@{/pedidos}" class="pedidos-row-link">Ver todos →</a>
-    </div>
-    <div class="pedidos-stats">
-      <div class="pstat pstat-total">
-        <div class="pstat-val" th:text="${totalPedidos}">0</div>
-        <div class="pstat-lbl">Total</div>
-      </div>
-      <div class="pstat pstat-pendente">
-        <div class="pstat-val" th:text="${pedidosPendentes}">0</div>
-        <div class="pstat-lbl">Pendentes</div>
-      </div>
-      <div class="pstat pstat-andamento">
-        <div class="pstat-val" th:text="${pedidosAndamento}">0</div>
-        <div class="pstat-lbl">Em andamento</div>
-      </div>
-      <div class="pstat pstat-concluido">
-        <div class="pstat-val" th:text="${pedidosConcluidos}">0</div>
-        <div class="pstat-lbl">Concluídos</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── CHARTS ROW ── -->
-  <div class="charts-row">
-
-    <!-- Bar chart: orçamentos por mês -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Orçamentos por mês</div>
-          <div class="chart-sub">Últimos 6 meses</div>
-        </div>
-      </div>
-      <div class="chart-canvas-wrap" style="height:240px;">
-        <canvas id="barChart"
-                th:attr="data-labels=${labelsMesesJson},
-                         data-valores=${contagemPorMesJson}"></canvas>
-      </div>
-    </div>
-
-    <!-- Donut chart: distribuição por status -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Distribuição por status</div>
-          <div class="chart-sub">Situação atual</div>
-        </div>
-      </div>
-      <div class="chart-canvas-wrap" style="height:180px;">
+      <div class="donut-wrap">
         <canvas id="donutChart"
                 th:attr="data-pendente=${totalPendentes},
                          data-andamento=${totalAndamento},
                          data-concluido=${totalConcluidos},
                          data-cancelado=${totalCancelados}"></canvas>
-      </div>
-      <div class="donut-legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#f59e0b"></div>
-          <span class="legend-label">Pendente</span>
-          <span class="legend-val" th:text="${totalPendentes}">0</span>
-          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalPendentes * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#3b82f6"></div>
-          <span class="legend-label">Em andamento</span>
-          <span class="legend-val" th:text="${totalAndamento}">0</span>
-          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalAndamento * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#22c55e"></div>
-          <span class="legend-label">Concluído</span>
-          <span class="legend-val" th:text="${totalConcluidos}">0</span>
-          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalConcluidos * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#f43f5e"></div>
-          <span class="legend-label">Cancelado</span>
-          <span class="legend-val" th:text="${totalCancelados}">0</span>
-          <span class="legend-pct" th:text="'(' + (${totalOrcamentos} > 0 ? ${#numbers.formatDecimal(totalCancelados * 100.0 / totalOrcamentos, 1, 0)} : 0) + '%)'"></span>
+        <div class="donut-center">
+          <span class="donut-total" th:text="${totalOrcamentos}">0</span>
+          <span class="donut-cap">orçamentos</span>
         </div>
       </div>
-    </div>
+      <ul class="donut-legend">
+        <li><span class="dot dot-pendente"></span> Pendente <b th:text="${totalPendentes}">0</b></li>
+        <li><span class="dot dot-andamento"></span> Em andamento <b th:text="${totalAndamento}">0</b></li>
+        <li><span class="dot dot-concluido"></span> Concluído <b th:text="${totalConcluidos}">0</b></li>
+        <li><span class="dot dot-cancelado"></span> Cancelado <b th:text="${totalCancelados}">0</b></li>
+      </ul>
+    </section>
 
-  </div>
+    <!-- MINI KPI 1: Faturamento -->
+    <section class="bento-card kpi kpi-1">
+      <div class="kpi-top">
+        <span class="kpi-label">Faturamento</span>
+        <span class="kpi-icon">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="'R$ ' + ${#numbers.formatDecimal(faturamentoConcluido,1,'POINT',2,'COMMA')}">R$ 0,00</div>
+      <div class="kpi-sub">ticket médio
+        <b th:text="'R$ ' + ${#numbers.formatDecimal(ticketMedio,1,'POINT',2,'COMMA')}">R$ 0,00</b></div>
+    </section>
 
-  <!-- ── RECENT TABLES ROW ── -->
-  <div class="recent-tables-row">
+    <!-- MINI KPI 2: Em aberto -->
+    <section class="bento-card kpi kpi-2">
+      <div class="kpi-top">
+        <span class="kpi-label">Em aberto</span>
+        <span class="kpi-icon">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${totalAtivos}">0</div>
+      <div class="kpi-sub"><b th:text="${totalPendentes}">0</b> pend · <b th:text="${totalAndamento}">0</b> em and.</div>
+    </section>
 
-  <!-- ── ORÇAMENTOS RECENTES ── -->
-  <div class="recent-card">
-    <div class="recent-header">
-      <h3>Orçamentos recentes</h3>
-      <a th:href="@{/indicadores}" class="see-all">
-        Ver todos
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </a>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Cliente / Solicitante</th>
-          <th>Serviço</th>
-          <th>Data</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:if="${#lists.isEmpty(orcamentosRecentes)}" class="empty-row">
-          <td colspan="6">Nenhum orçamento cadastrado ainda.</td>
-        </tr>
-        <tr th:each="orc : ${orcamentosRecentes}">
-          <td class="td-id" th:text="'#' + ${orc.id}">—</td>
-          <td>
-            <div class="td-cliente">
-              <div class="mini-avatar"
-                   th:text="${orc.pessoa != null ? #strings.substring(orc.pessoa.nome, 0, (orc.pessoa.nome.length() > 1 ? 2 : 1)) : (orc.usuario != null ? #strings.substring(orc.usuario.login, 0, 2) : '?')}">
-                ??
-              </div>
-              <span th:text="${orc.pessoa != null ? orc.pessoa.nome : (orc.usuario != null ? orc.usuario.login : '—')}">—</span>
-            </div>
-          </td>
-          <td>
-            <span th:if="${orc.pessoa != null and orc.pessoa.tipoServico != null}"
-                  style="font-size:12px;padding:3px 9px;border-radius:6px;background:var(--primary-light);color:var(--primary);font-weight:600;"
-                  th:text="${orc.pessoa.tipoServico}">—</span>
-            <span th:if="${orc.pessoa == null or orc.pessoa.tipoServico == null}"
-                  style="color:var(--text-faint);font-size:12px;">—</span>
-          </td>
-          <td class="td-date" th:text="${#temporals.format(orc.dataOrcamento,'dd/MM/yyyy')}">—</td>
-          <td>
-            <span class="status-badge"
-                  th:classappend="${orc.status.cssClass}"
-                  th:text="${orc.status.label}">—</span>
-          </td>
-          <td>
-            <a th:href="@{/indicadores/{id}(id=${orc.id})}" class="td-link">
-              Abrir
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- MINI KPI 3: Taxa de conclusão -->
+    <section class="bento-card kpi kpi-3">
+      <div class="kpi-top">
+        <span class="kpi-label">Taxa de conclusão</span>
+        <span class="kpi-icon">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${taxaConclusao} + '%'">0%</div>
+      <div class="kpi-sub"><b th:text="${totalConcluidos}">0</b> de <b th:text="${totalOrcamentos - totalCancelados}">0</b> orçamentos</div>
+    </section>
 
-  <!-- ── PEDIDOS RECENTES ── -->
-  <div class="recent-card">
-    <div class="recent-header">
-      <h3>Pedidos recentes</h3>
-      <a th:href="@{/pedidos}" class="see-all">
-        Ver todos
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-      </a>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Cliente</th>
-          <th>Data</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:if="${#lists.isEmpty(pedidosRecentes)}" class="empty-row">
-          <td colspan="5">Nenhum pedido registrado ainda.</td>
-        </tr>
-        <tr th:each="ped : ${pedidosRecentes}"
-            th:with="orc=${ped.orcamento}, nome=${orc != null and orc.pessoa != null ? orc.pessoa.nome : (orc != null and orc.usuario != null ? orc.usuario.login : '—')}">
-          <td class="td-id" th:text="'#PED-' + ${ped.id}">—</td>
-          <td>
-            <div class="td-cliente">
-              <div class="mini-avatar"
-                   th:text="${nome != null and nome.length() > 1 ? #strings.toUpperCase(nome.substring(0,2)) : '?'}">??</div>
-              <span th:text="${nome}">—</span>
-            </div>
-          </td>
-          <td class="td-date" th:text="${#temporals.format(ped.dataPedido,'dd/MM/yyyy')}">—</td>
-          <td>
-            <span class="status-badge"
-                  th:classappend="${ped.status == 'PENDENTE'} ? 'status-pendente' : (${ped.status == 'EM_ANDAMENTO'} ? 'status-andamento' : (${ped.status == 'CONCLUIDO'} ? 'status-concluido' : 'status-cancelado'))"
-                  th:text="${ped.status == 'PENDENTE' ? 'Pendente' : (ped.status == 'EM_ANDAMENTO' ? 'Em andamento' : (ped.status == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'))}">—</span>
-          </td>
-          <td>
-            <a th:href="@{/pedidos/{id}(id=${ped.id})}" class="td-link">
-              Abrir
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- MINI KPI 4: Análises ativas -->
+    <section class="bento-card kpi kpi-4">
+      <div class="kpi-top">
+        <span class="kpi-label">Análises ativas</span>
+        <span class="kpi-icon">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 2v7.31l-5.66 9.8A2 2 0 0 0 6.07 22h11.86a2 2 0 0 0 1.73-2.89L14 9.31V2"/><line x1="8" y1="2" x2="16" y2="2"/></svg>
+        </span>
+      </div>
+      <div class="kpi-value" th:text="${totalAnalisesAtivas}">0</div>
+      <div class="kpi-sub"><a th:href="@{/analises}">ver catálogo →</a></div>
+    </section>
 
-  </div><!-- /recent-tables-row -->
+    <!-- ATIVIDADE RECENTE (abas) -->
+    <section class="bento-card bento-activity">
+      <div class="activity-head">
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" data-tab="orc" role="tab" aria-selected="true">Orçamentos recentes</button>
+          <button class="tab" data-tab="ped" role="tab" aria-selected="false">Pedidos recentes</button>
+        </div>
+        <a th:href="@{/indicadores}" class="see-all" data-seeall="orc">Ver todos →</a>
+        <a th:href="@{/pedidos}" class="see-all" data-seeall="ped" hidden>Ver todos →</a>
+      </div>
+
+      <!-- Painel: orçamentos -->
+      <div class="tab-panel" data-panel="orc">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Cliente</th><th>Serviço</th><th>Data</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(orcamentosRecentes)}" class="empty-row">
+              <td colspan="6">Nenhum orçamento cadastrado ainda.</td>
+            </tr>
+            <tr th:each="orc : ${orcamentosRecentes}"
+                th:with="nome=${orc.pessoa != null ? orc.pessoa.nome : (orc.usuario != null ? orc.usuario.login : '—')}">
+              <td class="td-id" th:text="'#' + ${orc.id}">—</td>
+              <td>
+                <div class="td-cliente">
+                  <div class="mini-avatar" th:text="${nome != null and nome.length() > 1 ? #strings.toUpperCase(nome.substring(0,2)) : '?'}">??</div>
+                  <span th:text="${nome}">—</span>
+                </div>
+              </td>
+              <td>
+                <span th:if="${orc.pessoa != null and orc.pessoa.tipoServico != null}" class="chip"
+                      th:text="${orc.pessoa.tipoServico}">—</span>
+                <span th:unless="${orc.pessoa != null and orc.pessoa.tipoServico != null}" class="td-faint">—</span>
+              </td>
+              <td class="td-date" th:text="${#temporals.format(orc.dataOrcamento,'dd/MM/yyyy')}">—</td>
+              <td><span class="status-badge" th:classappend="${orc.status.cssClass}" th:text="${orc.status.label}">—</span></td>
+              <td><a th:href="@{/indicadores/{id}(id=${orc.id})}" class="td-link">Abrir
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Painel: pedidos -->
+      <div class="tab-panel" data-panel="ped" hidden>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Cliente</th><th>Data</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(pedidosRecentes)}" class="empty-row">
+              <td colspan="5">Nenhum pedido registrado ainda.</td>
+            </tr>
+            <tr th:each="ped : ${pedidosRecentes}"
+                th:with="orc=${ped.orcamento}, nome=${orc != null and orc.pessoa != null ? orc.pessoa.nome : (orc != null and orc.usuario != null ? orc.usuario.login : '—')}">
+              <td class="td-id" th:text="'#PED-' + ${ped.id}">—</td>
+              <td>
+                <div class="td-cliente">
+                  <div class="mini-avatar" th:text="${nome != null and nome.length() > 1 ? #strings.toUpperCase(nome.substring(0,2)) : '?'}">??</div>
+                  <span th:text="${nome}">—</span>
+                </div>
+              </td>
+              <td class="td-date" th:text="${#temporals.format(ped.dataPedido,'dd/MM/yyyy')}">—</td>
+              <td><span class="status-badge"
+                    th:classappend="${ped.status == 'PENDENTE'} ? 'status-pendente' : (${ped.status == 'EM_ANDAMENTO'} ? 'status-andamento' : (${ped.status == 'CONCLUIDO'} ? 'status-concluido' : 'status-cancelado'))"
+                    th:text="${ped.status == 'PENDENTE' ? 'Pendente' : (ped.status == 'EM_ANDAMENTO' ? 'Em andamento' : (ped.status == 'CONCLUIDO' ? 'Concluído' : 'Cancelado'))}">—</span></td>
+              <td><a th:href="@{/pedidos/{id}(id=${ped.id})}" class="td-link">Abrir
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /bento -->
 
 </main>
 
