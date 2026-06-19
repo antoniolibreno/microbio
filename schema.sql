@@ -120,6 +120,7 @@ CREATE TABLE pedido_analise (
     id               SERIAL PRIMARY KEY,
     pedido_id        INT NOT NULL REFERENCES pedido(id)  ON DELETE CASCADE,
     analise_id       INT NOT NULL REFERENCES analise(id) ON DELETE CASCADE,
+    valor_unitario   DECIMAL(10, 2),
     resultado        TEXT,
     valor_referencia VARCHAR(200),
     conformidade     VARCHAR(20)  DEFAULT 'PENDENTE',
@@ -131,9 +132,10 @@ CREATE TABLE pedido_analise (
 -- TABELA: orcamento_analise (análises solicitadas no orçamento)
 -- ============================================================
 CREATE TABLE orcamento_analise (
-    id           SERIAL PRIMARY KEY,
-    orcamento_id INT NOT NULL REFERENCES orcamento(id) ON DELETE CASCADE,
-    analise_id   INT NOT NULL REFERENCES analise(id)   ON DELETE CASCADE
+    id             SERIAL PRIMARY KEY,
+    orcamento_id   INT NOT NULL REFERENCES orcamento(id) ON DELETE CASCADE,
+    analise_id     INT NOT NULL REFERENCES analise(id)   ON DELETE CASCADE,
+    valor_unitario DECIMAL(10, 2)
 );
 
 -- ============================================================

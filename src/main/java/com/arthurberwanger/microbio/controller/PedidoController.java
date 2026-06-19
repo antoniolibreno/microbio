@@ -57,7 +57,10 @@ public class PedidoController {
             model.addAttribute("pedido", pedido);
 
             Set<Long> vinculadas = new java.util.HashSet<>();
-            pedido.getAnalises().forEach(pa -> vinculadas.add(pa.getAnalise().getId()));
+            pedido.getAnalises().stream()
+                    .map(pa -> pa.getAnalise() != null ? pa.getAnalise().getId() : null)
+                    .filter(java.util.Objects::nonNull)
+                    .forEach(vinculadas::add);
             var disponiveis = analiseService.listarTodas().stream()
                     .filter(a -> "ATIVA".equals(a.getStatus()) && !vinculadas.contains(a.getId()))
                     .toList();

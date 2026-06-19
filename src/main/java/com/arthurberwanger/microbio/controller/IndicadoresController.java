@@ -17,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -68,21 +67,53 @@ public class IndicadoresController {
                           RedirectAttributes ra) {
         try {
             Orcamento orc = orcamentoService.buscarPorId(id);
-            BigDecimal valorSugerido = null;
-            if (orc.getPessoa() != null && orc.getPessoa().getTipoServico() != null) {
-                valorSugerido = analiseRepository
-                        .findFirstByNomeIgnoreCase(orc.getPessoa().getTipoServico())
-                        .map(a -> a.getValor())
-                        .orElse(null);
-            }
+
+            var vinculadas = orcamentoService.listarAnalises(id);
+            var idsVinculados = vinculadas.stream()
+                    .map(oa -> oa.getAnalise() != null ? oa.getAnalise().getId() : null)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+            var disponiveis = analiseRepository.findAll().stream()
+                    .filter(a -> "ATIVA".equals(a.getStatus()) && !idsVinculados.contains(a.getId()))
+                    .toList();
+
             model.addAttribute("orcamento", orc);
-            model.addAttribute("valorSugerido", valorSugerido);
+            model.addAttribute("analisesVinculadas", vinculadas);
+            model.addAttribute("analisesDisponiveis", disponiveis);
             model.addAttribute("statusValues", StatusOrcamento.values());
             return "indicadores/editar";
         } catch (EntityNotFoundException e) {
             ra.addFlashAttribute("erro", e.getMessage());
             return "redirect:/indicadores";
         }
+    }
+
+    /** Adiciona uma análise ao orçamento (recalcula o total automaticamente). */
+    @PostMapping("/{id}/analises/adicionar")
+    public String adicionarAnalise(@PathVariable Long id,
+                                   @RequestParam Long analiseId,
+                                   RedirectAttributes ra) {
+        try {
+            orcamentoService.adicionarAnalise(id, analiseId);
+            ra.addFlashAttribute("sucesso", "Análise adicionada ao orçamento.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/indicadores/" + id;
+    }
+
+    /** Remove uma análise do orçamento (recalcula o total automaticamente). */
+    @PostMapping("/{id}/analises/{oaId}/remover")
+    public String removerAnalise(@PathVariable Long id,
+                                 @PathVariable Long oaId,
+                                 RedirectAttributes ra) {
+        try {
+            orcamentoService.removerAnalise(oaId);
+            ra.addFlashAttribute("sucesso", "Análise removida do orçamento.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/indicadores/" + id;
     }
 
     /** Promove o status: PENDENTE→EM_ANDAMENTO→CONCLUIDO. */
@@ -113,21 +144,16 @@ public class IndicadoresController {
         return "redirect:/indicadores/" + id;
     }
 
-    /** Salva status + valor + observações de uma vez (botão "Salvar" do detalhe). */
+    /** Salva status + observações (botão "Salvar" do detalhe). O valor total é derivado das análises. */
     @PostMapping("/{id}/atualizar")
     public String atualizar(@PathVariable Long id,
                             @RequestParam(required = false) String status,
-                            @RequestParam(required = false) String valorTotal,
                             @RequestParam(required = false) String observacoes,
                             RedirectAttributes ra) {
         try {
             StatusOrcamento s = (status != null && !status.isBlank())
                     ? StatusOrcamento.valueOf(status) : null;
-            BigDecimal valor = null;
-            if (valorTotal != null && !valorTotal.isBlank()) {
-                valor = new BigDecimal(valorTotal.replace(",", "."));
-            }
-            orcamentoService.atualizar(id, s, valor, observacoes);
+            orcamentoService.atualizar(id, s, observacoes);
             ra.addFlashAttribute("sucesso", "Orçamento atualizado.");
         } catch (Exception e) {
             ra.addFlashAttribute("erro", "Erro ao atualizar: " + e.getMessage());
@@ -135,20 +161,13 @@ public class IndicadoresController {
         return "redirect:/indicadores/" + id;
     }
 
-    /** "Ganhar" o orçamento: marca CONCLUIDO e cria um Pedido vinculado. */
+    /** "Ganhar" o orçamento: cria o Pedido vinculado e marca CONCLUIDO, atomicamente. */
     @PostMapping("/{id}/ganhar")
     public String ganhar(@PathVariable Long id,
                          @RequestParam(required = false) String observacoes,
-                         @RequestParam(required = false) String valorTotal,
                          RedirectAttributes ra) {
         try {
-            BigDecimal valor = null;
-            if (valorTotal != null && !valorTotal.isBlank()) {
-                valor = new BigDecimal(valorTotal.replace(",", "."));
-            }
-            orcamentoService.atualizar(id, null, valor, observacoes);
-            Pedido novo = pedidoService.criarDe(id, observacoes);
-            orcamentoService.atualizarStatus(id, StatusOrcamento.CONCLUIDO);
+            Pedido novo = pedidoService.ganharOrcamento(id, observacoes);
             ra.addFlashAttribute("sucesso",
                     "Orçamento ganho! Pedido #" + novo.getId() + " criado.");
             return "redirect:/indicadores";

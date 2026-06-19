@@ -182,8 +182,8 @@
                     </td>
                     <td style="color:var(--text-secondary);font-size:13px"
                         th:text="${pa.dataRealizacao != null ? #temporals.format(pa.dataRealizacao,'dd/MM/yyyy') : '—'}">—</td>
-                    <td style="text-align:right;font-weight:500"
-                        th:text="${a.valor != null ? 'R$ ' + #numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA') : '—'}">—</td>
+                    <td style="text-align:right;font-weight:500;font-variant-numeric:tabular-nums"
+                        th:text="${pa.valorUnitario != null ? 'R$ ' + #numbers.formatDecimal(pa.valorUnitario,1,'POINT',2,'COMMA') : '—'}">—</td>
                     <td style="text-align:center;white-space:nowrap">
                       <button type="button" class="btn-result" th:onclick="'toggleResult(' + ${pa.id} + ')'" title="Resultado / Laudo">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">

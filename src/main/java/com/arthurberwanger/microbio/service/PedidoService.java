@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -83,19 +84,39 @@ public class PedidoService {
             PedidoAnalise pa = new PedidoAnalise();
             pa.setPedido(pedido);
             pa.setAnalise(oa.getAnalise());
+            // Herda o snapshot de preço do orçamento (não relê do catálogo) → totais idênticos.
+            pa.setValorUnitario(oa.getValorUnitario() != null
+                    ? oa.getValorUnitario()
+                    : (oa.getAnalise() != null ? oa.getAnalise().getValor() : null));
             pedidoAnaliseRepository.save(pa);
         }
 
         Pedido recarregado = pedidoRepository.findByIdComDetalhes(pedido.getId()).orElse(pedido);
         recalcularValorTotal(recarregado);
         pedidoRepository.save(recarregado);
-
-        if (orc.getValorTotal() == null && recarregado.getValorTotal() != null) {
-            orc.setValorTotal(recarregado.getValorTotal());
-            orcamentoRepository.save(orc);
-        }
-
         return recarregado;
+    }
+
+    /**
+     * "Ganha" o orçamento de forma atômica: cria o pedido (copiando as análises e seus
+     * snapshots de preço) e marca o orçamento como CONCLUIDO. Tudo em uma transação —
+     * se qualquer passo falhar, nada é persistido.
+     */
+    @Transactional
+    public Pedido ganharOrcamento(Long orcamentoId, String observacoes) {
+        Orcamento orc = orcamentoRepository.findById(orcamentoId)
+                .orElseThrow(() -> new EntityNotFoundException("Orçamento #" + orcamentoId + " não encontrado"));
+        if (orc.getStatus() == Orcamento.StatusOrcamento.CANCELADO)
+            throw new IllegalStateException("Um orçamento cancelado não pode ser ganho.");
+        if (orc.getStatus() == Orcamento.StatusOrcamento.CONCLUIDO)
+            throw new IllegalStateException("Este orçamento já foi ganho.");
+        if (orcamentoAnaliseRepository.findByOrcamentoId(orcamentoId).isEmpty())
+            throw new IllegalStateException("Adicione ao menos uma análise ao orçamento antes de ganhá-lo.");
+
+        Pedido pedido = criarDe(orcamentoId, observacoes);
+        orc.setStatus(Orcamento.StatusOrcamento.CONCLUIDO);
+        orcamentoRepository.save(orc);
+        return pedido;
     }
 
     /** Avança o status: PENDENTE → EM_ANDAMENTO → CONCLUIDO */
@@ -158,6 +179,7 @@ public class PedidoService {
         PedidoAnalise pa = new PedidoAnalise();
         pa.setPedido(pedido);
         pa.setAnalise(analise);
+        pa.setValorUnitario(analise.getValor()); // congela o preço do catálogo neste instante
         PedidoAnalise salvo = pedidoAnaliseRepository.save(pa);
 
         atualizarTotaisAposMudancaAnalise(pedidoId);
@@ -200,12 +222,15 @@ public class PedidoService {
                 .filter(p -> status.equals(p.getStatus())).count();
     }
 
-    /** Recalcula valor_total do pedido somando os valores das análises vinculadas. */
+    /** Recalcula valor_total do pedido somando os snapshots de preço das análises vinculadas.
+     *  Consulta a tabela de junção diretamente (fonte da verdade), evitando coleções
+     *  potencialmente desatualizadas na sessão do Hibernate. */
     private void recalcularValorTotal(Pedido pedido) {
-        BigDecimal total = pedido.getAnalises().stream()
-                .map(pa -> pa.getAnalise() != null ? pa.getAnalise().getValor() : null)
+        BigDecimal total = pedidoAnaliseRepository.findByPedidoId(pedido.getId()).stream()
+                .map(PedidoAnalise::getValorUnitario)
                 .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
         pedido.setValorTotal(total);
     }
 
@@ -219,17 +244,11 @@ public class PedidoService {
             throw new IllegalStateException("Não é possível concluir: existem análises com conformidade PENDENTE.");
     }
 
-    /** Recarrega pedido + recalcula + propaga ao orçamento quando este ainda não tinha total. */
+    /** Recarrega pedido (com análises) e recalcula seu total a partir dos snapshots. */
     private void atualizarTotaisAposMudancaAnalise(Long pedidoId) {
         Pedido recarregado = pedidoRepository.findByIdComDetalhes(pedidoId)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido #" + pedidoId + " não encontrado"));
         recalcularValorTotal(recarregado);
         pedidoRepository.save(recarregado);
-
-        Orcamento orc = recarregado.getOrcamento();
-        if (orc != null && orc.getValorTotal() == null && recarregado.getValorTotal() != null) {
-            orc.setValorTotal(recarregado.getValorTotal());
-            orcamentoRepository.save(orc);
-        }
     }
 }

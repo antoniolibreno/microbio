@@ -53,7 +53,7 @@
             Cancelar
           </button>
           <button th:if="${isPendente}" type="button" class="btn btn-success"
-                  onclick="document.getElementById('modalGanharObservacoes').value = (document.querySelector('textarea[name=observacoes]') || {}).value || ''; document.getElementById('modalGanharValorTotal').value = (document.querySelector('input[name=valorTotal]') || {}).value || ''; document.getElementById('modalGanhar').hidden = false;">
+                  onclick="document.getElementById('modalGanharObservacoes').value = (document.querySelector('textarea[name=observacoes]') || {}).value || ''; document.getElementById('modalGanhar').hidden = false;">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22M18 2H6v7a6 6 0 1012 0V2z"/>
             </svg>
@@ -119,14 +119,63 @@
               </div>
               <div class="form-field">
                 <label>Valor total (R$)</label>
-                <input type="number" name="valorTotal" step="0.01" min="0"
-                       th:value="${orcamento.valorTotal != null ? orcamento.valorTotal : (valorSugerido != null ? valorSugerido : '')}"
-                       th:disabled="${!editable}" placeholder="0,00">
-                <small th:if="${orcamento.valorTotal == null and valorSugerido != null}"
-                       style="display:block;margin-top:4px;font-size:11px;color:var(--text-muted, #6b7280)">
-                  Valor sugerido a partir da análise cadastrada. Edite se necessário.
+                <input type="text" disabled
+                       th:value="${orcamento.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(orcamento.valorTotal,1,'POINT',2,'COMMA') : 'R$ 0,00'}">
+                <small style="display:block;margin-top:4px;font-size:11px;color:var(--text-muted, #6b7280)">
+                  Calculado automaticamente a partir das análises do orçamento.
                 </small>
               </div>
+            </div>
+          </div>
+
+          <!-- Análises do orçamento -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Análises do orçamento
+                (<span th:text="${#lists.size(analisesVinculadas)}">0</span>)
+              </h2>
+            </div>
+            <div th:if="${#lists.isEmpty(analisesVinculadas)}"
+                 style="padding:24px;text-align:center;color:var(--text-tertiary);font-size:13px">
+              Nenhuma análise adicionada. Use o seletor abaixo para montar o orçamento.
+            </div>
+            <div th:unless="${#lists.isEmpty(analisesVinculadas)}" class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Análise</th>
+                    <th style="width:140px;text-align:right">Valor (R$)</th>
+                    <th style="width:60px" th:if="${editable}"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="oa : ${analisesVinculadas}">
+                    <td th:text="${oa.analise != null ? oa.analise.nome : '—'}">Análise</td>
+                    <td style="text-align:right;font-variant-numeric:tabular-nums"
+                        th:text="${oa.valorUnitario != null ? 'R$ ' + #numbers.formatDecimal(oa.valorUnitario,1,'POINT',2,'COMMA') : '—'}">R$ 0,00</td>
+                    <td th:if="${editable}" style="text-align:right">
+                      <button type="submit" th:form="'rmForm' + ${oa.id}" class="btn btn-danger btn-sm"
+                              title="Remover análise" aria-label="Remover análise">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div th:if="${editable}" class="add-analise-row"
+                 style="display:flex;gap:8px;padding:16px;border-top:1px solid var(--border)">
+              <select name="analiseId" th:form="'addAnaliseForm'" required
+                      aria-label="Selecionar análise para adicionar" style="flex:1">
+                <option value="" disabled selected>Selecione uma análise…</option>
+                <option th:each="a : ${analisesDisponiveis}"
+                        th:value="${a.id}"
+                        th:text="${a.nome} + (${a.valor != null} ? ' — R$ ' + ${#numbers.formatDecimal(a.valor,1,'POINT',2,'COMMA')} : '')"></option>
+              </select>
+              <button type="submit" th:form="'addAnaliseForm'" class="btn btn-primary btn-sm">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Adicionar
+              </button>
             </div>
           </div>
 
@@ -241,6 +290,12 @@
       </div>
     </form><!-- /formSalvar -->
 
+    <!-- Forms de gestão de análises (fora do formSalvar, referenciados via atributo form) -->
+    <form th:if="${editable}" id="addAnaliseForm"
+          th:action="@{/indicadores/{id}/analises/adicionar(id=${orcamento.id})}" method="post"></form>
+    <form th:if="${editable}" th:each="oa : ${analisesVinculadas}" th:id="'rmForm' + ${oa.id}"
+          th:action="@{/indicadores/{id}/analises/{oaId}/remover(id=${orcamento.id},oaId=${oa.id})}" method="post"></form>
+
     <!-- Modal Ganhar -->
     <div class="modal-overlay" id="modalGanhar" hidden onclick="if(event.target===this) this.hidden=true">
       <div class="modal-content">
@@ -266,7 +321,6 @@
           <button type="button" class="btn btn-ghost" onclick="document.getElementById('modalGanhar').hidden=true">Voltar</button>
           <form th:action="@{/indicadores/{id}/ganhar(id=${orcamento.id})}" method="post" style="display:inline">
             <input type="hidden" id="modalGanharObservacoes" name="observacoes" value="">
-            <input type="hidden" id="modalGanharValorTotal" name="valorTotal" value="">
             <button type="submit" class="btn btn-success">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
               Confirmar e criar pedido

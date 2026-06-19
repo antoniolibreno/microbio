@@ -144,49 +144,7 @@ public class PainelClienteController {
                                       RedirectAttributes ra) {
         try {
             Usuario usuario = usuarioLogado(auth);
-            Cliente cliente = usuario.getCliente();
-
-            List<Analise> selecionadas = (analiseIds != null && !analiseIds.isEmpty())
-                    ? analiseRepository.findAllById(analiseIds)
-                    : List.of();
-
-            Pessoa pessoa = new Pessoa();
-            String tipoServico = selecionadas.stream()
-                    .map(Analise::getNome)
-                    .collect(java.util.stream.Collectors.joining(", "));
-            pessoa.setTipoServico(tipoServico.isBlank() ? "Análise laboratorial" : tipoServico);
-
-            if (cliente != null) {
-                pessoaRepository.findFirstByClienteOrderByDataSolAsc(cliente).ifPresentOrElse(
-                        p -> { pessoa.setNome(p.getNome()); pessoa.setEmail(p.getEmail()); pessoa.setTelefone(p.getTelefone()); },
-                        () -> pessoa.setNome(usuario.getLogin())
-                );
-                pessoa.setCliente(cliente);
-            } else {
-                pessoa.setNome(usuario.getLogin());
-            }
-            pessoaRepository.save(pessoa);
-
-            Orcamento orc = new Orcamento();
-            orc.setPessoa(pessoa);
-            orc.setUsuario(usuario);
-            if (observacoes != null && !observacoes.isBlank()) orc.setObservacoes(observacoes);
-            orcamentoRepository.save(orc);
-
-            for (Analise a : selecionadas) {
-                OrcamentoAnalise oa = new OrcamentoAnalise();
-                oa.setOrcamento(orc);
-                oa.setAnalise(a);
-                orcamentoAnaliseRepository.save(oa);
-            }
-
-            BigDecimal total = selecionadas.stream()
-                    .map(Analise::getValor)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            orc.setValorTotal(total);
-            orcamentoRepository.save(orc);
-
+            orcamentoService.criarSolicitacaoCliente(usuario, analiseIds, observacoes);
             ra.addFlashAttribute("sucesso", "Solicitação enviada! Em breve entraremos em contato.");
             return "redirect:/painel/orcamentos";
         } catch (Exception e) {
