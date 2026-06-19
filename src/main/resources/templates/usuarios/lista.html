@@ -1,126 +1,925 @@
-<!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Usuários - Microbio</title>
-  <th:block th:replace="~{fragments/toast :: head}"></th:block>
-  <link rel="stylesheet" th:href="@{/css/usuarios/lista.css}">
-</head>
-<body>
+<!doctype html>
+<html
+  lang="pt-BR"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usuários - Microbio</title>
+    <th:block th:replace="~{fragments/toast :: head}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/usuarios/lista.css}" />
+  </head>
+  <body>
+    <aside th:replace="~{fragments/sidebar :: sidebar('usuarios')}"></aside>
 
-<aside th:replace="~{fragments/sidebar :: sidebar('usuarios')}"></aside>
-
-<main class="main">
-
-  <div class="page-header">
-    <div class="header-left">
-      <h1>
-        <span class="header-icon">
-          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    <main class="main">
+      <div class="page-header">
+        <div class="header-left">
+          <h1>
+            <span class="header-icon">
+              <svg
+                width="18"
+                height="18"
+                fill="none"
+                stroke="#fff"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </span>
+            Usuários
+          </h1>
+          <p>Gerencie os usuários e permissões de acesso ao sistema</p>
+        </div>
+        <button type="button" class="btn-new" onclick="abrirModalNovo()">
+          <svg
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-        </span>
-        Usuários
-      </h1>
-      <p>Gerencie os usuários e permissões de acesso ao sistema</p>
-    </div>
-    <a th:href="@{/usuarios/novo}" class="btn-new">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Novo usuário
-    </a>
-  </div>
-
-
-  <div class="table-card">
-    <div class="table-toolbar">
-      <div class="search-wrap">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="Buscar usuário…" oninput="filtrar()">
+          Novo usuário
+        </button>
       </div>
-      <span class="table-count" id="countLabel"
-            th:text="${usuarios != null ? usuarios.size() + ' usuário(s)' : '0 usuário(s)'}">0 usuário(s)</span>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <div class="search-wrap">
+            <svg
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              id="searchInput"
+              placeholder="Buscar usuário…"
+              oninput="filtrar()"
+            />
+          </div>
+          <span
+            class="table-count"
+            id="countLabel"
+            th:text="${usuarios != null ? usuarios.size() + ' usuário(s)' : '0 usuário(s)'}"
+            >0 usuário(s)</span
+          >
+        </div>
+
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>Perfil</th>
+              <th>Cadastro</th>
+              <th style="text-align: right">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(usuarios)}">
+              <td colspan="4">
+                <div class="empty-state">
+                  <svg
+                    width="40"
+                    height="40"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                  <p>Nenhum usuário cadastrado ainda.</p>
+                </div>
+              </td>
+            </tr>
+            <tr
+              th:each="u : ${usuarios}"
+              th:with="login=${u.login != null ? u.login : ''},
+                                                hasCliente=${u.cliente != null},
+                                                end=${u.cliente != null ? u.cliente.endereco : null}"
+              class="user-row"
+              th:attr="data-id=${u.id},
+                     data-login=${login},
+                     data-admin=${u.admin},
+                     data-hascliente=${hasCliente},
+                     data-tipocliente=${hasCliente and u.cliente.tipoCliente != null ? u.cliente.tipoCliente : ''},
+                     data-cpfcnpj=${hasCliente and u.cliente.cpfCnpj != null ? u.cliente.cpfCnpj : ''},
+                     data-cep=${end != null and end.cep != null ? end.cep : ''},
+                     data-estado=${end != null and end.estado != null ? end.estado : ''},
+                     data-cidade=${end != null and end.cidade != null ? end.cidade : ''},
+                     data-rua=${end != null and end.rua != null ? end.rua : ''},
+                     data-numero=${end != null and end.numero != null ? end.numero : ''},
+                     data-bairro=${end != null and end.bairro != null ? end.bairro : ''}"
+            >
+              <td>
+                <div class="td-user">
+                  <div
+                    class="u-avatar"
+                    th:classappend="${u.admin} ? 'avatar-admin' : 'avatar-client'"
+                    th:text="${#strings.toUpperCase(login.length() &lt; 2 ? login : login.substring(0,2))}"
+                  >
+                    ??
+                  </div>
+                  <div>
+                    <div class="u-name" th:text="${login}">login</div>
+                    <div class="u-sub" th:text="'ID #' + ${u.id}">ID #0</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span th:if="${u.admin}" class="role-badge role-admin">
+                  <svg
+                    width="10"
+                    height="10"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
+                  </svg>
+                  Administrador
+                </span>
+                <span
+                  th:if="${!u.admin}"
+                  class="role-badge role-client"
+                >
+                  <svg
+                    width="10"
+                    height="10"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Cliente
+                </span>
+              </td>
+              <td>
+                <span
+                  th:if="${hasCliente}"
+                  style="font-size: 12.5px; color: var(--text-muted)"
+                  th:text="${u.cliente.tipoCliente != null and !#strings.isEmpty(u.cliente.tipoCliente) ? u.cliente.tipoCliente : 'Cliente'}"
+                  >—</span
+                >
+                <span
+                  th:unless="${hasCliente}"
+                  style="font-size: 12.5px; color: var(--text-faint)"
+                  >—</span
+                >
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="btn-ellipsis"
+                    aria-label="Ações"
+                    aria-haspopup="true"
+                    onclick="toggleRowMenu(this, event)"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle cx="12" cy="5" r="2" />
+                      <circle cx="12" cy="12" r="2" />
+                      <circle cx="12" cy="19" r="2" />
+                    </svg>
+                  </button>
+                  <div class="row-menu" hidden>
+                    <button
+                      type="button"
+                      class="row-menu-item"
+                      onclick="abrirModalEditar(this)"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                        />
+                        <path
+                          d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                        />
+                      </svg>
+                      Editar
+                    </button>
+                    <form
+                      th:action="@{/usuarios/{id}/excluir(id=${u.id})}"
+                      method="post"
+                      onsubmit="return confirm('Excluir este usuário?');"
+                    >
+                      <button type="submit" class="row-menu-item danger">
+                        <svg
+                          width="14"
+                          height="14"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <polyline points="3 6 5 6 21 6" />
+                          <path
+                            d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                          />
+                        </svg>
+                        Excluir
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- ── MODAL: NOVO USUÁRIO ── -->
+    <div class="modal-overlay" id="modalNovo" aria-hidden="true">
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalNovoTitle"
+      >
+        <div class="modal-header">
+          <h2 id="modalNovoTitle">Novo usuário</h2>
+          <button
+            type="button"
+            class="modal-close"
+            aria-label="Fechar"
+            onclick="fecharModal('modalNovo')"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="tabs">
+            <button
+              class="tab-btn active"
+              type="button"
+              data-tab="novo-simples"
+              onclick="trocarAba(this)"
+            >
+              Acesso simples
+            </button>
+            <button
+              class="tab-btn"
+              type="button"
+              data-tab="novo-completo"
+              onclick="trocarAba(this)"
+            >
+              Com dados de cliente
+            </button>
+          </div>
+
+          <!-- ABA: SIMPLES -->
+          <div id="novo-simples" class="tab-panel active">
+            <form th:action="@{/usuarios/salvar-simples}" method="post">
+              <span class="sec-label">Perfil de acesso</span>
+              <div class="role-picker">
+                <label class="role-option">
+                  <input type="radio" name="admin" value="false" checked />
+                  <div class="role-card">
+                    <div class="role-icon icon-client">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Cliente</strong
+                      ><span>Acessa o painel do cliente</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="role-option">
+                  <input type="radio" name="admin" value="true" />
+                  <div class="role-card">
+                    <div class="role-icon icon-admin">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Administrador</strong
+                      ><span>Acessa o painel admin</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Dados de acesso</span>
+              <div class="form-group">
+                <label>Login</label>
+                <input
+                  type="text"
+                  name="login"
+                  placeholder="Nome de usuário"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Senha</label>
+                  <input
+                    type="password"
+                    name="senha"
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Confirmar senha</label>
+                  <input
+                    type="password"
+                    name="confirmarSenha"
+                    placeholder="Repita a senha"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn-submit">
+                <svg
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Criar usuário
+              </button>
+            </form>
+          </div>
+
+          <!-- ABA: COMPLETO -->
+          <div id="novo-completo" class="tab-panel">
+            <form th:action="@{/usuarios/salvar-completo}" method="post">
+              <span class="sec-label">Perfil de acesso</span>
+              <div class="role-picker">
+                <label class="role-option">
+                  <input type="radio" name="admin" value="false" checked />
+                  <div class="role-card">
+                    <div class="role-icon icon-client">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Cliente</strong
+                      ><span>Acessa o painel do cliente</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="role-option">
+                  <input type="radio" name="admin" value="true" />
+                  <div class="role-card">
+                    <div class="role-icon icon-admin">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Administrador</strong
+                      ><span>Acessa o painel admin</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Dados de acesso</span>
+              <div class="form-group">
+                <label>Login</label>
+                <input
+                  type="text"
+                  name="login"
+                  placeholder="Nome de usuário"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Senha</label>
+                  <input
+                    type="password"
+                    name="senha"
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Confirmar senha</label>
+                  <input
+                    type="password"
+                    name="confirmarSenha"
+                    placeholder="Repita a senha"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Dados do cliente</span>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Tipo de cliente</label>
+                  <select name="tipoCliente">
+                    <option value="">Selecione…</option>
+                    <option value="Pessoa Física">Pessoa Física</option>
+                    <option value="Pessoa Jurídica">Pessoa Jurídica</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>CPF / CNPJ</label>
+                  <input
+                    type="text"
+                    name="cpfCnpj"
+                    placeholder="000.000.000-00"
+                  />
+                </div>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Endereço</span>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>CEP</label>
+                  <input
+                    type="text"
+                    name="cep"
+                    placeholder="00000-000"
+                    maxlength="9"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Estado (UF)</label>
+                  <input
+                    type="text"
+                    name="estado"
+                    placeholder="PR"
+                    maxlength="2"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cidade</label>
+                <input type="text" name="cidade" placeholder="Nome da cidade" />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Rua</label>
+                  <input type="text" name="rua" placeholder="Nome da rua" />
+                </div>
+                <div class="form-group">
+                  <label>Número</label>
+                  <input type="text" name="numero" placeholder="123" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Bairro</label>
+                <input type="text" name="bairro" placeholder="Nome do bairro" />
+              </div>
+              <button type="submit" class="btn-submit">
+                <svg
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Cadastrar usuário
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <table id="userTable">
-      <thead>
-        <tr>
-          <th>Usuário</th>
-          <th>Perfil</th>
-          <th>Cadastro</th>
-          <th style="text-align:right">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:if="${#lists.isEmpty(usuarios)}">
-          <td colspan="4">
-            <div class="empty-state">
-              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              <p>Nenhum usuário cadastrado ainda.</p>
-            </div>
-          </td>
-        </tr>
-        <tr th:each="u : ${usuarios}" th:with="login=${u.login != null ? u.login : ''},
-                                                hasCliente=${u.cliente != null}">
-          <td>
-            <div class="td-user">
-              <div class="u-avatar" th:classappend="${u.admin} ? 'avatar-admin' : 'avatar-client'"
-                   th:text="${#strings.toUpperCase(login.length() &lt; 2 ? login : login.substring(0,2))}">??</div>
-              <div>
-                <div class="u-name" th:text="${login}">login</div>
-                <div class="u-sub" th:text="'ID #' + ${u.id}">ID #0</div>
+    <!-- ── MODAL: EDITAR USUÁRIO ── -->
+    <div class="modal-overlay" id="modalEditar" aria-hidden="true">
+      <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalEditarTitle"
+      >
+        <div class="modal-header">
+          <h2 id="modalEditarTitle">Editar usuário</h2>
+          <button
+            type="button"
+            class="modal-close"
+            aria-label="Fechar"
+            onclick="fecharModal('modalEditar')"
+          >
+            <svg
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="tabs">
+            <button
+              class="tab-btn active"
+              type="button"
+              data-tab="edit-acesso"
+              onclick="trocarAba(this)"
+            >
+              Dados de acesso
+            </button>
+            <button
+              class="tab-btn"
+              type="button"
+              data-tab="edit-completo"
+              onclick="trocarAba(this)"
+            >
+              Dados do cliente
+            </button>
+          </div>
+
+          <!-- ABA: ACESSO -->
+          <div id="edit-acesso" class="tab-panel active">
+            <form id="formEditAcesso" method="post">
+              <span class="sec-label">Perfil de acesso</span>
+              <div class="role-picker">
+                <label class="role-option">
+                  <input type="radio" name="admin" value="false" />
+                  <div class="role-card">
+                    <div class="role-icon icon-client">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Cliente</strong
+                      ><span>Acessa o painel do cliente</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="role-option">
+                  <input type="radio" name="admin" value="true" />
+                  <div class="role-card">
+                    <div class="role-icon icon-admin">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Administrador</strong
+                      ><span>Acessa o painel admin</span>
+                    </div>
+                  </div>
+                </label>
               </div>
-            </div>
-          </td>
-          <td>
-            <span th:if="${u.admin}" class="role-badge role-admin">
-              <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              Administrador
-            </span>
-            <span th:if="${!u.admin and hasCliente}" class="role-badge role-client">
-              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Cliente
-            </span>
-            <span th:if="${!u.admin and !hasCliente}" class="role-badge role-simple">
-              Só acesso
-            </span>
-          </td>
-          <td>
-            <span th:if="${hasCliente}" style="font-size:12.5px;color:var(--text-muted);"
-                  th:text="${u.cliente.tipoCliente != null and !#strings.isEmpty(u.cliente.tipoCliente) ? u.cliente.tipoCliente : 'Cliente'}">—</span>
-            <span th:unless="${hasCliente}" style="font-size:12.5px;color:var(--text-faint);">—</span>
-          </td>
-          <td>
-            <div class="actions" style="justify-content:flex-end">
-              <a th:href="@{/usuarios/{id}/visualizar(id=${u.id})}" class="btn-act btn-view">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                Ver
-              </a>
-              <a th:href="@{/usuarios/{id}/editar(id=${u.id})}" class="btn-act btn-edit">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Editar
-              </a>
-              <form th:action="@{/usuarios/{id}/excluir(id=${u.id})}" method="post"
-                    onsubmit="return confirm('Excluir este usuário?')">
-                <button type="submit" class="btn-act btn-del">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                  Excluir
-                </button>
-              </form>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 
-</main>
+              <div class="field-sep"></div>
+              <span class="sec-label">Credenciais</span>
+              <div class="form-group">
+                <label>Login</label>
+                <input
+                  type="text"
+                  name="login"
+                  data-edit="login"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Nova senha</label>
+                  <input
+                    type="password"
+                    name="senha"
+                    placeholder="Em branco = mantém atual"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Confirmar nova senha</label>
+                  <input
+                    type="password"
+                    name="confirmarSenha"
+                    placeholder="Repita a senha"
+                  />
+                </div>
+              </div>
+              <p class="hint">Deixe a senha em branco para não alterá-la.</p>
+              <button type="submit" class="btn-submit">
+                <svg
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                </svg>
+                Salvar
+              </button>
+            </form>
+          </div>
 
-<div th:replace="~{fragments/toast :: root}"></div>
-<script th:src="@{/js/usuarios/lista.js}" defer></script>
-<script th:replace="~{fragments/toast :: script}"></script>
-</body>
+          <!-- ABA: COMPLETO -->
+          <div id="edit-completo" class="tab-panel">
+            <form id="formEditCompleto" method="post">
+              <span class="sec-label">Perfil de acesso</span>
+              <div class="role-picker">
+                <label class="role-option">
+                  <input type="radio" name="admin" value="false" />
+                  <div class="role-card">
+                    <div class="role-icon icon-client">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Cliente</strong
+                      ><span>Acessa o painel do cliente</span>
+                    </div>
+                  </div>
+                </label>
+                <label class="role-option">
+                  <input type="radio" name="admin" value="true" />
+                  <div class="role-card">
+                    <div class="role-icon icon-admin">
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="role-text">
+                      <strong>Administrador</strong
+                      ><span>Acessa o painel admin</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Credenciais</span>
+              <div class="form-group">
+                <label>Login</label>
+                <input
+                  type="text"
+                  name="login"
+                  data-edit="login"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Nova senha</label>
+                  <input
+                    type="password"
+                    name="senha"
+                    placeholder="Em branco = mantém atual"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Confirmar senha</label>
+                  <input
+                    type="password"
+                    name="confirmarSenha"
+                    placeholder="Repita a senha"
+                  />
+                </div>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Dados do cliente</span>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Tipo de cliente</label>
+                  <select name="tipoCliente" data-edit="tipocliente">
+                    <option value="">Selecione…</option>
+                    <option value="Pessoa Física">Pessoa Física</option>
+                    <option value="Pessoa Jurídica">Pessoa Jurídica</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>CPF / CNPJ</label>
+                  <input
+                    type="text"
+                    name="cpfCnpj"
+                    data-edit="cpfcnpj"
+                    placeholder="000.000.000-00"
+                  />
+                </div>
+              </div>
+
+              <div class="field-sep"></div>
+              <span class="sec-label">Endereço</span>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>CEP</label>
+                  <input
+                    type="text"
+                    name="cep"
+                    data-edit="cep"
+                    placeholder="00000-000"
+                    maxlength="9"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Estado (UF)</label>
+                  <input
+                    type="text"
+                    name="estado"
+                    data-edit="estado"
+                    placeholder="PR"
+                    maxlength="2"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Cidade</label>
+                <input
+                  type="text"
+                  name="cidade"
+                  data-edit="cidade"
+                  placeholder="Nome da cidade"
+                />
+              </div>
+              <div class="row-2">
+                <div class="form-group">
+                  <label>Rua</label>
+                  <input
+                    type="text"
+                    name="rua"
+                    data-edit="rua"
+                    placeholder="Nome da rua"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Número</label>
+                  <input
+                    type="text"
+                    name="numero"
+                    data-edit="numero"
+                    placeholder="123"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Bairro</label>
+                <input
+                  type="text"
+                  name="bairro"
+                  data-edit="bairro"
+                  placeholder="Nome do bairro"
+                />
+              </div>
+              <button type="submit" class="btn-submit">
+                <svg
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"
+                  />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                </svg>
+                Salvar cadastro completo
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/toast :: root}"></div>
+    <script th:src="@{/js/usuarios/lista.js}" defer></script>
+    <script th:replace="~{fragments/toast :: script}"></script>
+  </body>
 </html>

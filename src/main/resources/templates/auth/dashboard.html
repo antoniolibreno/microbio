@@ -26,8 +26,6 @@
       <h1>Olá, <span sec:authentication="name">admin</span></h1>
       <p>Visão geral e indicadores operacionais do laboratório</p>
     </div>
-    <span class="header-date"
-          th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd MMM yyyy', #locale)}">segunda-feira, 12 mai 2025</span>
   </header>
 
   <!-- ── BENTO GRID ── -->

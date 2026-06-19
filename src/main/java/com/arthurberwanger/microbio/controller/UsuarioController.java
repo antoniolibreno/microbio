@@ -22,9 +22,6 @@ public class UsuarioController {
         return "usuarios/lista";
     }
 
-    @GetMapping("/novo")
-    public String paginaCadastro() { return "usuarios/novo"; }
-
     @Operation(
             summary = "Cadastra um usuário (modo simples)",
             description = "Cria um novo usuário apenas com login, senha e flag de administrador. Valida confirmação de senha e tamanho mínimo de 6 caracteres."
@@ -35,16 +32,16 @@ public class UsuarioController {
                                 @RequestParam String confirmarSenha,
                                 @RequestParam(defaultValue = "false") boolean admin,
                                 RedirectAttributes ra) {
-        if (login.isBlank() || senha.isBlank()) { ra.addFlashAttribute("erro","Login e senha obrigatórios."); return "redirect:/usuarios/novo"; }
-        if (!senha.equals(confirmarSenha))       { ra.addFlashAttribute("erro","Senhas não coincidem.");       return "redirect:/usuarios/novo"; }
-        if (senha.length() < 6)                  { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios/novo"; }
+        if (login.isBlank() || senha.isBlank()) { ra.addFlashAttribute("erro","Login e senha obrigatórios."); return "redirect:/usuarios"; }
+        if (!senha.equals(confirmarSenha))       { ra.addFlashAttribute("erro","Senhas não coincidem.");       return "redirect:/usuarios"; }
+        if (senha.length() < 6)                  { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios"; }
         try {
             usuarioService.criarUsuarioSimples(login, senha, admin);
             ra.addFlashAttribute("sucesso", "Usuário criado com sucesso!");
             return "redirect:/usuarios";
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("erro", e.getMessage());
-            return "redirect:/usuarios/novo";
+            return "redirect:/usuarios";
         }
     }
 
@@ -66,29 +63,17 @@ public class UsuarioController {
                                  @RequestParam(required=false) String estado,
                                  @RequestParam(required=false) String cep,
                                  RedirectAttributes ra) {
-        if (login.isBlank() || senha.isBlank()) { ra.addFlashAttribute("erro","Login e senha obrigatórios."); return "redirect:/usuarios/novo"; }
-        if (!senha.equals(confirmarSenha))       { ra.addFlashAttribute("erro","Senhas não coincidem.");       return "redirect:/usuarios/novo"; }
-        if (senha.length() < 6)                  { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios/novo"; }
+        if (login.isBlank() || senha.isBlank()) { ra.addFlashAttribute("erro","Login e senha obrigatórios."); return "redirect:/usuarios"; }
+        if (!senha.equals(confirmarSenha))       { ra.addFlashAttribute("erro","Senhas não coincidem.");       return "redirect:/usuarios"; }
+        if (senha.length() < 6)                  { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios"; }
         try {
             usuarioService.criarUsuarioCompleto(login, senha, admin, tipoCliente, cpfCnpj, rua, numero, bairro, cidade, estado, cep);
             ra.addFlashAttribute("sucesso", "Usuário cadastrado com sucesso!");
             return "redirect:/usuarios";
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("erro", e.getMessage());
-            return "redirect:/usuarios/novo";
+            return "redirect:/usuarios";
         }
-    }
-
-    @GetMapping("/{id}/visualizar")
-    public String visualizar(@PathVariable Long id, Model model, RedirectAttributes ra) {
-        try { model.addAttribute("usuario", usuarioService.buscarPorId(id)); return "usuarios/visualizar"; }
-        catch (IllegalArgumentException e) { ra.addFlashAttribute("erro", e.getMessage()); return "redirect:/usuarios"; }
-    }
-
-    @GetMapping("/{id}/editar")
-    public String editar(@PathVariable Long id, Model model, RedirectAttributes ra) {
-        try { model.addAttribute("usuario", usuarioService.buscarPorId(id)); return "usuarios/editar"; }
-        catch (IllegalArgumentException e) { ra.addFlashAttribute("erro", e.getMessage()); return "redirect:/usuarios"; }
     }
 
     @PostMapping("/{id}/atualizar-acesso")
@@ -98,10 +83,10 @@ public class UsuarioController {
                                   @RequestParam(required=false) String confirmarSenha,
                                   @RequestParam(defaultValue = "false") boolean admin,
                                   RedirectAttributes ra) {
-        if (login.isBlank()) { ra.addFlashAttribute("erro","Login obrigatório."); return "redirect:/usuarios/"+id+"/editar"; }
+        if (login.isBlank()) { ra.addFlashAttribute("erro","Login obrigatório."); return "redirect:/usuarios"; }
         if (senha != null && !senha.isBlank()) {
-            if (!senha.equals(confirmarSenha)) { ra.addFlashAttribute("erro","Senhas não coincidem."); return "redirect:/usuarios/"+id+"/editar"; }
-            if (senha.length() < 6)            { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios/"+id+"/editar"; }
+            if (!senha.equals(confirmarSenha)) { ra.addFlashAttribute("erro","Senhas não coincidem."); return "redirect:/usuarios"; }
+            if (senha.length() < 6)            { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios"; }
         }
         try {
             usuarioService.atualizarAcesso(id, login, senha, admin);
@@ -109,7 +94,7 @@ public class UsuarioController {
             return "redirect:/usuarios";
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("erro", e.getMessage());
-            return "redirect:/usuarios/"+id+"/editar";
+            return "redirect:/usuarios";
         }
     }
 
@@ -128,10 +113,10 @@ public class UsuarioController {
                                     @RequestParam(required=false) String estado,
                                     @RequestParam(required=false) String cep,
                                     RedirectAttributes ra) {
-        if (login.isBlank()) { ra.addFlashAttribute("erro","Login obrigatório."); return "redirect:/usuarios/"+id+"/editar"; }
+        if (login.isBlank()) { ra.addFlashAttribute("erro","Login obrigatório."); return "redirect:/usuarios"; }
         if (senha != null && !senha.isBlank()) {
-            if (!senha.equals(confirmarSenha)) { ra.addFlashAttribute("erro","Senhas não coincidem."); return "redirect:/usuarios/"+id+"/editar"; }
-            if (senha.length() < 6)            { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios/"+id+"/editar"; }
+            if (!senha.equals(confirmarSenha)) { ra.addFlashAttribute("erro","Senhas não coincidem."); return "redirect:/usuarios"; }
+            if (senha.length() < 6)            { ra.addFlashAttribute("erro","Senha: mínimo 6 caracteres."); return "redirect:/usuarios"; }
         }
         try {
             usuarioService.atualizarCompleto(id, login, senha, admin, tipoCliente, cpfCnpj, rua, numero, bairro, cidade, estado, cep);
@@ -139,7 +124,7 @@ public class UsuarioController {
             return "redirect:/usuarios";
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("erro", e.getMessage());
-            return "redirect:/usuarios/"+id+"/editar";
+            return "redirect:/usuarios";
         }
     }
 

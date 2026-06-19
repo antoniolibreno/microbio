@@ -56,7 +56,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-dark);display
 .analise-check{display:flex;align-items:flex-start;gap:14px;padding:14px;border-radius:8px;cursor:pointer;transition:background .15s;border:1.5px solid transparent}
 .analise-check:hover{background:#f9fafb;border-color:var(--border)}
 .analise-check input[type=checkbox]{width:17px;height:17px;accent-color:var(--primary);flex-shrink:0;margin-top:2px;cursor:pointer}
-.analise-check:has(input:checked){background:var(--primary-light);border-color:#86efac}
+.analise-check:has(input:checked){background:var(--primary-light);border-color:#bbf7d0}
 .ac-info{display:flex;flex-direction:column;gap:3px;min-width:0}
 .ac-nome{font-size:14px;font-weight:600;color:var(--text-dark)}
 .ac-desc{font-size:13px;color:var(--text-muted);line-height:1.4}
