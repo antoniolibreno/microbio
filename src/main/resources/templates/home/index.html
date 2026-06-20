@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Microbio - Análises Clínicas</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='%231e873a'><rect x='48' y='8' width='10' height='6' rx='2'/><rect x='44' y='13' width='18' height='30' rx='3'/><rect x='46' y='40' width='14' height='8' rx='2'/><ellipse cx='53' cy='52' rx='10' ry='6'/><rect x='49' y='55' width='8' height='18' rx='2'/><rect x='25' y='73' width='55' height='9' rx='4'/><rect x='18' y='78' width='15' height='6' rx='3'/><rect x='40' y='44' width='22' height='5' rx='2' transform='rotate(-35,51,46)'/></g></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/site.css}">
@@ -106,13 +107,13 @@
 
     <div class="cards2-container">
         <div class="card2">
-            <img th:src="@{/img/microbiologia.jpg}" alt="Microorganismos em placa de Petri" class="card2-img">
+            <img th:src="@{/img/bioinsumo.jpg}" alt="Bioinsumos" class="card2-img">
             <div class="card2-body">
-                <h3>Microbiologia</h3>
-                <p class="card2-desc">Análise detalhada de microorganismos patogênicos.</p>
+                <h3>Controle de Qualidade em Bioinsumos</h3>
+                <p class="card2-desc">Contagem de microrganismos viáveis (UFC ou esporos)</p>
 
                 <div class="card2-expandable">
-                    <p>Exames de cultura, antibiograma e pesquisa de bactérias e fungos com alta precisão.</p>
+                    <p>Análise de pureza microbiológica</p>
                 </div>
 
                 <button class="btn-detalhes">DETALHES</button>
@@ -120,36 +121,67 @@
         </div>
 
         <div class="card2">
-            <img th:src="@{/img/bioquimica.jpg}" alt="Microorganismos em placa de Petri" class="card2-img">
+            <img th:src="@{/img/nematoides.jpg}" alt="Nematoides" class="card2-img">
             <div class="card2-body">
-                <h3>Bioquímica</h3>
-                <p class="card2-desc">Avaliação de processos químicos corporais e enzimas.</p>
+                <h3>Análise de Nematóides</h3>
+                <p class="card2-desc">Extração e quantificação de nematóides do solo</p>
                 <div class="card2-expandable">
-                    <p>Dosagens hormonais, glicemia, colesterol e perfis hepáticos e renais completos.</p>
+                    <p>Extração e quantificação de nematóides em raízes
+                        Identificação de gêneros de nematóides fitopatogênicos
+                        Estimativa de população e nível de infestação
+                    </p>
                 </div>
                 <button class="btn-detalhes">DETALHES</button>
             </div>
         </div>
 
         <div class="card2">
-            <img th:src="@{/img/hematologia.jpg}" alt="Microorganismos em placa de Petri" class="card2-img">
+            <img th:src="@{/img/metagenomicas.jpg}" alt="Metagenomica" class="card2-img">
             <div class="card2-body">
-                <h3>Hematologia</h3>
-                <p class="card2-desc">Estudo completo dos componentes e doenças do sangue.</p>
+                <h3>Metagenômica do Solo</h3>
+                <p class="card2-desc">Análise da diversidade microbiana do solo</p>
                 <div class="card2-expandable">
-                    <p>Hemograma completo, coagulograma e análise de distúrbios sanguíneos.</p>
+                    <p>Perfil da comunidade bacteriana e fúngica
+                        Identificação de microrganismos benéficos e potenciais patógenos</p>
                 </div>
                 <button class="btn-detalhes">DETALHES</button>
             </div>
         </div>
 
         <div class="card2">
-            <img th:src="@{/img/imunologia.jpg}" alt="Microorganismos em placa de Petri" class="card2-img">
+            <img th:src="@{/img/agua.jpg}" alt="Agua" class="card2-img">
             <div class="card2-body">
-                <h3>Imunologia</h3>
-                <p class="card2-desc">Diagnósticos complexos do sistema imunitário.</p>
+                <h3>Análise Microbiológica de Água</h3>
+                <p class="card2-desc">Contagem de bactérias heterotróficas</p>
                 <div class="card2-expandable">
-                    <p>Testes de alergia, doenças autoimunes e sorologia para diversas patologias.</p>
+                    <p>Pesquisa de coliformes totais e E. coli
+                        Avaliação microbiológica para uso agrícola
+                        Monitoramento da qualidade microbiológica de água para preparo de bioinsumos</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/agro.jpg}" alt="agro" class="card2-img">
+            <div class="card2-body">
+                <h3>Análises Microbiológicas Agronômicas</h3>
+                <p class="card2-desc">Contagem de bactérias totais do solo</p>
+                <div class="card2-expandable">
+                    <p>Contagem de fungos do solo
+                        Carbono da biomassa microbiana</p>
+                </div>
+                <button class="btn-detalhes">DETALHES</button>
+            </div>
+        </div>
+
+        <div class="card2">
+            <img th:src="@{/img/solo.jpg}" alt="Solo" class="card2-img">
+            <div class="card2-body">
+                <h3>BioAS – Bioanálise de Saúde do Solo</h3>
+                <p class="card2-desc">Quantificação da enzima arilsulfatas </p>
+                <div class="card2-expandable">
+                    <p>Quantificação da enzima beta-glicosidase.</p>
                 </div>
                 <button class="btn-detalhes">DETALHES</button>
             </div>
@@ -199,7 +231,7 @@
             <span>TOLEDO, PR</span>
         </div>
     </div>
-    </div>
+
     <div class="footer-bottom">
         <p>&copy; 2026 Microbio Análises Clínicas. </p>
     </div>
@@ -238,15 +270,20 @@
                 </div>
                 <div class="modal-field">
                     <label for="orcTelefone">Telefone / WhatsApp</label>
-                    <input type="tel" id="orcTelefone" placeholder="(45) 99999-0000" maxlength="16" inputmode="numeric">
-                    <span class="field-error" id="errTelefone"></span>
+                    <input type="tel" id="orcTelefone" placeholder="(45) 99999-0000" maxlength="20">
                 </div>
             </div>
 
             <div class="modal-field">
                 <label for="orcServico">Tipo de serviço <span class="req">*</span></label>
                 <select id="orcServico" required>
-                    <option value="" disabled selected>Carregando análises...</option>
+                    <option value="" disabled selected>Selecione uma especialidade...</option>
+                    <option value="Microbiologia">🔬 Microbiologia</option>
+                    <option value="Bioquimica">⚗️ Bioquímica</option>
+                    <option value="Hematologia">🩸 Hematologia</option>
+                    <option value="Imunologia">🧬 Imunologia</option>
+                    <option value="Controle de Qualidade em Bioinsumos">🧪 Controle de Qualidade em Bioinsumos</option>
+                    <option value="Outro">📋 Outro / Não sei ainda</option>
                 </select>
                 <span class="field-error" id="errServico"></span>
             </div>
@@ -270,6 +307,40 @@
     </div>
 </div>
 
-  <link rel="stylesheet" th:href="@{/css/home/index.css}">
+<style>
+    .modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+    .modal-overlay.ativo{opacity:1;visibility:visible}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;box-shadow:0 24px 64px rgba(0,0,0,.18);border-top:5px solid #177d33;transform:translateY(20px);transition:transform .25s;max-height:90vh;overflow-y:auto}
+    .modal-overlay.ativo .modal-box{transform:translateY(0)}
+    .modal-header{display:flex;align-items:center;gap:14px;padding:24px 28px 20px;border-bottom:1px solid #e5e7eb}
+    .modal-icon{width:44px;height:44px;flex-shrink:0;background:#e8f5e9;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#177d33;font-size:20px}
+    .modal-header h2{font-size:18px;font-weight:700;color:#1f2937;margin:0 0 2px}
+    .modal-header p{font-size:13px;color:#6b7280;margin:0}
+    .modal-close{margin-left:auto;background:none;border:none;font-size:24px;color:#9ca3af;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s,color .15s;line-height:1}
+    .modal-close:hover{background:#f3f4f6;color:#374151}
+    form#formOrcamento{padding:24px 28px}
+    .modal-field{display:flex;flex-direction:column;margin-bottom:18px}
+    .modal-field label{font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+    .req{color:#dc2626}
+    .modal-field input,.modal-field select{padding:11px 14px;border:1.5px solid #d1d5db;border-radius:8px;font-size:14px;color:#1f2937;transition:border-color .2s,box-shadow .2s;outline:none;background:#fff}
+    .modal-field input:focus,.modal-field select:focus{border-color:#177d33;box-shadow:0 0 0 3px rgba(23,125,51,.12)}
+    .modal-field input.erro,.modal-field select.erro{border-color:#dc2626}
+    .field-error{font-size:12px;color:#dc2626;margin-top:4px;min-height:16px}
+    .modal-row{display:flex;gap:14px}
+    .modal-row .modal-field{flex:1}
+    .modal-notice{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:13px;color:#15803d;margin-bottom:20px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+    .modal-notice i{margin-top:2px;flex-shrink:0}
+    .modal-feedback{padding:12px 14px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .modal-feedback.ok{background:#f0fdf4;border:1px solid #86efac;color:#15803d}
+    .modal-feedback.err{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+    .btn-cancelar{padding:11px 20px;border:1.5px solid #d1d5db;background:#fff;color:#374151;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+    .btn-cancelar:hover{background:#f9fafb}
+    .btn-enviar{padding:11px 24px;background:#9c5f32;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;min-width:160px}
+    .btn-enviar:hover{background:#824f29}
+    .btn-enviar:active{transform:scale(.98)}
+    .btn-enviar:disabled{opacity:.65;cursor:not-allowed}
+    @media(max-width:500px){.modal-row{flex-direction:column;gap:0}.modal-header,form#formOrcamento{padding-left:18px;padding-right:18px}.modal-actions{flex-direction:column-reverse}.btn-cancelar,.btn-enviar{width:100%;text-align:center}}
+</style>
 
 </html>

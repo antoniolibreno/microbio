@@ -415,10 +415,11 @@ p {
 
 /* Container Principal da Section */
 .especialidades-section {
-    padding: 40px 20px;
+    padding: 40px 60px;
     background-color: #f7f9f8;
     /* Cor de fundo clara inspirada na imagem */
     font-family: Arial, sans-serif;
+
 }
 
 /* Cabeçalho da Section */
@@ -456,9 +457,9 @@ p {
 /* Container dos Cards */
 .cards2-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
     gap: 20px;
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     align-items: start;
 }
@@ -473,6 +474,7 @@ p {
     flex-direction: column;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease;
+    min-height:380px
 }
 
 .card2:hover {
