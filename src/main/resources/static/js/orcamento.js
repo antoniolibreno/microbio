@@ -38,7 +38,7 @@ async function carregarAnalises() {
 
         analises.forEach(a => {
             const opt = document.createElement('option');
-            opt.value = a.nome;
+            opt.value = a.id;
             opt.textContent = a.nome;
             select.appendChild(opt);
         });
@@ -151,11 +151,13 @@ async function enviarSolicitacao() {
     loader.style.display = 'inline';
     document.getElementById('modalFeedback').style.display = 'none';
 
+    const servico = document.getElementById('orcServico');
     const payload = {
         nome:        document.getElementById('orcNome').value.trim(),
         email:       document.getElementById('orcEmail').value.trim() || null,
         telefone:    document.getElementById('orcTelefone').value.trim() || null,
-        tipoServico: document.getElementById('orcServico').value
+        analiseId:   parseInt(servico.value, 10),
+        tipoServico: servico.options[servico.selectedIndex].text
     };
 
     try {
