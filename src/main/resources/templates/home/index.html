@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/site.css}">
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <th:block th:replace="~{fragments/toast :: head}"></th:block>
 </head>
 
 <body>
@@ -238,6 +239,8 @@
     </div>
     </div>
 </footer>
+<div th:replace="~{fragments/toast :: root}"></div>
+<script th:replace="~{fragments/toast :: script}"></script>
 <script th:src="@{/js/script.js}"></script>
 <script th:src="@{/js/orcamento.js}"></script>
 </body>
@@ -277,13 +280,7 @@
             <div class="modal-field">
                 <label for="orcServico">Tipo de serviço <span class="req">*</span></label>
                 <select id="orcServico" required>
-                    <option value="" disabled selected>Selecione uma especialidade...</option>
-                    <option value="Microbiologia">🔬 Microbiologia</option>
-                    <option value="Bioquimica">⚗️ Bioquímica</option>
-                    <option value="Hematologia">🩸 Hematologia</option>
-                    <option value="Imunologia">🧬 Imunologia</option>
-                    <option value="Controle de Qualidade em Bioinsumos">🧪 Controle de Qualidade em Bioinsumos</option>
-                    <option value="Outro">📋 Outro / Não sei ainda</option>
+                    <option value="" disabled selected>Selecione uma análise...</option>
                 </select>
                 <span class="field-error" id="errServico"></span>
             </div>

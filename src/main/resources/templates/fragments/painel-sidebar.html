@@ -9,9 +9,10 @@
   Valores válidos para activePage: 'inicio', 'orcamentos', 'pedidos', 'meus-dados'
 -->
 <aside th:fragment="sidebar(activePage)" class="sidebar">
+  <link rel="stylesheet" th:href="@{/css/fragments/sidebar.css}">
   <div class="sidebar-brand">
-    <h1>🧫 Microbio</h1>
-    <p>Laboratório de microbiologia</p>
+    <img th:src="@{/logo.png}" alt="Microbio"
+         style="display:block;max-width:100%;height:auto;max-height:56px;object-fit:contain;"/>
   </div>
   <nav class="sidebar-nav">
     <span class="nav-section">Minha conta</span>

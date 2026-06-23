@@ -114,6 +114,34 @@
         </div>
     </div>
 
+    <!-- Análises solicitadas -->
+    <div class="card">
+        <div class="card-header"><h3 th:text="|Análises solicitadas (${#lists.size(analises)})|">Análises solicitadas</h3></div>
+        <div th:if="${#lists.isEmpty(analises)}" class="empty-small">
+            Nenhuma análise vinculada a este orçamento.
+        </div>
+        <table th:unless="${#lists.isEmpty(analises)}" style="width:100%;border-collapse:collapse">
+            <thead><tr class="t-head">
+                <th>Análise</th><th>Prazo</th><th style="text-align:right">Valor</th>
+            </tr></thead>
+            <tbody>
+            <tr th:each="oa : ${analises}" class="t-row">
+                <td style="font-weight:600;color:var(--text-dark)" th:text="${oa.analise?.nome ?: '—'}">—</td>
+                <td style="color:var(--text-muted)" th:text="${oa.analise?.tempoProducao ?: '—'}">—</td>
+                <td style="text-align:right;color:var(--text-dark)"
+                    th:text="${oa.valorUnitario != null} ? |R$ ${#numbers.formatDecimal(oa.valorUnitario,1,'POINT',2,'COMMA')}| : '—'">—</td>
+            </tr>
+            </tbody>
+            <tfoot th:if="${orcamento.valorTotal != null}">
+            <tr class="t-row">
+                <td colspan="2" style="font-weight:700;color:var(--text-dark)">Total</td>
+                <td style="text-align:right;font-weight:700;color:var(--primary)"
+                    th:text="|R$ ${#numbers.formatDecimal(orcamento.valorTotal,1,'POINT',2,'COMMA')}|">—</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
     <!-- Observações do laboratório -->
     <div class="card" th:if="${orcamento.observacoes != null and !#strings.isEmpty(orcamento.observacoes)}">
         <div class="card-header"><h3>Observações do laboratório</h3></div>

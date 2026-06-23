@@ -117,6 +117,7 @@ public class PainelClienteController {
         }
 
         model.addAttribute("orcamento", orc);
+        model.addAttribute("analises", orcamentoService.listarAnalises(orc.getId()));
         return "painel/orcamento-detalhe";
     }
 

@@ -21,6 +21,9 @@ public class OrcamentoDTO {
     @Size(max = 100)
     private String tipoServico;
 
+    /** Id da análise escolhida no site — usado para vincular a análise (com snapshot de preço) ao orçamento. */
+    private Long analiseId;
+
     // getters e setters
     public String getNome()                { return nome; }
     public void   setNome(String nome)     { this.nome = nome; }
@@ -33,4 +36,7 @@ public class OrcamentoDTO {
 
     public String getTipoServico()                  { return tipoServico; }
     public void   setTipoServico(String tipoServico){ this.tipoServico = tipoServico; }
+
+    public Long getAnaliseId()              { return analiseId; }
+    public void setAnaliseId(Long analiseId){ this.analiseId = analiseId; }
 }

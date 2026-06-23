@@ -58,7 +58,20 @@ public class OrcamentoService {
 
         Orcamento orc = new Orcamento();
         orc.setPessoa(pessoa);
-        return orcamentoRepository.save(orc);
+        orcamentoRepository.save(orc);
+
+        // Vincula a análise escolhida no site, congelando o preço do catálogo (mesmo padrão do painel).
+        if (dto.getAnaliseId() != null) {
+            Analise analise = analiseRepository.findById(dto.getAnaliseId())
+                    .orElseThrow(() -> new EntityNotFoundException("Análise #" + dto.getAnaliseId() + " não encontrada"));
+            OrcamentoAnalise oa = new OrcamentoAnalise();
+            oa.setOrcamento(orc);
+            oa.setAnalise(analise);
+            oa.setValorUnitario(analise.getValor());
+            orcamentoAnaliseRepository.save(oa);
+            recalcularValorTotal(orc.getId());
+        }
+        return orc;
     }
 
     /** Lista todas as solicitações de orçamento (tabela pessoa). */
